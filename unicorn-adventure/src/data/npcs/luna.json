@@ -1,0 +1,19 @@
+{
+  "id": "luna",
+  "name": "Luna",
+  "avatar": "unicorn",
+  "x": 832,
+  "y": 288,
+  "interactionRadius": 112,
+  "repeatDialogue": "Tak for hjælpen! Kig forbi igen, hvis du vil lære mere.",
+  "interactions": [
+    {
+      "type": "quest",
+      "questId": "rainbow-forest-rainbow"
+    },
+    {
+      "type": "challenge",
+      "challengeId": "regnbue"
+    }
+  ]
+}

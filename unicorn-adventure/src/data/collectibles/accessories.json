@@ -1,0 +1,26 @@
+{
+  "type": "accessory",
+  "items": [
+    {
+      "id": "accessory-crown",
+      "name": "Krone",
+      "texture": "accessory-crown",
+      "x": 384,
+      "y": 176
+    },
+    {
+      "id": "accessory-saddle",
+      "name": "Sadel",
+      "texture": "accessory-saddle",
+      "x": 832,
+      "y": 480
+    },
+    {
+      "id": "accessory-star-sticker",
+      "name": "Stjernemærke",
+      "texture": "accessory-star-sticker",
+      "x": 960,
+      "y": 736
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f8ff" />
+    <title>Enhjørningeeventyr</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="page-heading">
+        <p class="eyebrow">En lille verden af udfordringer</p>
+        <h1>Enhjørningeeventyr</h1>
+      </header>
+      <div id="game" aria-label="Læringsspillet Enhjørningeeventyr"></div>
+      <p class="page-hint">Gå med piletasterne eller WASD. Find enhjørninger og tilbehør!</p>
+    </main>
+
+    <!-- Phaser is the only runtime dependency; the game itself stays split into native ES modules. -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

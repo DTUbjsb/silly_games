@@ -1,0 +1,74 @@
+{
+  "challenges": [
+    {
+      "id": "math-addition",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "3 + 4 = ?",
+      "options": ["6", "7", "8"],
+      "correctAnswer": "7",
+      "story": {
+        "character": "Broens trold",
+        "introduction": "Jeg er sulten og har glemt, hvor mange æbler jeg skal bruge. Hjælper du mig?",
+        "success": "Syv æbler! Tak for hjælpen. Trolden åbner broen, så I kan gå videre.",
+        "hint": "Prøv at tælle tre æbler og lægge fire mere til."
+      }
+    },
+    {
+      "id": "math-subtraction",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "Du har 8 æbler og giver 3 væk. Hvor mange æbler har du tilbage?",
+      "options": ["4", "5", "6"],
+      "correctAnswer": "5",
+      "story": {
+        "character": "Egernet på stien",
+        "introduction": "Jeg havde otte nødder, men gav tre til mine venner. Hvor mange har jeg tilbage?",
+        "success": "Du har ret! Egernet deler sine nødder og viser jer den næste sti.",
+        "hint": "Start ved otte, og tæl tre nødder tilbage."
+      }
+    },
+    {
+      "id": "math-multiplication",
+      "category": "Math",
+      "difficulty": 3,
+      "question": "Et tog har 4 vogne med 5 passagerer i hver. Hvor mange passagerer er der i alt?",
+      "options": ["15", "20", "25"],
+      "correctAnswer": "20",
+      "story": {
+        "character": "Togføreren",
+        "introduction": "Mit lille skovtog har fire vogne med fem passagerer i hver. Hvor mange rejser med?",
+        "success": "Tyve passagerer! Togføreren fløjter, og toget kører jer gennem skoven.",
+        "hint": "Læg fem sammen fire gange."
+      }
+    },
+    {
+      "id": "math-division",
+      "category": "Math",
+      "difficulty": 4,
+      "question": "24 bær deles ligeligt mellem 6 venner. Hvor mange bær får hver ven?",
+      "options": ["3", "4", "6"],
+      "correctAnswer": "4",
+      "story": {
+        "character": "Bageren",
+        "introduction": "Jeg har 24 bær til seks venner. Hvor mange bær skal hver ven få, så det bliver lige?",
+        "success": "Lige mange til alle! Bageren giver jer en kurv til rejsen.",
+        "hint": "Del 24 i seks lige store grupper."
+      }
+    },
+    {
+      "id": "math-discount",
+      "category": "Math",
+      "difficulty": 5,
+      "question": "En bog koster 80 kr. Den sættes ned med 25 %. Hvad koster den nu?",
+      "options": ["60 kr.", "65 kr.", "75 kr."],
+      "correctAnswer": "60 kr.",
+      "story": {
+        "character": "Købmanden på markedet",
+        "introduction": "En eventyrbog koster 80 kr. I dag får du 25 % rabat. Hvad bliver prisen?",
+        "success": "Godt regnet! Købmanden sælger jer bogen til den rigtige pris.",
+        "hint": "Find først 25 % af 80 kr., og træk det fra prisen."
+      }
+    }
+  ]
+}

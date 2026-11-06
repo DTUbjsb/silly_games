@@ -1,0 +1,74 @@
+{
+  "challenges": [
+    {
+      "id": "reading-sentence",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "Læs sætningen: “Maja har en rød bold.” Hvad har Maja?",
+      "options": ["En bold", "En kat", "En cykel"],
+      "correctAnswer": "En bold",
+      "story": {
+        "character": "Maja i blomsterengen",
+        "introduction": "Maja leder efter sin røde bold, så hun kan lege med jer.",
+        "success": "Du fandt bolden! Maja inviterer jer med i legen.",
+        "hint": "Læs sætningen igen, og læg mærke til, hvad Maja har."
+      }
+    },
+    {
+      "id": "reading-nest",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "Læs sætningen: “Fuglen byggede en rede i træet.” Hvor byggede fuglen sin rede?",
+      "options": ["I et træ", "I en sø", "I et hus"],
+      "correctAnswer": "I et træ",
+      "story": {
+        "character": "Fuglen ved den gamle eg",
+        "introduction": "En fugl leder efter sit hjem. Hun byggede en rede i træet.",
+        "success": "Du fandt reden! Fuglen viser jer vej gennem skoven.",
+        "hint": "Se efter stedet, hvor fuglen byggede sin rede."
+      }
+    },
+    {
+      "id": "reading-rain",
+      "category": "Reading",
+      "difficulty": 3,
+      "question": "“Ali tog paraplyen med, fordi skyerne var mørke.” Hvorfor tog Ali paraplyen?",
+      "options": ["Fordi det måske ville regne", "Fordi han skulle sove", "Fordi solen skinnede"],
+      "correctAnswer": "Fordi det måske ville regne",
+      "story": {
+        "character": "Ali på skovstien",
+        "introduction": "Ali tog sin paraply med, fordi skyerne var mørke. Hvorfor mon?",
+        "success": "Godt læst! Ali deler sin paraply med jer på stien.",
+        "hint": "Mørke skyer kan fortælle os noget om vejret."
+      }
+    },
+    {
+      "id": "reading-seed",
+      "category": "Reading",
+      "difficulty": 4,
+      "question": "“Frøet fik vand og sol hver dag. Efter nogle uger voksede der en grøn plante.” Hvad hjalp frøet med at vokse?",
+      "options": ["Vand og sol", "Sne og vind", "Mørke og sten"],
+      "correctAnswer": "Vand og sol",
+      "story": {
+        "character": "Gartneren",
+        "introduction": "En lille plante er ved at vokse. Gartneren fortæller, at frøet fik vand og sol hver dag.",
+        "success": "Du fandt plantens hemmelighed! Gartneren giver jer et blomsterfrø.",
+        "hint": "Husk, hvad frøet fik hver dag."
+      }
+    },
+    {
+      "id": "reading-library",
+      "category": "Reading",
+      "difficulty": 5,
+      "question": "“Sofie lånte en bog på biblioteket. Hun læste den færdig, før afleveringsdagen kom.” Hvad gjorde Sofie, før hun afleverede bogen?",
+      "options": ["Hun læste den færdig", "Hun købte bogen", "Hun gav den til en ven"],
+      "correctAnswer": "Hun læste den færdig",
+      "story": {
+        "character": "Bibliotekaren",
+        "introduction": "Sofie lånte en bog og læste den færdig, før afleveringsdagen kom.",
+        "success": "Du huskede historien! Bibliotekaren låner jer et kort over eventyrbogen.",
+        "hint": "Find det, Sofie gjorde, før hun afleverede bogen."
+      }
+    }
+  ]
+}

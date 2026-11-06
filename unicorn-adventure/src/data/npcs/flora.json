@@ -1,0 +1,22 @@
+{
+  "id": "flora",
+  "name": "Flora",
+  "avatar": "unicorn-blue",
+  "x": 640,
+  "y": 320,
+  "interactionRadius": 112,
+  "repeatDialogue": "Hav en magisk dag i skoven!",
+  "interactions": [
+    {
+      "type": "dialogue",
+      "lines": [
+        "Velkommen til blomsterengen!",
+        "Jeg elsker at lære nye ord."
+      ]
+    },
+    {
+      "type": "challenge",
+      "challengeId": "stjerne"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "challenges": [
+    {
+      "id": "stjerne",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder det engelske ord “star” på dansk?",
+      "options": ["stjerne", "sky", "måne"],
+      "correctAnswer": "stjerne",
+      "story": {
+        "character": "Ugleungen",
+        "introduction": "En lille ugle prøver at læse et engelsk ord på et stjernekort.",
+        "success": "Det var rigtigt! Ugleungen finder stjernekortets vej gennem natten.",
+        "hint": "Tænk på det lysende punkt på himlen, som uglen ser om natten."
+      }
+    },
+    {
+      "id": "hjerte",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder det engelske ord “heart” på dansk?",
+      "options": ["hjerte", "hest", "hus"],
+      "correctAnswer": "hjerte",
+      "story": {
+        "character": "Skovens lille ånd",
+        "introduction": "Skovens ånd har fundet et engelsk ord på en magisk sten.",
+        "success": "Du oversatte ordet! Stenen lyser, og skovens ånd smiler.",
+        "hint": "Ordet betyder den kropsdel, der slår inde i brystet."
+      }
+    },
+    {
+      "id": "regnbue",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder det engelske ord “rainbow” på dansk?",
+      "options": ["blomst", "regnbue", "sommerfugl"],
+      "correctAnswer": "regnbue",
+      "story": {
+        "character": "Luna og regnbuestien",
+        "introduction": "Luna viser jer et engelsk ord, der gemmer på regnbuens farver.",
+        "success": "Du fandt den rigtige oversættelse! Regnbuestien åbner sig.",
+        "hint": "Tænk på buen med mange farver, som kan ses efter regn."
+      }
+    },
+    {
+      "id": "english-carefully",
+      "category": "English",
+      "difficulty": 4,
+      "question": "Hvad betyder det engelske ord “carefully” på dansk?",
+      "options": ["forsigtigt", "hurtigt", "højt"],
+      "correctAnswer": "forsigtigt",
+      "story": {
+        "character": "Den forsigtige fe",
+        "introduction": "En fe skal bære en glaskugle over en smal bro uden at tabe den.",
+        "success": "Du hjalp feen med at forstå ordet. Hun bærer kuglen sikkert over.",
+        "hint": "Ordet beskriver, hvordan man gør noget omhyggeligt uden at skynde sig."
+      }
+    },
+    {
+      "id": "english-past-go",
+      "category": "English",
+      "difficulty": 5,
+      "question": "Hvad er datidsformen af det engelske udsagnsord “go”?",
+      "options": ["went", "goed", "goes"],
+      "correctAnswer": "went",
+      "story": {
+        "character": "Den tidsrejsende",
+        "introduction": "En tidsrejsende skal fortælle, hvor han gik hen i går.",
+        "success": "Rigtigt! Den tidsrejsende finder vejen tilbage til nutiden.",
+        "hint": "Dette engelske udsagnsord ændrer stavemåde i datid."
+      }
+    }
+  ]
+}

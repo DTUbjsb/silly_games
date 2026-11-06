@@ -1,0 +1,16 @@
+{
+  "id": "bridge-troll",
+  "name": "Broens trold",
+  "avatar": "bridge-troll",
+  "x": 640,
+  "y": 656,
+  "interactionRadius": 112,
+  "repeatDialogue": "Broen er åben! I kan gå over nu.",
+  "interactions": [
+    {
+      "type": "challenge",
+      "challengeId": "math-addition",
+      "opensBridge": true
+    }
+  ]
+}

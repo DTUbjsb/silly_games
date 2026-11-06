@@ -1,0 +1,26 @@
+{
+  "type": "unicorn",
+  "items": [
+    {
+      "id": "unicorn-solstraale",
+      "name": "Solstråle",
+      "texture": "unicorn",
+      "x": 256,
+      "y": 192
+    },
+    {
+      "id": "unicorn-himmel",
+      "name": "Himmel",
+      "texture": "unicorn-blue",
+      "x": 704,
+      "y": 432
+    },
+    {
+      "id": "unicorn-regnbue",
+      "name": "Regnbue",
+      "texture": "unicorn-pink",
+      "x": 1088,
+      "y": 784
+    }
+  ]
+}

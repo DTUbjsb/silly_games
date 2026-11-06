@@ -1,0 +1,74 @@
+{
+  "challenges": [
+    {
+      "id": "logic-count",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilket tal kommer efter 2, 4 og 6?",
+      "options": ["7", "8", "9"],
+      "correctAnswer": "8",
+      "story": {
+        "character": "Portvogteren",
+        "introduction": "Portvogteren tæller stenene i en sti: 2, 4 og 6. Hvilket tal kommer nu?",
+        "success": "Rigtigt! Portvogteren åbner porten til haven.",
+        "hint": "Tallene vokser med det samme antal hver gang."
+      }
+    },
+    {
+      "id": "logic-sequence",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Mønstret gentager sig: rød, blå, rød, blå. Hvilken farve kommer nu?",
+      "options": ["Rød", "Grøn", "Gul"],
+      "correctAnswer": "Rød",
+      "story": {
+        "character": "Farvevæveren",
+        "introduction": "Farvevæveren har vævet et mønster: rød, blå, rød, blå.",
+        "success": "Du fandt mønstret! Farvevæveren væver jer et farverigt flag.",
+        "hint": "Se på de to farver, der skiftes til at komme."
+      }
+    },
+    {
+      "id": "logic-pattern",
+      "category": "Logic",
+      "difficulty": 3,
+      "question": "Hvilket tal mangler i rækken 3, 6, 9, __, 15?",
+      "options": ["10", "12", "13"],
+      "correctAnswer": "12",
+      "story": {
+        "character": "Stenstatuen",
+        "introduction": "En statue viser en talrække på sin sokkel: 3, 6, 9, __, 15.",
+        "success": "Du løste rækken! Statuen flytter sig og viser en skjult dør.",
+        "hint": "Prøv at finde forskellen mellem hvert tal."
+      }
+    },
+    {
+      "id": "logic-doubling",
+      "category": "Logic",
+      "difficulty": 4,
+      "question": "Hvert tal bliver dobbelt så stort som det forrige. Hvilket tal kommer efter 3, 6, 12 og 24?",
+      "options": ["36", "48", "52"],
+      "correctAnswer": "48",
+      "story": {
+        "character": "Krystalvogteren",
+        "introduction": "Krystalvogteren følger en række, hvor hvert tal bliver dobbelt så stort.",
+        "success": "Du fandt det næste tal! Krystallen lyser og viser jer vej.",
+        "hint": "Gang det sidste tal med to."
+      }
+    },
+    {
+      "id": "logic-order",
+      "category": "Logic",
+      "difficulty": 5,
+      "question": "Mila er højere end Noah. Noah er højere end Liv. Hvem er lavest?",
+      "options": ["Mila", "Noah", "Liv"],
+      "correctAnswer": "Liv",
+      "story": {
+        "character": "De tre venner",
+        "introduction": "Mila er højere end Noah, og Noah er højere end Liv. De skal stille sig i rækkefølge.",
+        "success": "Du fandt den laveste! Vennerne stiller sig rigtigt og åbner lågen.",
+        "hint": "Sammenlign Liv med Noah og Noah med Mila."
+      }
+    }
+  ]
+}
