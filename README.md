@@ -18,3 +18,14 @@ Small silly js/html games for kids. Mainly in Danish or teaching Danish->English
 - This is a small prototype with a test map and sample characters, NPCs, quests, collectibles, and challenges.
 - Collected items, quest progress, and challenge progress are held in memory and reset when the page is reloaded.
 - Accessories can be collected but cannot yet be equipped on a unicorn.
+
+### To-do:
+
+- Implement a stable where the collected unicorns can be outfitted with the accessories.
+- Improve unicorn looks for the fitting of accessories. Possibly a detailed close-up for the customization?
+- Add wing option for unicorns
+- Accessory manager for each player. Accessories are not shared, so the player picking up an accessory can decide whether to use it on a unicorn
+- Accesories to decorate Stable?
+- Region unlocks behind e.g. bridge trolls should include a separate mini-game. Sort of like flappy bird/jet pack or a shooter type game. These should be more fast paced and up for several attempts. Possibly with an option to re-try even if the barrier they unlock is open.
+- World randomization?
+- Question type randomization?
