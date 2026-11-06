@@ -1,0 +1,3 @@
+Click the start-game.bat
+
+Open a browser and write http://127.0.0.1:8781/
