@@ -1,6 +1,37 @@
 {
   "challenges": [
     {
+      "id": "logic-one-shapes", "category": "Logic", "difficulty": 1,
+      "question": "Cirkel, firkant, cirkel, firkant. Hvad kommer nu?", "options": ["Cirkel", "Firkant", "Trekant"], "correctAnswer": "Cirkel",
+      "story": { "character": "Formfeen", "introduction": "Feen lægger cirkler og firkanter på skift.", "success": "En cirkel kommer nu!", "hint": "Se, hvad der kommer efter en firkant." }
+    },
+    {
+      "id": "logic-one-smallest", "category": "Logic", "difficulty": 1,
+      "question": "Hvilket tal er mindst: 4, 1 eller 3?", "options": ["4", "1", "3"], "correctAnswer": "1",
+      "story": { "character": "Talvennen", "introduction": "Talvennen sammenligner tre tal.", "success": "Ét er det mindste tal!", "hint": "Hvilket tal kommer først, når du tæller?" }
+    },
+    {
+      "id": "logic-one-backwards", "category": "Logic", "difficulty": 1,
+      "question": "5, 4, 3, ... Hvilket tal kommer nu?", "options": ["2", "4", "6"], "correctAnswer": "2",
+      "story": { "character": "Raketten", "introduction": "Raketten tæller baglæns: fem, fire, tre.", "success": "To kommer efter tre!", "hint": "Tæl én tilbage fra tre." }
+    },
+    {
+      "id": "logic-two-pattern", "category": "Logic", "difficulty": 2,
+      "question": "3, 6, 9, ... Hvilket tal kommer nu?", "options": ["10", "12", "13"], "correctAnswer": "12",
+      "story": { "character": "Taltrolden", "introduction": "Trolden tæller tre videre hver gang.", "success": "Tolv kommer efter ni!", "hint": "Læg tre til ni." }
+    },
+    {
+      "id": "logic-two-order", "category": "Logic", "difficulty": 2,
+      "question": "En snegl er langsommere end en kanin. En kanin er langsommere end en hest. Hvem er hurtigst?",
+      "options": ["Sneglen", "Kaninen", "Hesten"], "correctAnswer": "Hesten",
+      "story": { "character": "De tre venner", "introduction": "Sneglen, kaninen og hesten løber om kap.", "success": "Hesten er hurtigst!", "hint": "Hvem er hurtigere end kaninen?" }
+    },
+    {
+      "id": "logic-two-alternating", "category": "Logic", "difficulty": 2,
+      "question": "2, 4, 2, 4, 2, ... Hvilket tal kommer nu?", "options": ["2", "3", "4"], "correctAnswer": "4",
+      "story": { "character": "Mønstermusen", "introduction": "Musen skifter mellem to og fire.", "success": "Fire kommer efter to!", "hint": "Tallene skifter mellem to og fire." }
+    },
+    {
       "id": "logic-one-colors",
       "category": "Logic",
       "difficulty": 1,

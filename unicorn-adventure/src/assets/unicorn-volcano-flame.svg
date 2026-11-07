@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="110" viewBox="0 0 160 110">
+  <title>Rødorange enhjørning med gylden manke</title>
+  <defs><linearGradient id="fur" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#dd542c"/><stop offset=".25" stop-color="#ed7836"/><stop offset=".5" stop-color="#be3926"/><stop offset=".75" stop-color="#ff8a42"/><stop offset="1" stop-color="#cc4a27"/></linearGradient></defs>
+  <path d="M37 50Q17 35 15 53Q10 67 5 71Q18 71 25 62Q20 78 10 84Q32 82 38 62" fill="#f9af35" stroke="#5a2028" stroke-width="2"/>
+  <path d="M43 69L38 94Q38 99 44 99H51L54 72M91 70L95 95Q96 100 103 100H110L105 68" fill="url(#fur)" stroke="#2c1b19" stroke-width="2"/>
+  <path d="M34 47Q35 33 55 31L93 32Q112 32 114 47L111 64Q106 76 90 76H54Q37 74 34 61Z" fill="url(#fur)" stroke="#2c1b19" stroke-width="2"/>
+  <path d="M43 68L45 95Q45 101 51 101H57L59 72M91 72L89 95Q89 101 95 101H102L104 65" fill="url(#fur)" stroke="#2c1b19" stroke-width="2"/>
+  <path d="M44 94h14v7H46q-2 0-2-3zM89 94h14v7H91q-2 0-2-3z" fill="#5a2028"/>
+  <path d="M99 62Q104 50 106 29L120 24Q124 39 119 58L112 70Z" fill="url(#fur)" stroke="#2c1b19" stroke-width="2"/>
+  <path d="M106 36Q96 35 98 18Q104 23 105 27Q105 16 111 14Q110 23 114 27Q111 42 108 49Z" fill="#f9af35"/>
+  <path d="M116 25L115 8Q121 11 124 22" fill="#a97e68" stroke="#2c1b19" stroke-width="2"/>
+  <path d="M120 23Q129 20 134 27L139 37L151 42Q155 44 153 50Q151 56 143 56L132 54Q125 53 121 47L114 42Z" fill="url(#fur)" stroke="#2c1b19" stroke-width="2"/>
+  <path d="M124 23L130 0L134 28Z" fill="#cab8a1" stroke="#6d5952" stroke-width="2"/>
+  <path d="M110 27Q116 18 124 20Q120 28 116 34Z" fill="#e28780"/>
+  <circle cx="132" cy="36" r="2.5" fill="#35445a"/><path d="M144 50q4 2 7-1" fill="none" stroke="#b65c88" stroke-width="2"/>
+</svg>

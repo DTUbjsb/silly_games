@@ -1,6 +1,10 @@
 {
   "files": [
     "unicorns.json",
-    "accessories.json"
+    "accessories.json",
+    "north-unicorns.json",
+    "north-accessories.json",
+    "volcano-unicorns.json",
+    "volcano-accessories.json"
   ]
 }

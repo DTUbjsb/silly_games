@@ -1,4 +1,19 @@
 const EFFECTS = {
+  catMeow: [{ type: 'triangle', from: 580, to: 420, duration: 0.24, volume: 0.075 },
+    { type: 'sine', from: 850, to: 620, duration: 0.2, volume: 0.035 }],
+  worldVolcanoLow: [{ type: 'triangle', from: 147, to: 140, duration: 0.4, volume: 0.04 }],
+  worldVolcanoHigh: [{ type: 'triangle', from: 220, to: 208, duration: 0.4, volume: 0.04 }],
+  worldHappyC: [{ type: 'sine', from: 523, to: 523, duration: 0.3, volume: 0.035 }],
+  worldHappyE: [{ type: 'sine', from: 659, to: 659, duration: 0.3, volume: 0.035 }],
+  worldHappyF: [{ type: 'sine', from: 698, to: 698, duration: 0.3, volume: 0.035 }],
+  worldHappyG: [{ type: 'sine', from: 784, to: 784, duration: 0.3, volume: 0.035 }],
+  worldHappyA: [{ type: 'sine', from: 880, to: 880, duration: 0.3, volume: 0.035 }],
+  worldDarkLow: [
+    { type: 'triangle', from: 110, to: 105, duration: 0.55, volume: 0.035 },
+    { type: 'sine', from: 165, to: 160, duration: 0.55, volume: 0.02 },
+  ],
+  worldDarkMid: [{ type: 'triangle', from: 131, to: 123, duration: 0.55, volume: 0.04 }],
+  worldDarkHigh: [{ type: 'sine', from: 156, to: 148, duration: 0.55, volume: 0.045 }],
   troll: [
     { type: 'sawtooth', from: 125, to: 58, duration: 0.48, volume: 0.055 },
     { type: 'noise', from: 600, to: 180, duration: 0.42, volume: 0.045 },
@@ -18,6 +33,14 @@ const EFFECTS = {
   crown: [
     { type: 'sine', from: 1760, to: 1760, duration: 0.38, volume: 0.1 },
     { type: 'sine', from: 2640, to: 2640, duration: 0.23, volume: 0.04 },
+  ],
+  saddlePickup: [
+    { type: 'triangle', from: 300, to: 210, duration: 0.1, volume: 0.07 },
+    { type: 'sine', from: 740, to: 980, duration: 0.18, volume: 0.065, delay: 0.08 },
+  ],
+  stickerPickup: [
+    { type: 'sine', from: 850, to: 1250, duration: 0.12, volume: 0.07 },
+    { type: 'triangle', from: 1500, to: 1750, duration: 0.16, volume: 0.045, delay: 0.09 },
   ],
   questionCorrect: [
     { type: 'sine', from: 523, to: 523, duration: 0.16, volume: 0.075 },

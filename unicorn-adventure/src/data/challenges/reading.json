@@ -1,6 +1,48 @@
 {
   "challenges": [
     {
+      "id": "volcano-cat-reading", "category": "Reading", "difficulty": 1,
+      "question": "En kat er rød. En ... er rød?",
+      "options": ["kat", "mus", "ko"], "correctAnswer": "kat",
+      "story": { "character": "En kat", "introduction": "Se en kat.", "success": "Ja! En kat.", "hint": "Se: En kat er rød." }
+    },
+    {
+      "id": "reading-short-lamb", "category": "Reading", "difficulty": 1,
+      "question": "Et får har et lam. Et får har et ...?",
+      "options": ["lam", "mus", "kat"], "correctAnswer": "lam",
+      "story": { "character": "Et får", "introduction": "Se på et lam.", "success": "Ja! Et lam.", "hint": "Se på: et lam." }
+    },
+    {
+      "id": "reading-short-ice", "category": "Reading", "difficulty": 1,
+      "question": "Ib får en is. Ib får en ...?",
+      "options": ["is", "hat", "bil"], "correctAnswer": "is",
+      "story": { "character": "Ib", "introduction": "Se på Ib.", "success": "Ja! En is.", "hint": "Se på: en is." }
+    },
+    {
+      "id": "reading-short-car", "category": "Reading", "difficulty": 1,
+      "question": "Bo har en bil. Bo har en ...?",
+      "options": ["bil", "bus", "ko"], "correctAnswer": "bil",
+      "story": { "character": "En bil", "introduction": "Se på en bil.", "success": "Ja! En bil.", "hint": "Se på: en bil." }
+    },
+    {
+      "id": "reading-two-kitten", "category": "Reading", "difficulty": 2,
+      "question": "“Katten sover under bordet.” Hvor sover katten?",
+      "options": ["Under bordet", "På taget", "I haven"], "correctAnswer": "Under bordet",
+      "story": { "character": "Katten", "introduction": "En kat har fundet et roligt sted at sove.", "success": "Ja, katten sover under bordet!", "hint": "Læs, hvad der står efter ordet sover." }
+    },
+    {
+      "id": "reading-two-picnic", "category": "Reading", "difficulty": 2,
+      "question": "“Freja tog æbler og brød med på tur.” Hvad tog Freja med?",
+      "options": ["Æbler og brød", "Pærer og ost", "En bog og en hat"], "correctAnswer": "Æbler og brød",
+      "story": { "character": "Freja", "introduction": "Freja pakker mad til en tur i det grønne.", "success": "Ja, hun tog æbler og brød med!", "hint": "Find de to ting i sætningen." }
+    },
+    {
+      "id": "reading-two-snow", "category": "Reading", "difficulty": 2,
+      "question": "“Da sneen faldt, tog Amir sine vanter på.” Hvornår tog Amir vanter på?",
+      "options": ["Da sneen faldt", "Da solen stod op", "Da han gik i seng"], "correctAnswer": "Da sneen faldt",
+      "story": { "character": "Amir", "introduction": "Amir gør sig klar til at lege udenfor.", "success": "Ja, han tog vanter på, da sneen faldt!", "hint": "Se på begyndelsen af sætningen." }
+    },
+    {
       "id": "reading-short-cat",
       "category": "Reading",
       "difficulty": 1,

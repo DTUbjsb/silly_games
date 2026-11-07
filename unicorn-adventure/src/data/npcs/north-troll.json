@@ -1,0 +1,12 @@
+{
+  "id": "north-troll",
+  "name": "Mørkeskovens trold",
+  "avatar": "bridge-troll",
+  "x": 1776,
+  "y": -912,
+  "interactionRadius": 112,
+  "repeatDialogue": "Stien til mørkeskoven er åben.",
+  "interactions": [
+    { "type": "challenge", "challengeId": "north-troll-stones", "miniGame": "troll", "opensGate": "northForest" }
+  ]
+}

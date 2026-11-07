@@ -178,6 +178,14 @@ export class EducationalChallengeManager {
       === String(right).trim().toLocaleLowerCase();
   }
 
+  rotateOptions(challenge) {
+    const offset = Math.floor(Math.random() * challenge.options.length);
+    return {
+      ...challenge,
+      options: [...challenge.options.slice(offset), ...challenge.options.slice(0, offset)],
+    };
+  }
+
   getAllChallenges() {
     return Array.from(this.challenges.values(), (challenge) => (
       { ...challenge, options: [...challenge.options] }

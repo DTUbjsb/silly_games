@@ -1,6 +1,56 @@
 {
   "challenges": [
     {
+      "id": "volcano-crystal-question", "category": "Math", "difficulty": 1,
+      "question": "2 + 4 = ?", "options": ["5", "6", "7"], "correctAnswer": "6",
+      "story": { "character": "Krystalvogteren", "introduction": "Der ligger to krystaller og fire mere. Hvor mange er der?", "success": "Seks krystaller!", "hint": "Tæl fire videre fra to." }
+    },
+    {
+      "id": "volcano-rune-question", "category": "Math", "difficulty": 1,
+      "question": "8 - 3 = ?", "options": ["4", "5", "6"], "correctAnswer": "5",
+      "story": { "character": "Runevogteren", "introduction": "Der er otte sten, og tre fjernes. Hvor mange er tilbage?", "success": "Fem sten!", "hint": "Tæl tre tilbage fra otte." }
+    },
+    {
+      "id": "north-troll-stones", "category": "Math", "difficulty": 1,
+      "question": "4 + 2 = ?", "options": ["5", "6", "7"], "correctAnswer": "6",
+      "story": {
+        "character": "Mørkeskovens trold",
+        "introduction": "Trolden har fire sten og finder to mere. Hvor mange sten har han?",
+        "success": "Seks sten! Nu skal I samle æbler og undgå stenene.",
+        "hint": "Tæl to videre fra fire."
+      }
+    },
+    {
+      "id": "math-one-add-birds", "category": "Math", "difficulty": 1,
+      "question": "1 + 4 = ?", "options": ["3", "5", "6"], "correctAnswer": "5",
+      "story": { "character": "Fuglevennen", "introduction": "En fugl får besøg af fire fugle mere. Hvor mange er der nu?", "success": "Der er fem fugle!", "hint": "Tæl fire videre fra én." }
+    },
+    {
+      "id": "math-one-subtract-cakes", "category": "Math", "difficulty": 1,
+      "question": "7 - 3 = ?", "options": ["3", "4", "5"], "correctAnswer": "4",
+      "story": { "character": "Kagefeen", "introduction": "Feen har syv kager og giver tre væk. Hvor mange er tilbage?", "success": "Der er fire kager tilbage!", "hint": "Tæl tre tilbage fra syv." }
+    },
+    {
+      "id": "math-one-add-leaves", "category": "Math", "difficulty": 1,
+      "question": "3 + 3 = ?", "options": ["5", "6", "7"], "correctAnswer": "6",
+      "story": { "character": "Bladmusen", "introduction": "Musen finder tre blade og så tre til. Hvor mange har den?", "success": "Musen har seks blade!", "hint": "Tæl tre videre fra tre." }
+    },
+    {
+      "id": "math-two-add-twenties", "category": "Math", "difficulty": 2,
+      "question": "24 + 9 = ?", "options": ["32", "33", "34"], "correctAnswer": "33",
+      "story": { "character": "Stensamleren", "introduction": "Der er 24 sten i kurven, og ni kommer til. Hvor mange er der?", "success": "Der er 33 sten!", "hint": "Læg først seks til 24 og derefter tre mere." }
+    },
+    {
+      "id": "math-two-subtract-thirty", "category": "Math", "difficulty": 2,
+      "question": "31 - 7 = ?", "options": ["23", "24", "25"], "correctAnswer": "24",
+      "story": { "character": "Postbuddet", "introduction": "Postbuddet har 31 breve og afleverer syv. Hvor mange er tilbage?", "success": "Der er 24 breve tilbage!", "hint": "Træk først én fra 31 og derefter seks mere." }
+    },
+    {
+      "id": "math-two-pairs", "category": "Math", "difficulty": 2,
+      "question": "4 par støvler. Hvor mange støvler er det?", "options": ["6", "8", "10"], "correctAnswer": "8",
+      "story": { "character": "Skomageren", "introduction": "Skomageren har fire par støvler. Der er to støvler i hvert par.", "success": "Der er otte støvler!", "hint": "Tæl to støvler for hvert af de fire par." }
+    },
+    {
       "id": "west-troll-apples",
       "category": "Math",
       "difficulty": 1,

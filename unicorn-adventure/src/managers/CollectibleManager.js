@@ -1,4 +1,5 @@
 import { CollectionStore } from './CollectionStore.js';
+import { arrangeCollectibles, newLayoutSeed } from '../data/collectibleLayout.js';
 
 const COLLECTIBLE_TYPES = new Set(['unicorn', 'accessory']);
 const ACCESSORY_SLOTS = new Set(['crown', 'saddle', 'sticker', 'wings']);
@@ -81,9 +82,14 @@ export class CollectibleManager {
         throw new Error('Den gemte samling indeholder ugyldigt udstyr.');
       }
     }
+    if (saved.layoutSeed === null && saved.collectedIds.size === 0 && saved.equipment.size === 0) {
+      saved.layoutSeed = newLayoutSeed();
+      this.store.save(saved.collectedIds, saved.equipment, saved.layoutSeed);
+    }
     this.collectedIds = saved.collectedIds;
     this.equipment = saved.equipment;
-    this.items = loadedItems;
+    this.items = new Map(arrangeCollectibles(Array.from(loadedItems.values()), saved.layoutSeed)
+      .map((item) => [item.id, item]));
     this.items.forEach((item) => {
       if (!this.collectedIds.has(item.id)) {
         this.createPickup(item);

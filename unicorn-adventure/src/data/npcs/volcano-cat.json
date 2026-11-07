@@ -1,0 +1,12 @@
+{
+  "id": "volcano-cat",
+  "name": "Ildkatten",
+  "avatar": "red-cat",
+  "x": 4320,
+  "y": 1100,
+  "interactionRadius": 105,
+  "repeatDialogue": "Mjav! Du fangede mig. Nu kan vi være venner!",
+  "interactions": [
+    { "type": "challenge", "challengeId": "volcano-cat-reading", "miniGame": "catMaze" }
+  ]
+}

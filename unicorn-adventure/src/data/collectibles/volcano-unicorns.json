@@ -1,0 +1,8 @@
+{
+  "type": "unicorn",
+  "items": [
+    { "id": "unicorn-volcano-flame", "name": "Flamme", "texture": "unicorn-volcano-flame", "color": "Rødorange med gylden manke", "x": 4752, "y": 528 },
+    { "id": "unicorn-volcano-ember", "name": "Gnist", "texture": "unicorn-volcano-ember", "color": "Rødorange med rød manke", "x": 5520, "y": 1712 },
+    { "id": "unicorn-volcano-ash", "name": "Aske", "texture": "unicorn-volcano-ash", "color": "Rødorange med mørk manke", "x": 6032, "y": 2608 }
+  ]
+}

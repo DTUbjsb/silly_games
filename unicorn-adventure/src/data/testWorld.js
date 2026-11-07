@@ -12,11 +12,79 @@ export const WORLD_TILE = Object.freeze({
   WEST_WALL: 9,
   WEST_BRIDGE: 10,
   WEST_FOREST_GATE: 11,
+  DARK_GROUND: 12,
+  DARK_TREE: 13,
+  NORTH_FOREST_GATE: 14,
+  VOLCANIC_GROUND: 15,
+  VOLCANIC_ROCK: 16,
+  VOLCANIC_GATE_A: 17,
+  VOLCANIC_GATE_B: 18,
 });
 
 export const WEST_REGION_WIDTH = 32;
 export const WEST_CRACK = Object.freeze({ x: -16, y: 400, radius: 115 });
 export const WEST_REGION_DATA = createWestRegion();
+export const NORTH_REGION_HEIGHT = 48;
+export const NORTH_HOLE = Object.freeze({ x: 816, y: -16, radius: 115 });
+export const NORTH_FOREST = Object.freeze({ left: 90, right: 110, top: 10, bottom: 30 });
+export const NORTH_REGION_DATA = createNorthRegion();
+export const EAST_REGION_WIDTH = 64;
+export const EAST_ORIGIN = 128 * TEST_WORLD_TILE_SIZE;
+export const EAST_PASS = Object.freeze({ x: EAST_ORIGIN + 16, y: 400, radius: 115 });
+export const EAST_REGION_DATA = createEastRegion();
+
+function createEastRegion() {
+  const tiles = Array.from({ length: 96 }, (_, y) => Array.from({ length: EAST_REGION_WIDTH }, (_, x) => (
+    x === 0 ? WORLD_TILE.WEST_WALL : WORLD_TILE.VOLCANIC_GROUND
+  )));
+  for (const [left, right, top, bottom, gate, gateY] of [
+    [12, 27, 8, 24, WORLD_TILE.VOLCANIC_GATE_A, 16],
+    [35, 52, 45, 61, WORLD_TILE.VOLCANIC_GATE_B, 53],
+  ]) {
+    for (let y = top; y <= bottom; y += 1) {
+      for (let x = left; x <= right; x += 1) {
+        if (x === left || x === right || y === top || y === bottom) tiles[y][x] = WORLD_TILE.VOLCANIC_ROCK;
+      }
+    }
+    for (let y = gateY - 1; y <= gateY + 1; y += 1) tiles[y][left] = gate;
+  }
+  return tiles;
+}
+
+function createNorthRegion() {
+  const width = 128 + WEST_REGION_WIDTH;
+  const tiles = Array.from({ length: NORTH_REGION_HEIGHT + 1 }, (_, y) => (
+    Array.from({ length: width }, (_, x) => {
+      if (y === NORTH_REGION_HEIGHT) return WORLD_TILE.WEST_WALL;
+      const worldX = (x - WEST_REGION_WIDTH) * TEST_WORLD_TILE_SIZE + 16;
+      const worldY = (y - NORTH_REGION_HEIGHT - 1) * TEST_WORLD_TILE_SIZE + 16;
+      const nearEntrance = Math.abs(worldX - NORTH_HOLE.x) < 200 && worldY > -300;
+      return !nearEntrance && x > 1 && x < width - 2 && y > 1
+        && (x * 19 + y * 31 + x * y) % 29 === 0
+        ? WORLD_TILE.DARK_TREE : WORLD_TILE.DARK_GROUND;
+    })
+  ));
+  for (let y = NORTH_FOREST.top; y <= NORTH_FOREST.bottom; y += 1) {
+    for (let x = NORTH_FOREST.left; x <= NORTH_FOREST.right; x += 1) {
+      const border = x < NORTH_FOREST.left + 3 || x > NORTH_FOREST.right - 3
+        || y < NORTH_FOREST.top + 3 || y > NORTH_FOREST.bottom - 3;
+      tiles[y][x] = border ? WORLD_TILE.DARK_TREE : WORLD_TILE.DARK_GROUND;
+    }
+  }
+  for (let y = 19; y <= 21; y += 1) {
+    for (let x = 90; x <= 92; x += 1) tiles[y][x] = WORLD_TILE.NORTH_FOREST_GATE;
+    for (let x = 86; x <= 89; x += 1) tiles[y][x] = WORLD_TILE.DARK_GROUND;
+  }
+  for (const [x, y] of [
+    [8, 6], [20, 15], [30, 30], [40, 8], [48, 23],
+    [60, 38], [68, 7], [76, 29], [126, 14], [145, 35],
+  ]) {
+    for (let dy = -1; dy <= 1; dy += 1) {
+      for (let dx = -1; dx <= 1; dx += 1) tiles[y + dy][x + dx] = WORLD_TILE.DARK_GROUND;
+    }
+  }
+  return tiles;
+}
 
 function createWestRegion() {
   const tiles = Array.from({ length: 96 }, (_, y) => (
@@ -46,6 +114,9 @@ export const WORLD_GATES = Object.freeze({
   secondBridge: WORLD_TILE.SECOND_BRIDGE,
   westBridge: WORLD_TILE.WEST_BRIDGE,
   westForest: WORLD_TILE.WEST_FOREST_GATE,
+  northForest: WORLD_TILE.NORTH_FOREST_GATE,
+  volcanoA: WORLD_TILE.VOLCANIC_GATE_A,
+  volcanoB: WORLD_TILE.VOLCANIC_GATE_B,
 });
 
 // Keep map layout separate from rendering so this test world can later be replaced with authored maps.

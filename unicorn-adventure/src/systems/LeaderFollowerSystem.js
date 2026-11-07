@@ -5,6 +5,7 @@ export class LeaderFollowerSystem {
     }
 
     this.players = [...players];
+    this.companions = [];
     this.spacing = spacing;
     this.followSpeed = followSpeed;
     this.sampleDistance = sampleDistance;
@@ -13,6 +14,18 @@ export class LeaderFollowerSystem {
 
   get leader() {
     return this.players[0];
+  }
+
+  get followers() {
+    return [...this.players.slice(1), ...this.companions];
+  }
+
+  addCompanion(companion) {
+    if (this.companions.some((other) => other.id === companion.id)
+      || this.players.some((player) => player.id === companion.id)) {
+      throw new Error(`Følgeren "${companion.id}" findes allerede i gruppen.`);
+    }
+    this.companions.push(companion);
   }
 
   swapLeader() {
@@ -47,7 +60,7 @@ export class LeaderFollowerSystem {
     }
 
     const smoothing = Math.min(1, (delta / 1000) * this.followSpeed);
-    this.players.slice(1).forEach((player, index) => {
+    this.followers.forEach((player, index) => {
       const sprite = player.sprite;
       const target = this.getTrailPosition(this.spacing * (index + 1));
       sprite.setPosition(
@@ -55,7 +68,7 @@ export class LeaderFollowerSystem {
         Phaser.Math.Linear(sprite.y, target.y, smoothing),
       );
       sprite.body.updateFromGameObject();
-      sprite.setVelocity(0, 0);
+      sprite.body.setVelocity(0, 0);
     });
   }
 
@@ -86,7 +99,7 @@ export class LeaderFollowerSystem {
   }
 
   trimTrail() {
-    const maxDistance = this.spacing * (this.players.length + 2);
+    const maxDistance = this.spacing * (this.players.length + this.companions.length + 2);
     let distance = 0;
     let lastIndex = this.trail.length - 1;
 

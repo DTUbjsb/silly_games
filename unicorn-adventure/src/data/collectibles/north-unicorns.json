@@ -1,0 +1,8 @@
+{
+  "type": "unicorn",
+  "items": [
+    { "id": "unicorn-dark-red", "name": "Glød", "texture": "unicorn-dark-red", "color": "Mørkebrun med rød manke", "x": 2192, "y": -912 },
+    { "id": "unicorn-dark-purple", "name": "Skygge", "texture": "unicorn-dark-purple", "color": "Mørkebrun med lilla manke", "x": -752, "y": -1360 },
+    { "id": "unicorn-dark-black", "name": "Midnat", "texture": "unicorn-dark-black", "color": "Mørkebrun med sort manke", "x": -368, "y": -1072 }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "id": "volcano-keeper", "name": "Krystalvogteren", "avatar": "bridge-troll", "x": 4432, "y": 528,
+  "interactionRadius": 112, "repeatDialogue": "Krystalhaven er åben.",
+  "interactions": [{ "type": "challenge", "challengeId": "volcano-crystal-question", "miniGame": "volcanoCrystals", "opensGate": "volcanoA" }]
+}

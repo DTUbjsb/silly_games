@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="64" viewBox="0 0 72 64">
+  <title>En lille rød kat</title>
+  <path d="M47 48Q67 54 65 34Q64 25 58 29" fill="none" stroke="#ad361c" stroke-width="7" stroke-linecap="round"/>
+  <ellipse cx="34" cy="45" rx="22" ry="15" fill="#dc5428" stroke="#96341e" stroke-width="2"/>
+  <path d="M17 29L15 10L27 17Q35 13 43 17L55 10L53 30Q54 41 35 42Q16 42 17 29Z" fill="#ec6933" stroke="#96341e" stroke-width="2"/>
+  <path d="M19 16L20 25L26 19M50 16L49 25L43 19" fill="#f3ae86"/>
+  <ellipse cx="28" cy="29" rx="3" ry="4" fill="#493522"/><ellipse cx="42" cy="29" rx="3" ry="4" fill="#493522"/>
+  <path d="M32 35L38 35L35 38Z" fill="#9b3940"/><path d="M35 38Q32 42 29 39M35 38Q38 42 41 39" fill="none" stroke="#7e3021" stroke-width="1.5"/>
+  <path d="M21 36L9 33M21 39L9 41M49 36L61 33M49 39L61 41" fill="none" stroke="#7e3021" stroke-width="1.5"/>
+  <ellipse cx="22" cy="57" rx="8" ry="4" fill="#e97843"/><ellipse cx="45" cy="57" rx="8" ry="4" fill="#e97843"/>
+</svg>

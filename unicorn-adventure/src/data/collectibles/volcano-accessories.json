@@ -1,0 +1,17 @@
+{
+  "type": "accessory",
+  "items": [
+    { "id": "accessory-volcano-flame-saddle", "name": "Flammes ildsadel", "texture": "accessory-volcano-flame-saddle", "wornTexture": "saddle-worn-volcano-flame", "slot": "saddle", "x": 4656, "y": 432 },
+    { "id": "accessory-volcano-flame-wings", "name": "Flammes ildvinger", "texture": "accessory-volcano-flame-wings", "slot": "wings", "x": 4848, "y": 432 },
+    { "id": "accessory-volcano-flame-hat", "name": "Flammes ildkrone", "texture": "accessory-volcano-flame-hat", "slot": "crown", "x": 4656, "y": 624 },
+    { "id": "accessory-volcano-flame-sticker", "name": "Flammes solmærke", "texture": "accessory-volcano-flame-sticker", "slot": "sticker", "x": 4848, "y": 624 },
+    { "id": "accessory-volcano-ember-saddle", "name": "Gnists ildsadel", "texture": "accessory-volcano-ember-saddle", "wornTexture": "saddle-worn-volcano-ember", "slot": "saddle", "x": 5424, "y": 1616 },
+    { "id": "accessory-volcano-ember-wings", "name": "Gnists ildvinger", "texture": "accessory-volcano-ember-wings", "slot": "wings", "x": 5616, "y": 1616 },
+    { "id": "accessory-volcano-ember-hat", "name": "Gnists ildkrone", "texture": "accessory-volcano-ember-hat", "slot": "crown", "x": 5424, "y": 1808 },
+    { "id": "accessory-volcano-ember-sticker", "name": "Gnists solmærke", "texture": "accessory-volcano-ember-sticker", "slot": "sticker", "x": 5616, "y": 1808 },
+    { "id": "accessory-volcano-ash-saddle", "name": "Askes ildsadel", "texture": "accessory-volcano-ash-saddle", "wornTexture": "saddle-worn-volcano-ash", "slot": "saddle", "x": 4496, "y": 1072 },
+    { "id": "accessory-volcano-ash-wings", "name": "Askes ildvinger", "texture": "accessory-volcano-ash-wings", "slot": "wings", "x": 5904, "y": 816 },
+    { "id": "accessory-volcano-ash-hat", "name": "Askes ildkrone", "texture": "accessory-volcano-ash-hat", "slot": "crown", "x": 4624, "y": 2448 },
+    { "id": "accessory-volcano-ash-sticker", "name": "Askes solmærke", "texture": "accessory-volcano-ash-sticker", "slot": "sticker", "x": 5648, "y": 2928 }
+  ]
+}

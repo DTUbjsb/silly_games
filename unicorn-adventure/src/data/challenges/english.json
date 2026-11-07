@@ -1,6 +1,36 @@
 {
   "challenges": [
     {
+      "id": "english-one-cat", "category": "English", "difficulty": 1,
+      "question": "Hvad betyder “cat” på dansk?", "options": ["kat", "hund", "fugl"], "correctAnswer": "kat",
+      "story": { "character": "Katten", "introduction": "Katten vil lære sit navn på engelsk.", "success": "Ja, cat betyder kat!", "hint": "Det er et dyr, der kan miave." }
+    },
+    {
+      "id": "english-one-blue", "category": "English", "difficulty": 1,
+      "question": "Hvad betyder “blue” på dansk?", "options": ["rød", "blå", "gul"], "correctAnswer": "blå",
+      "story": { "character": "Farvefeen", "introduction": "Feen viser en blå sten og siger blue.", "success": "Ja, blue betyder blå!", "hint": "Det er farven på stenen." }
+    },
+    {
+      "id": "english-one-dog", "category": "English", "difficulty": 1,
+      "question": "Hvad betyder “dog” på dansk?", "options": ["hund", "hest", "mus"], "correctAnswer": "hund",
+      "story": { "character": "Hunden", "introduction": "Hunden vil lære sit navn på engelsk.", "success": "Ja, dog betyder hund!", "hint": "Det er et dyr, der kan gø." }
+    },
+    {
+      "id": "english-two-butterfly", "category": "English", "difficulty": 2,
+      "question": "Hvad betyder “butterfly” på dansk?", "options": ["sommerfugl", "regnorm", "fisk"], "correctAnswer": "sommerfugl",
+      "story": { "character": "Havefeen", "introduction": "Feen ser en butterfly flyve mellem blomsterne.", "success": "Ja, butterfly betyder sommerfugl!", "hint": "Det er et insekt med farverige vinger." }
+    },
+    {
+      "id": "english-two-window", "category": "English", "difficulty": 2,
+      "question": "Hvad betyder “window” på dansk?", "options": ["dør", "vindue", "tag"], "correctAnswer": "vindue",
+      "story": { "character": "Husmusen", "introduction": "Musen kigger ud gennem et window.", "success": "Ja, window betyder vindue!", "hint": "Man kan kigge ud gennem dets glas." }
+    },
+    {
+      "id": "english-two-morning", "category": "English", "difficulty": 2,
+      "question": "Hvad betyder “morning” på dansk?", "options": ["morgen", "aften", "nat"], "correctAnswer": "morgen",
+      "story": { "character": "Morgenfuglen", "introduction": "Fuglen synger, når en ny dag begynder.", "success": "Ja, morning betyder morgen!", "hint": "Det er begyndelsen af dagen." }
+    },
+    {
       "id": "flora-forest",
       "category": "English",
       "difficulty": 1,

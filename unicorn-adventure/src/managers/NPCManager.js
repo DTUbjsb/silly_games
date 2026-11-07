@@ -153,7 +153,7 @@ export class NPCManager {
       if (interaction.opensGate !== undefined && !this.gateIds.has(interaction.opensGate)) {
         throw new Error(`Personen "${filename}" henviser til en ukendt adgang: "${interaction.opensGate}".`);
       }
-      if (interaction.miniGame !== undefined && !['mosquito', 'troll'].includes(interaction.miniGame)) {
+      if (interaction.miniGame !== undefined && !['mosquito', 'troll', 'volcanoCrystals', 'volcanoRunes', 'catMaze'].includes(interaction.miniGame)) {
         throw new Error(`Personen "${filename}" henviser til et ukendt minispil: "${interaction.miniGame}".`);
       }
       if (interaction.randomForPlayer !== undefined && typeof interaction.randomForPlayer !== 'boolean') {
@@ -194,7 +194,7 @@ export class NPCManager {
   }
 
   update(leader, blocked = false) {
-    const nearby = leader ? this.npcs.map((npc) => ({
+    const nearby = leader ? this.npcs.filter((npc) => !npc.following).map((npc) => ({
       npc,
       distance: Phaser.Math.Distance.Between(
         leader.sprite.x,
@@ -229,7 +229,7 @@ export class NPCManager {
       return false;
     }
 
-    const sound = npc.avatar === 'bridge-troll' ? 'troll'
+    const sound = npc.avatar === 'red-cat' ? 'catMeow' : npc.avatar === 'bridge-troll' ? 'troll'
       : npc.avatar.startsWith('fairy-') ? 'fairy' : null;
     if (sound) {
       this.scene.registry.get('soundEffects').play(sound);

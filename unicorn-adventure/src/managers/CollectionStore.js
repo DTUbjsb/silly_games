@@ -17,7 +17,7 @@ export class CollectionStore {
       throw new Error('Samlingen kunne ikke læses fra browserens lager.', { cause: error });
     }
     if (raw === null) {
-      return { collectedIds: new Set(), equipment: new Map() };
+      return { collectedIds: new Set(), equipment: new Map(), layoutSeed: null };
     }
 
     let saved;
@@ -36,18 +36,25 @@ export class CollectionStore {
           && entry.every((id) => typeof id === 'string' && id.trim().length > 0))
         || new Set(saved.equipment.map((entry) => entry[0])).size !== saved.equipment.length
       ))
+      || (saved.layoutSeed !== undefined && saved.layoutSeed !== null
+        && (!Number.isInteger(saved.layoutSeed) || saved.layoutSeed < 0 || saved.layoutSeed > 0xffffffff))
     ) {
       throw new Error('Den gemte samling har et ugyldigt format.');
     }
-    return { collectedIds: new Set(saved.collectedIds), equipment: new Map(saved.equipment ?? []) };
+    return {
+      collectedIds: new Set(saved.collectedIds),
+      equipment: new Map(saved.equipment ?? []),
+      layoutSeed: saved.layoutSeed ?? null,
+    };
   }
 
-  save(ids, equipment = this.loadState().equipment) {
+  save(ids, equipment = this.loadState().equipment, layoutSeed = this.loadState().layoutSeed) {
     try {
       (this.storage ?? window.localStorage).setItem(STORAGE_KEY, JSON.stringify({
         version: 1,
         collectedIds: Array.from(ids),
         equipment: Array.from(equipment),
+        layoutSeed,
       }));
     } catch (error) {
       throw new Error('Samlingen kunne ikke gemmes i browserens lager.', { cause: error });

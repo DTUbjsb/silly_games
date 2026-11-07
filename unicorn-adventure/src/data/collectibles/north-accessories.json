@@ -1,0 +1,17 @@
+{
+  "type": "accessory",
+  "items": [
+    { "id": "accessory-dark-red-saddle", "name": "Gløds mørke sadel", "texture": "accessory-dark-red-saddle", "wornTexture": "saddle-worn-dark-red", "slot": "saddle", "x": 2096, "y": -1008 },
+    { "id": "accessory-dark-red-wings", "name": "Gløds flagermusvinger", "texture": "accessory-dark-red-wings", "slot": "wings", "x": 2288, "y": -1008 },
+    { "id": "accessory-dark-red-hat", "name": "Gløds mørke krone", "texture": "accessory-dark-red-hat", "slot": "crown", "x": 2096, "y": -816 },
+    { "id": "accessory-dark-red-sticker", "name": "Gløds månemærke", "texture": "accessory-dark-red-sticker", "slot": "sticker", "x": 2288, "y": -816 },
+    { "id": "accessory-dark-purple-saddle", "name": "Skygges mørke sadel", "texture": "accessory-dark-purple-saddle", "wornTexture": "saddle-worn-dark-purple", "slot": "saddle", "x": -48, "y": -592 },
+    { "id": "accessory-dark-purple-wings", "name": "Skygges flagermusvinger", "texture": "accessory-dark-purple-wings", "slot": "wings", "x": 272, "y": -1296 },
+    { "id": "accessory-dark-purple-hat", "name": "Skygges mørke krone", "texture": "accessory-dark-purple-hat", "slot": "crown", "x": 528, "y": -816 },
+    { "id": "accessory-dark-purple-sticker", "name": "Skygges månemærke", "texture": "accessory-dark-purple-sticker", "slot": "sticker", "x": 912, "y": -336 },
+    { "id": "accessory-dark-black-saddle", "name": "Midnats mørke sadel", "texture": "accessory-dark-black-saddle", "wornTexture": "saddle-worn-dark-black", "slot": "saddle", "x": 1168, "y": -1328 },
+    { "id": "accessory-dark-black-wings", "name": "Midnats flagermusvinger", "texture": "accessory-dark-black-wings", "slot": "wings", "x": 1424, "y": -624 },
+    { "id": "accessory-dark-black-hat", "name": "Midnats mørke krone", "texture": "accessory-dark-black-hat", "slot": "crown", "x": 3024, "y": -1104 },
+    { "id": "accessory-dark-black-sticker", "name": "Midnats månemærke", "texture": "accessory-dark-black-sticker", "slot": "sticker", "x": 3632, "y": -432 }
+  ]
+}

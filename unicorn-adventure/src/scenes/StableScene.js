@@ -45,7 +45,7 @@ export class StableScene extends Phaser.Scene {
       const accessoryLayer = this.add.container(x, y)
         .setScale(sprite.scaleX / PORTRAIT_UNICORN_SCALE).setDepth(3);
       renderUnicornAccessories(this, accessoryLayer, unicorn.id, accessories, collection);
-      this.add.text(x, y - 70, `${unicorn.name} · ${unicorn.color}`, {
+      this.add.text(x, y - 70, unicorn.name, {
         fontFamily: 'Trebuchet MS, sans-serif', fontSize: '14px',
         fontStyle: 'bold', color: '#594e59', backgroundColor: '#fff8e9',
         padding: { x: 5, y: 3 },
@@ -57,6 +57,12 @@ export class StableScene extends Phaser.Scene {
       ...player, x: 400 - index * 75, y: 195,
     }));
     this.followers = new LeaderFollowerSystem(this.players, { spacing: 75 });
+    const world = this.scene.get('MainWorldScene');
+    if (world.leaderFollowerSystem.companions.some((companion) => companion.id === 'volcano-cat')) {
+      const sprite = this.physics.add.image(250, 195, 'red-cat').setScale(0.72).setDepth(2);
+      sprite.body.setCollideWorldBounds(true);
+      this.followers.addCompanion({ id: 'volcano-cat', sprite });
+    }
     this.movement = new MovementSystem(this, this.followers.leader.sprite);
     this.cameras.main.startFollow(this.followers.leader.sprite, true, 0.12, 0.12);
     this.scene.get('MainWorldScene').hud.setLocation(true);
@@ -94,6 +100,9 @@ export class StableScene extends Phaser.Scene {
       this.movement.update();
     }
     this.followers.update(delta);
+    if (this.followers.companions.length && !this.detailPanel.isOpen) {
+      this.scene.get('MainWorldScene').updateCatMeow(delta);
+    }
     this.players.forEach((player) => player.updateNameTag());
     const nearest = this.getNearbyTarget();
     this.prompt.setText(this.detailPanel.isOpen ? '' : nearest?.label ?? '');

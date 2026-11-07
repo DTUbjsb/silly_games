@@ -20,6 +20,7 @@ export class ChallengeScene extends Phaser.Scene {
     }
 
     this.onComplete = onComplete;
+    this.challenge = challenge;
     this.isResolved = false;
     this.answerButtons = [];
     const beginnerReading = challenge.category === 'Reading' && challenge.difficulty === 1;

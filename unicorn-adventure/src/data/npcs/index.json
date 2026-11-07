@@ -5,6 +5,10 @@
     "bridge-troll.json",
     "river-troll.json",
     "west-fairy.json",
-    "west-troll.json"
+    "west-troll.json",
+    "north-troll.json",
+    "volcano-keeper.json",
+    "volcano-rune-keeper.json",
+    "volcano-cat.json"
   ]
 }

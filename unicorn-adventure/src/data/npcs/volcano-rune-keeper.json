@@ -1,0 +1,5 @@
+{
+  "id": "volcano-rune-keeper", "name": "Runevogteren", "avatar": "bridge-troll", "x": 5072, "y": 1712,
+  "interactionRadius": 112, "repeatDialogue": "Runernes have er åben.",
+  "interactions": [{ "type": "challenge", "challengeId": "volcano-rune-question", "miniGame": "volcanoRunes", "opensGate": "volcanoB" }]
+}
