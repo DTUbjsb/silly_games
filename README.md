@@ -37,3 +37,5 @@ To run the game-rules regression checks, start the same server and open `tests/i
 - Region unlocks behind e.g. bridge trolls should include a separate mini-game. Sort of like flappy bird/jet pack or a shooter type game. These should be more fast paced and up for several attempts. Possibly with an option to re-try even if the barrier they unlock is open.
 - World randomization?
 - Question type randomization?
+
+- ADD A STORY LINE
