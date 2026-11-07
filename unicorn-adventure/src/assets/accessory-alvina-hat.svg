@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="100" viewBox="0 0 120 100">
+  <path d="M28 70L39 12Q60 3 81 12L92 70Z" fill="#4795d5" stroke="#235f9b" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M16 70Q60 82 104 70L110 80Q60 93 10 80Z" fill="#276db3" stroke="#235f9b" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="30" y="46" width="60" height="19" rx="4" fill="#e4f5ff"/>
+  <text x="60" y="60" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="15" fill="#174e83">Alvina</text>
+</svg>

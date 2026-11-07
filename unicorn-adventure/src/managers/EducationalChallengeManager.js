@@ -120,7 +120,7 @@ export class EducationalChallengeManager {
     return challenge ? { ...challenge, options: [...challenge.options] } : undefined;
   }
 
-  getChallengeForAge(age, excludedIds = []) {
+  getChallengeForAge(age, excludedIds = [], reservedIds = []) {
     if (!Number.isInteger(age) || age < 0) {
       throw new RangeError('Alderen skal være et helt tal på mindst 0.');
     }
@@ -128,21 +128,19 @@ export class EducationalChallengeManager {
       throw new Error('Udfordringerne er ikke indlæst.');
     }
 
-    const excluded = new Set(excludedIds);
-    const available = Array.from(this.challenges.values())
-      .filter((challenge) => !excluded.has(challenge.id));
-    if (available.length === 0) {
-      throw new Error('Der er ingen uløste udfordringer tilbage.');
+    const targetDifficulty = this.getDifficultyForAge(age);
+    const reserved = new Set(reservedIds);
+    const suitable = Array.from(this.challenges.values())
+      .filter((challenge) => challenge.difficulty <= targetDifficulty && !reserved.has(challenge.id));
+    if (suitable.length === 0) {
+      throw new Error('Der findes ingen udfordringer på et passende niveau.');
     }
 
-    const targetDifficulty = this.getDifficultyForAge(age);
-    const suitable = available.filter((challenge) => challenge.difficulty <= targetDifficulty);
-    // A sparse catalog should fall back to an easier available level, not over-challenge a child.
-    const chosenPool = suitable.length > 0 ? suitable : available;
-    const difficulty = suitable.length > 0
-      ? Math.max(...suitable.map((challenge) => challenge.difficulty))
-      : Math.min(...available.map((challenge) => challenge.difficulty));
-    const candidates = chosenPool.filter((challenge) => challenge.difficulty === difficulty);
+    const excluded = new Set(excludedIds);
+    const unseen = suitable.filter((challenge) => !excluded.has(challenge.id));
+    const pool = unseen.length > 0 ? unseen : suitable;
+    const difficulty = Math.max(...pool.map((challenge) => challenge.difficulty));
+    const candidates = pool.filter((challenge) => challenge.difficulty === difficulty);
     const challenge = candidates[Math.floor(Math.random() * candidates.length)];
     return { ...challenge, options: [...challenge.options] };
   }

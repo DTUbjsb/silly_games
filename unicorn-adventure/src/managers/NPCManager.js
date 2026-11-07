@@ -4,16 +4,19 @@ export class NPCManager {
     challengeManager,
     dialogueWindow,
     onChallenge,
-    onBridgeOpen,
+    gateIds,
+    onGateOpen,
   }) {
     this.scene = scene;
     this.questManager = questManager;
     this.challengeManager = challengeManager;
     this.dialogueWindow = dialogueWindow;
     this.onChallenge = onChallenge;
-    this.onBridgeOpen = onBridgeOpen;
+    this.gateIds = new Set(gateIds);
+    this.onGateOpen = onGateOpen;
     this.npcs = [];
     this.activeNPC = null;
+    this.nearbyNPCs = new Set();
     this.loadPromise = null;
 
     this.interactionPrompt = scene.add.text(400, 520, '', {
@@ -147,13 +150,21 @@ export class NPCManager {
       if (!this.challengeManager.getChallenge(challengeId)) {
         throw new Error(`Personen "${filename}" henviser til en ukendt læringsudfordring.`);
       }
-      if (interaction.opensBridge !== undefined && typeof interaction.opensBridge !== 'boolean') {
-        throw new Error(`Personen "${filename}" skal angive, om broen åbnes, med true eller false.`);
+      if (interaction.opensGate !== undefined && !this.gateIds.has(interaction.opensGate)) {
+        throw new Error(`Personen "${filename}" henviser til en ukendt adgang: "${interaction.opensGate}".`);
+      }
+      if (interaction.miniGame !== undefined && !['mosquito', 'troll'].includes(interaction.miniGame)) {
+        throw new Error(`Personen "${filename}" henviser til et ukendt minispil: "${interaction.miniGame}".`);
+      }
+      if (interaction.randomForPlayer !== undefined && typeof interaction.randomForPlayer !== 'boolean') {
+        throw new Error(`Personen "${filename}" har en ugyldig indstilling for tilfældige spørgsmål.`);
       }
       return {
         type: 'challenge',
         challengeId,
-        opensBridge: interaction.opensBridge ?? false,
+        opensGate: interaction.opensGate,
+        miniGame: interaction.miniGame,
+        randomForPlayer: interaction.randomForPlayer ?? false,
       };
     }
 
@@ -176,21 +187,31 @@ export class NPCManager {
     return { ...record, sprite, nameTag, interactionIndex: 0 };
   }
 
+  getGateChallengeIds() {
+    return this.npcs.flatMap((npc) => npc.interactions
+      .filter((interaction) => interaction.type === 'challenge' && interaction.opensGate)
+      .map((interaction) => interaction.challengeId));
+  }
+
   update(leader, blocked = false) {
+    const nearby = leader ? this.npcs.map((npc) => ({
+      npc,
+      distance: Phaser.Math.Distance.Between(
+        leader.sprite.x,
+        leader.sprite.y,
+        npc.x,
+        npc.y,
+      ),
+    })).filter(({ npc, distance }) => distance <= npc.interactionRadius)
+      .sort((a, b) => a.distance - b.distance) : [];
+    const nearbyIds = new Set(nearby.map(({ npc }) => npc.id));
+    if (!blocked && nearby.some(({ npc }) => !this.nearbyNPCs.has(npc.id))) {
+      this.scene.registry.get('soundEffects').play('npcNearby');
+    }
+    this.nearbyNPCs = nearbyIds;
     this.activeNPC = null;
-    if (!blocked && leader) {
-      this.activeNPC = this.npcs
-        .map((npc) => ({
-          npc,
-          distance: Phaser.Math.Distance.Between(
-            leader.sprite.x,
-            leader.sprite.y,
-            npc.x,
-            npc.y,
-          ),
-        }))
-        .filter(({ npc, distance }) => distance <= npc.interactionRadius)
-        .sort((a, b) => a.distance - b.distance)[0]?.npc ?? null;
+    if (!blocked) {
+      this.activeNPC = nearby[0]?.npc ?? null;
     }
 
     this.npcs.forEach((npc) => {
@@ -198,7 +219,7 @@ export class NPCManager {
     });
 
     this.interactionPrompt
-      .setText(this.activeNPC ? `Tryk SPACE for at tale med ${this.activeNPC.name}` : '')
+      .setText(this.activeNPC ? `Tryk MELLEMRUM for at tale med ${this.activeNPC.name}` : '')
       .setVisible(Boolean(this.activeNPC));
   }
 
@@ -208,6 +229,11 @@ export class NPCManager {
       return false;
     }
 
+    const sound = npc.avatar === 'bridge-troll' ? 'troll'
+      : npc.avatar.startsWith('fairy-') ? 'fairy' : null;
+    if (sound) {
+      this.scene.registry.get('soundEffects').play(sound);
+    }
     this.runInteraction(npc);
     return true;
   }
@@ -222,7 +248,7 @@ export class NPCManager {
     if (interaction.type === 'dialogue') {
       this.dialogueWindow.showLines(npc.name, interaction.lines, () => {
         this.advanceInteraction(npc);
-        if (npc.interactions[npc.interactionIndex]?.type === 'challenge') {
+        if (['challenge', 'quest'].includes(npc.interactions[npc.interactionIndex]?.type)) {
           this.runInteraction(npc);
         }
       });
@@ -238,6 +264,9 @@ export class NPCManager {
   }
 
   startChallenge(npc, challengeId) {
+    const interaction = npc.interactions[npc.interactionIndex];
+    const miniGame = interaction?.type === 'challenge' && interaction.challengeId === challengeId
+      ? interaction.miniGame : undefined;
     this.onChallenge(challengeId, () => {
       const activeQuest = this.questManager.getActiveQuests()
         .find((quest) => quest.challengeId === challengeId);
@@ -247,18 +276,21 @@ export class NPCManager {
 
       const interaction = npc.interactions[npc.interactionIndex];
       if (interaction?.type === 'challenge' && interaction.challengeId === challengeId) {
-        this.advanceInteraction(npc);
-        if (interaction.opensBridge) {
-          if (typeof this.onBridgeOpen !== 'function') {
-            throw new Error('Der mangler en handling til at åbne broen.');
+        if (interaction.opensGate) {
+          if (typeof this.onGateOpen !== 'function') {
+            throw new Error('Der mangler en handling til at åbne adgangen.');
           }
-          this.onBridgeOpen();
+          this.onGateOpen(interaction.opensGate);
         }
+        this.advanceInteraction(npc);
       }
 
       if (activeQuest) {
         this.dialogueWindow.showLines(npc.name, [`Tak for hjælpen! Opgaven "${activeQuest.title}" er løst.`]);
       }
+    }, miniGame, {
+      randomForPlayer: interaction?.type === 'challenge' && interaction.randomForPlayer,
+      npcId: npc.id,
     });
   }
 

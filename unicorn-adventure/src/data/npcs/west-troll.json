@@ -1,0 +1,17 @@
+{
+  "id": "west-troll",
+  "name": "Regnbueflodens trold",
+  "avatar": "bridge-troll",
+  "x": -272,
+  "y": 1584,
+  "interactionRadius": 112,
+  "repeatDialogue": "Broen er åben! I kan gå over regnbuefloden.",
+  "interactions": [
+    {
+      "type": "challenge",
+      "challengeId": "west-troll-apples",
+      "miniGame": "troll",
+      "opensGate": "westBridge"
+    }
+  ]
+}

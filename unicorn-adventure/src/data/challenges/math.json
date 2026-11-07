@@ -1,6 +1,104 @@
 {
   "challenges": [
     {
+      "id": "west-troll-apples",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "3 + 2 = ?",
+      "options": ["4", "5", "6"],
+      "correctAnswer": "5",
+      "story": {
+        "character": "Regnbueflodens trold",
+        "introduction": "Trolden har tre æbler og finder to mere. Hvor mange æbler har han nu?",
+        "success": "Fem æbler! Nu kan æblejagten begynde.",
+        "hint": "Start ved tre og tæl to mere."
+      }
+    },
+    {
+      "id": "math-one-add-apples",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "2 + 3 = ?",
+      "options": ["4", "5", "6"],
+      "correctAnswer": "5",
+      "story": {
+        "character": "Æblemusen",
+        "introduction": "Musen har to æbler og finder tre mere. Hvor mange æbler har den nu?",
+        "success": "Fem æbler! Musen deler dem med sine venner.",
+        "hint": "Start ved to og tæl tre mere."
+      }
+    },
+    {
+      "id": "math-one-subtract-flowers",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "6 - 2 = ?",
+      "options": ["3", "4", "5"],
+      "correctAnswer": "4",
+      "story": {
+        "character": "Blomsterfeen",
+        "introduction": "Feen har seks blomster og giver to væk. Hvor mange har hun tilbage?",
+        "success": "Fire blomster! Feen sætter dem i en vase.",
+        "hint": "Start ved seks og tæl to tilbage."
+      }
+    },
+    {
+      "id": "math-one-add-shells",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "4 + 1 = ?",
+      "options": ["4", "5", "6"],
+      "correctAnswer": "5",
+      "story": {
+        "character": "Odderen",
+        "introduction": "Odderen har fire muslinger og finder én mere. Hvor mange har den nu?",
+        "success": "Fem muslinger! Odderen lægger dem på række.",
+        "hint": "Tæl én videre fra fire."
+      }
+    },
+    {
+      "id": "math-two-add",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "17 + 6 = ?",
+      "options": ["21", "23", "24"],
+      "correctAnswer": "23",
+      "story": {
+        "character": "Bærplukkeren",
+        "introduction": "Der er 17 bær i kurven. Bærplukkeren lægger seks mere i. Hvor mange er der nu?",
+        "success": "Der er 23 bær i kurven!",
+        "hint": "Læg først tre til 17 for at nå 20. Læg så tre mere til."
+      }
+    },
+    {
+      "id": "math-two-subtract",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "25 - 8 = ?",
+      "options": ["16", "17", "18"],
+      "correctAnswer": "17",
+      "story": {
+        "character": "Bageren",
+        "introduction": "Bageren har 25 boller og sælger otte. Hvor mange boller er tilbage?",
+        "success": "Der er 17 boller tilbage!",
+        "hint": "Træk først fem fra 25 og derefter tre mere."
+      }
+    },
+    {
+      "id": "math-two-groups",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "3 grupper med 4 blomster i hver. Hvor mange blomster er der i alt?",
+      "options": ["7", "12", "16"],
+      "correctAnswer": "12",
+      "story": {
+        "character": "Gartneren",
+        "introduction": "Gartneren planter tre grupper med fire blomster i hver.",
+        "success": "Der er 12 blomster i alt!",
+        "hint": "Læg fire sammen tre gange."
+      }
+    },
+    {
       "id": "math-addition",
       "category": "Math",
       "difficulty": 1,
@@ -9,21 +107,35 @@
       "correctAnswer": "7",
       "story": {
         "character": "Broens trold",
-        "introduction": "Jeg er sulten og har glemt, hvor mange æbler jeg skal bruge. Hjælper du mig?",
-        "success": "Syv æbler! Tak for hjælpen. Trolden åbner broen, så I kan gå videre.",
+        "introduction": "Jeg vogter broen og er sulten. Jeg har tre æbler og finder fire mere. Hvor mange har jeg nu?",
+        "success": "Syv æbler! Nu skal du samle æbler og undgå troldens sten.",
         "hint": "Prøv at tælle tre æbler og lægge fire mere til."
+      }
+    },
+    {
+      "id": "river-troll-berries",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "5 + 2 = ?",
+      "options": ["6", "7", "8"],
+      "correctAnswer": "7",
+      "story": {
+        "character": "Flodens trold",
+        "introduction": "Jeg vogter broen over floden. Jeg har fem bær og finder to mere. Hvor mange bær har jeg nu?",
+        "success": "Syv bær! Nu skal du samle æbler og undgå troldens sten.",
+        "hint": "Prøv at tælle fem bær og lægge to mere til."
       }
     },
     {
       "id": "math-subtraction",
       "category": "Math",
-      "difficulty": 2,
-      "question": "Du har 8 æbler og giver 3 væk. Hvor mange æbler har du tilbage?",
+      "difficulty": 1,
+      "question": "Egernet har 8 nødder og giver 3 væk. Hvor mange nødder har egernet tilbage?",
       "options": ["4", "5", "6"],
       "correctAnswer": "5",
       "story": {
         "character": "Egernet på stien",
-        "introduction": "Jeg havde otte nødder, men gav tre til mine venner. Hvor mange har jeg tilbage?",
+        "introduction": "Egernet har otte nødder og vil give tre til sine venner. Hvor mange bliver der tilbage?",
         "success": "Du har ret! Egernet deler sine nødder og viser jer den næste sti.",
         "hint": "Start ved otte, og tæl tre nødder tilbage."
       }
@@ -31,7 +143,7 @@
     {
       "id": "math-multiplication",
       "category": "Math",
-      "difficulty": 3,
+      "difficulty": 2,
       "question": "Et tog har 4 vogne med 5 passagerer i hver. Hvor mange passagerer er der i alt?",
       "options": ["15", "20", "25"],
       "correctAnswer": "20",

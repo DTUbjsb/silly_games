@@ -4,23 +4,74 @@
     {
       "id": "unicorn-solstraale",
       "name": "Solstråle",
-      "texture": "unicorn",
-      "x": 256,
-      "y": 192
+      "texture": "unicorn-purple",
+      "color": "Lilla",
+      "x": 528,
+      "y": 784
     },
     {
       "id": "unicorn-himmel",
       "name": "Himmel",
       "texture": "unicorn-blue",
-      "x": 704,
-      "y": 432
+      "color": "Blå",
+      "x": 3408,
+      "y": 784
     },
     {
       "id": "unicorn-regnbue",
       "name": "Regnbue",
       "texture": "unicorn-pink",
-      "x": 1088,
-      "y": 784
+      "color": "Pink",
+      "x": 656,
+      "y": 1776
+    },
+    {
+      "id": "unicorn-graes",
+      "name": "Græs",
+      "texture": "unicorn-green",
+      "color": "Grøn",
+      "x": 3504,
+      "y": 1488
+    },
+    {
+      "id": "unicorn-rav",
+      "name": "Rav",
+      "texture": "unicorn-orange",
+      "color": "Orange",
+      "x": 592,
+      "y": 2608
+    },
+    {
+      "id": "unicorn-bolge",
+      "name": "Bølge",
+      "texture": "unicorn-turquoise",
+      "color": "Turkis",
+      "x": 3248,
+      "y": 2672
+    },
+    {
+      "id": "unicorn-rainbow-rose",
+      "name": "Rosenglød",
+      "texture": "unicorn-rainbow-rose",
+      "color": "Regnbue med rosa manke",
+      "x": -816,
+      "y": 240
+    },
+    {
+      "id": "unicorn-rainbow-ocean",
+      "name": "Havglimt",
+      "texture": "unicorn-rainbow-ocean",
+      "color": "Regnbue med blå manke",
+      "x": -688,
+      "y": 880
+    },
+    {
+      "id": "unicorn-rainbow-sun",
+      "name": "Solglimt",
+      "texture": "unicorn-rainbow-sun",
+      "color": "Regnbue med gylden manke",
+      "x": -752,
+      "y": 2448
     }
   ]
 }

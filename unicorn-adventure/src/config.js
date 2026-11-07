@@ -1,6 +1,10 @@
 import { BootScene } from './scenes/BootScene.js';
 import { ChallengeScene } from './scenes/ChallengeScene.js';
+import { FlightScene } from './scenes/FlightScene.js';
 import { MainWorldScene } from './scenes/MainWorldScene.js';
+import { MosquitoScene } from './scenes/MosquitoScene.js';
+import { StableScene } from './scenes/StableScene.js';
+import { TrollScene } from './scenes/TrollScene.js';
 
 export function createGameConfig() {
   return {
@@ -19,6 +23,6 @@ export function createGameConfig() {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [BootScene, MainWorldScene, ChallengeScene],
+    scene: [BootScene, MainWorldScene, ChallengeScene, MosquitoScene, TrollScene, FlightScene, StableScene],
   };
 }

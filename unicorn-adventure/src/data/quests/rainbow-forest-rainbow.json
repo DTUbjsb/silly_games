@@ -1,8 +1,8 @@
 {
   "id": "rainbow-forest-rainbow",
   "title": "Farver i Regnbueskoven",
-  "description": "Find regnbuen i skoven, og oversæt “rainbow” til dansk.",
-  "reward": "1 stjerne",
+  "description": "Luna vogter regnbueskoven. Svar på et spørgsmål, og jag myggene væk for at åbne stien.",
+  "reward": "Adgang til skoven og sadlen",
   "challengeId": "regnbue",
   "completed": false
 }

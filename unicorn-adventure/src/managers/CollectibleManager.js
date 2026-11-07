@@ -1,10 +1,15 @@
+import { CollectionStore } from './CollectionStore.js';
+
 const COLLECTIBLE_TYPES = new Set(['unicorn', 'accessory']);
+const ACCESSORY_SLOTS = new Set(['crown', 'saddle', 'sticker', 'wings']);
 
 export class CollectibleManager {
   constructor(scene) {
     this.scene = scene;
     this.items = new Map();
     this.collectedIds = new Set();
+    this.equipment = new Map();
+    this.store = scene.registry.get('collectionStore') ?? new CollectionStore();
     this.pickups = scene.physics.add.staticGroup();
     this.loadPromise = null;
   }
@@ -65,8 +70,25 @@ export class CollectibleManager {
       loadedItems.set(item.id, item);
     }
 
+    const saved = this.store.loadState();
+    for (const [accessoryId, unicornId] of saved.equipment) {
+      const accessory = loadedItems.get(accessoryId);
+      const unicorn = loadedItems.get(unicornId);
+      if (
+        (accessory && (accessory.type !== 'accessory' || !saved.collectedIds.has(accessoryId)))
+        || (unicorn && (unicorn.type !== 'unicorn' || !saved.collectedIds.has(unicornId)))
+      ) {
+        throw new Error('Den gemte samling indeholder ugyldigt udstyr.');
+      }
+    }
+    this.collectedIds = saved.collectedIds;
+    this.equipment = saved.equipment;
     this.items = loadedItems;
-    this.items.forEach((item) => this.createPickup(item));
+    this.items.forEach((item) => {
+      if (!this.collectedIds.has(item.id)) {
+        this.createPickup(item);
+      }
+    });
     return this.getAllItems();
   }
 
@@ -78,6 +100,9 @@ export class CollectibleManager {
       || !COLLECTIBLE_TYPES.has(item.type)
       || !hasText(item.name)
       || !hasText(item.texture)
+      || (item.type === 'unicorn' && !hasText(item.color))
+      || (item.type === 'accessory' && !ACCESSORY_SLOTS.has(item.slot))
+      || (item.wornTexture !== undefined && !hasText(item.wornTexture))
       || !Number.isFinite(item.x)
       || !Number.isFinite(item.y)
     ) {
@@ -86,12 +111,18 @@ export class CollectibleManager {
     if (!this.scene.textures.exists(item.texture)) {
       throw new Error(`Samlingens grafik "${item.texture}" er ikke indlæst.`);
     }
+    if (item.wornTexture && !this.scene.textures.exists(item.wornTexture)) {
+      throw new Error(`Tilbehørets grafik "${item.wornTexture}" er ikke indlæst.`);
+    }
 
     return {
       id: item.id.trim(),
       type: item.type,
       name: item.name.trim(),
       texture: item.texture.trim(),
+      ...(item.type === 'unicorn' ? { color: item.color.trim() } : {}),
+      ...(item.type === 'accessory' ? { slot: item.slot } : {}),
+      ...(item.wornTexture ? { wornTexture: item.wornTexture.trim() } : {}),
       x: item.x,
       y: item.y,
     };
@@ -115,7 +146,10 @@ export class CollectibleManager {
       return null;
     }
 
-    this.collectedIds.add(item.id);
+    const updatedIds = new Set(this.collectedIds);
+    updatedIds.add(item.id);
+    this.store.save(updatedIds, this.equipment);
+    this.collectedIds = updatedIds;
     pickup.destroy();
     return { ...item };
   }
@@ -134,5 +168,39 @@ export class CollectibleManager {
 
   getAllItems() {
     return Array.from(this.items.values(), (item) => ({ ...item }));
+  }
+
+  getCollectedItems(type) {
+    return Array.from(this.items.values())
+      .filter((item) => item.type === type && this.collectedIds.has(item.id))
+      .map((item) => ({ ...item }));
+  }
+
+  getAccessoryOwner(accessoryId) {
+    return this.equipment.get(accessoryId);
+  }
+
+  toggleAccessory(unicornId, accessoryId) {
+    const unicorn = this.items.get(unicornId);
+    const accessory = this.items.get(accessoryId);
+    if (
+      unicorn?.type !== 'unicorn' || accessory?.type !== 'accessory'
+      || !this.collectedIds.has(unicornId) || !this.collectedIds.has(accessoryId)
+    ) {
+      throw new Error('Enhjørningen og tilbehøret skal være samlet først.');
+    }
+    const updated = new Map(this.equipment);
+    if (updated.get(accessoryId) === unicornId) {
+      updated.delete(accessoryId);
+    } else {
+      for (const [otherId, ownerId] of updated) {
+        if (ownerId === unicornId && this.items.get(otherId)?.slot === accessory.slot) {
+          updated.delete(otherId);
+        }
+      }
+      updated.set(accessoryId, unicornId);
+    }
+    this.store.save(this.collectedIds, updated);
+    this.equipment = updated;
   }
 }

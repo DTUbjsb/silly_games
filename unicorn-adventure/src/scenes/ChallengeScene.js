@@ -22,6 +22,7 @@ export class ChallengeScene extends Phaser.Scene {
     this.onComplete = onComplete;
     this.isResolved = false;
     this.answerButtons = [];
+    const beginnerReading = challenge.category === 'Reading' && challenge.difficulty === 1;
     const optionSpacing = Math.min(54, 128 / (challenge.options.length - 1));
     const firstOptionY = 310 + (128 - (challenge.options.length - 1) * optionSpacing) / 2;
     const buttonHeight = Math.min(44, optionSpacing - 4);
@@ -34,7 +35,7 @@ export class ChallengeScene extends Phaser.Scene {
       .setStrokeStyle(4, 0x9b83d5)
       .setScrollFactor(0)
       .setDepth(21);
-    this.add.text(400, 66, 'EN NY EVENTYRUDFORDRING', {
+    this.add.text(400, 66, beginnerReading ? 'LÆS' : 'EN NY EVENTYRUDFORDRING', {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: '16px',
       fontStyle: 'bold',
@@ -55,7 +56,7 @@ export class ChallengeScene extends Phaser.Scene {
       wordWrap: { width: 610 },
     }).setOrigin(0.5).setScrollFactor(0).setDepth(22);
     this.add.text(400, 222, (
-      `${CATEGORY_LABELS[challenge.category]} · niveau ${challenge.difficulty}`
+      beginnerReading ? 'Læs · 1' : `${CATEGORY_LABELS[challenge.category]} · niveau ${challenge.difficulty}`
     ), {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: '15px',
@@ -71,7 +72,7 @@ export class ChallengeScene extends Phaser.Scene {
       wordWrap: { width: 620 },
     }).setOrigin(0.5).setScrollFactor(0).setDepth(22);
 
-    this.feedback = this.add.text(400, 486, 'Vælg et svar for at hjælpe.', {
+    this.feedback = this.add.text(400, 486, beginnerReading ? 'Se på et ord.' : 'Vælg et svar for at hjælpe.', {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: '17px',
       color: '#48616f',
@@ -103,6 +104,7 @@ export class ChallengeScene extends Phaser.Scene {
 
         if (evaluateAnswer(option)) {
           this.isResolved = true;
+          this.registry.get('soundEffects').play('questionCorrect');
           this.answerButtons.forEach((answerButton) => answerButton.disableInteractive());
           this.feedback.setText(challenge.story.success).setColor('#26734c');
           this.continueButton.setVisible(true);
@@ -113,7 +115,7 @@ export class ChallengeScene extends Phaser.Scene {
       });
     });
 
-    this.continueButton = this.add.text(400, 530, 'Fortsæt eventyret', {
+    this.continueButton = this.add.text(400, 530, beginnerReading ? 'Kom nu' : 'Fortsæt eventyret', {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: '16px',
       fontStyle: 'bold',
@@ -135,7 +137,8 @@ export class ChallengeScene extends Phaser.Scene {
     const onComplete = this.onComplete;
     this.onComplete = null;
     this.scene.stop();
-    this.scene.resume('MainWorldScene');
-    onComplete(true);
+    if (onComplete(true) !== false) {
+      this.scene.resume('MainWorldScene');
+    }
   }
 }

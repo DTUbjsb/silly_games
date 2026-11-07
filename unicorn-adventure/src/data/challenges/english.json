@@ -1,6 +1,20 @@
 {
   "challenges": [
     {
+      "id": "flora-forest",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder det engelske ord “flower” på dansk?",
+      "options": ["blomst", "træ", "sø"],
+      "correctAnswer": "blomst",
+      "story": {
+        "character": "Flora, blomsterskovens vogter",
+        "introduction": "Jeg vogter blomsterskoven. Hvad kalder vi “flower” på dansk?",
+        "success": "Rigtigt! Hjælp nu Flora med at jage myggene væk.",
+        "hint": "Tænk på noget farverigt, der vokser i en have."
+      }
+    },
+    {
       "id": "stjerne",
       "category": "English",
       "difficulty": 1,
@@ -36,9 +50,9 @@
       "options": ["blomst", "regnbue", "sommerfugl"],
       "correctAnswer": "regnbue",
       "story": {
-        "character": "Luna og regnbuestien",
-        "introduction": "Luna viser jer et engelsk ord, der gemmer på regnbuens farver.",
-        "success": "Du fandt den rigtige oversættelse! Regnbuestien åbner sig.",
+        "character": "Luna, regnbueskovens vogter",
+        "introduction": "Jeg vogter regnbueskoven. Hvad kalder vi “rainbow” på dansk?",
+        "success": "Rigtigt! Hjælp nu Luna med at jage myggene væk.",
         "hint": "Tænk på buen med mange farver, som kan ses efter regn."
       }
     },

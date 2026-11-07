@@ -1,0 +1,25 @@
+{
+  "id": "west-fairy",
+  "name": "Skovfeen Iris",
+  "avatar": "fairy-flora",
+  "x": -368,
+  "y": 880,
+  "interactionRadius": 112,
+  "repeatDialogue": "Skoven er åben. Find enhjørningen og skattene derinde!",
+  "interactions": [
+    {
+      "type": "dialogue",
+      "lines": [
+        "Jeg hedder Iris og passer på regnbueskoven.",
+        "Svar på et spørgsmål og hjælp med at jage myggene væk, så åbner jeg skoven."
+      ]
+    },
+    {
+      "type": "challenge",
+      "challengeId": "flora-forest",
+      "randomForPlayer": true,
+      "miniGame": "mosquito",
+      "opensGate": "westForest"
+    }
+  ]
+}

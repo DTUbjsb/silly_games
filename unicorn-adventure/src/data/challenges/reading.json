@@ -1,10 +1,80 @@
 {
   "challenges": [
     {
-      "id": "reading-sentence",
+      "id": "reading-short-cat",
       "category": "Reading",
       "difficulty": 1,
-      "question": "Læs sætningen: “Maja har en rød bold.” Hvad har Maja?",
+      "question": "En kat har en hat. En kat har en ...?",
+      "options": ["hat", "bil", "sko"],
+      "correctAnswer": "hat",
+      "story": {
+        "character": "En kat",
+        "introduction": "Se på en kat.",
+        "success": "Ja! En hat.",
+        "hint": "Se på: en hat."
+      }
+    },
+    {
+      "id": "reading-short-book",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "Ida har en bog. Ida har en ...?",
+      "options": ["bog", "mus", "ost"],
+      "correctAnswer": "bog",
+      "story": {
+        "character": "Ida",
+        "introduction": "Se på en bog.",
+        "success": "Ja! En bog.",
+        "hint": "Se på: en bog."
+      }
+    },
+    {
+      "id": "reading-short-sun",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En sol er gul. En sol er ...?",
+      "options": ["gul", "rød", "blå"],
+      "correctAnswer": "gul",
+      "story": {
+        "character": "En sol",
+        "introduction": "Se på en sol.",
+        "success": "Ja! Gul sol.",
+        "hint": "Se på: er gul."
+      }
+    },
+    {
+      "id": "reading-short-mouse",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En mus får ost. En mus får ...?",
+      "options": ["ost", "is", "te"],
+      "correctAnswer": "ost",
+      "story": {
+        "character": "En mus",
+        "introduction": "Se på en mus.",
+        "success": "Ja! Ost.",
+        "hint": "Se på: får ost."
+      }
+    },
+    {
+      "id": "reading-short-boy",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "Bo ser en ål. Bo så en ...?",
+      "options": ["ål", "ko", "so"],
+      "correctAnswer": "ål",
+      "story": {
+        "character": "Bo",
+        "introduction": "Se på Bo.",
+        "success": "Ja! En ål.",
+        "hint": "Se på: en ål."
+      }
+    },
+    {
+      "id": "reading-sentence",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "Læs sætningen: “Maja har mistet sin røde bold.” Hvad har Maja mistet?",
       "options": ["En bold", "En kat", "En cykel"],
       "correctAnswer": "En bold",
       "story": {
@@ -31,7 +101,7 @@
     {
       "id": "reading-rain",
       "category": "Reading",
-      "difficulty": 3,
+      "difficulty": 2,
       "question": "“Ali tog paraplyen med, fordi skyerne var mørke.” Hvorfor tog Ali paraplyen?",
       "options": ["Fordi det måske ville regne", "Fordi han skulle sove", "Fordi solen skinnede"],
       "correctAnswer": "Fordi det måske ville regne",
@@ -45,7 +115,7 @@
     {
       "id": "reading-seed",
       "category": "Reading",
-      "difficulty": 4,
+      "difficulty": 2,
       "question": "“Frøet fik vand og sol hver dag. Efter nogle uger voksede der en grøn plante.” Hvad hjalp frøet med at vokse?",
       "options": ["Vand og sol", "Sne og vind", "Mørke og sten"],
       "correctAnswer": "Vand og sol",
@@ -59,7 +129,7 @@
     {
       "id": "reading-library",
       "category": "Reading",
-      "difficulty": 5,
+      "difficulty": 2,
       "question": "“Sofie lånte en bog på biblioteket. Hun læste den færdig, før afleveringsdagen kom.” Hvad gjorde Sofie, før hun afleverede bogen?",
       "options": ["Hun læste den færdig", "Hun købte bogen", "Hun gav den til en ven"],
       "correctAnswer": "Hun læste den færdig",

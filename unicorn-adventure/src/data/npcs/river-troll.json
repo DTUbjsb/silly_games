@@ -1,0 +1,17 @@
+{
+  "id": "river-troll",
+  "name": "Flodens trold",
+  "avatar": "bridge-troll",
+  "x": 2992,
+  "y": 1968,
+  "interactionRadius": 112,
+  "repeatDialogue": "Broen er åben! I kan gå over floden.",
+  "interactions": [
+    {
+      "type": "challenge",
+      "challengeId": "river-troll-berries",
+      "miniGame": "troll",
+      "opensGate": "secondBridge"
+    }
+  ]
+}

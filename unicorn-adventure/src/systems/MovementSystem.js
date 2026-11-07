@@ -1,7 +1,7 @@
 export class MovementSystem {
   constructor(scene, player) {
     this.player = player;
-    this.speed = 220;
+    this.speed = 242;
     this.cursors = scene.input.keyboard.createCursorKeys();
     this.keys = scene.input.keyboard.addKeys('W,A,S,D');
   }

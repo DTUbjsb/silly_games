@@ -20,7 +20,15 @@ export class LeaderFollowerSystem {
       return null;
     }
 
-    [this.players[0], this.players[1]] = [this.players[1], this.players[0]];
+    return this.setLeader(this.players[1].id);
+  }
+
+  setLeader(id) {
+    const index = this.players.findIndex((player) => player.id === id);
+    if (index < 0) {
+      throw new Error(`Spilleren "${id}" findes ikke i gruppen.`);
+    }
+    [this.players[0], this.players[index]] = [this.players[index], this.players[0]];
     this.trail = [{ x: this.leader.sprite.x, y: this.leader.sprite.y }];
     return this.leader;
   }

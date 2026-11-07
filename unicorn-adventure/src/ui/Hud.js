@@ -1,59 +1,105 @@
+import { ACCESSORY_CATEGORIES } from '../data/accessoryCategories.js';
+
 export class Hud {
   constructor(scene) {
-    this.label = scene.add.text(28, 22, 'ORDJAGT', {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: '15px',
-      fontStyle: 'bold',
-      color: '#476579',
-      letterSpacing: 2,
-    }).setScrollFactor(0).setDepth(5);
+    const game = scene.game.canvas.parentElement;
+    this.element = document.createElement('div');
+    this.element.className = 'game-hud';
+    for (const type of ['keydown', 'keyup']) {
+      this.element.addEventListener(type, (event) => {
+        if (event.key === ' ' || event.key === 'Enter') {
+          event.stopPropagation();
+        }
+      });
+    }
 
-    this.progress = scene.add.text(750, 19, '', {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: '20px',
-      fontStyle: 'bold',
-      color: '#294c5b',
-    }).setOrigin(1, 0).setScrollFactor(0).setDepth(5);
+    const makeElement = (tag, className, text) => {
+      const element = document.createElement(tag);
+      element.className = className;
+      element.textContent = text;
+      if (tag === 'button') {
+        element.addEventListener('pointerdown', (event) => {
+          if (event.pointerType === 'mouse') {
+            event.preventDefault();
+          }
+        });
+      }
+      return element;
+    };
+    const location = makeElement('div', 'hud-location', '');
+    this.label = makeElement('strong', 'hud-label', 'EVENTYR');
+    this.resetButton = makeElement('button', 'hud-button hud-reset', 'Nulstil spil');
+    this.resetButton.type = 'button';
+    this.resetButton.addEventListener('click', () => scene.resetProgress());
+    location.append(this.label, this.resetButton);
 
-    this.collectionProgress = scene.add.text(750, 47, '', {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: '13px',
-      fontStyle: 'bold',
-      color: '#476579',
-    }).setOrigin(1, 0).setScrollFactor(0).setDepth(5);
+    const player = makeElement('div', 'hud-player', '');
+    this.turn = makeElement('strong', 'hud-turn', 'Indlæser tur...');
+    this.swapButton = makeElement('button', 'hud-button', 'Skift tur · T');
+    this.swapButton.type = 'button';
+    this.swapButton.addEventListener('click', () => scene.swapLeader());
+    player.append(this.turn, this.swapButton);
 
-    this.turn = scene.add.text(400, 18, 'Indlæser tur...', {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: '17px',
-      fontStyle: 'bold',
-      color: '#294c5b',
-    }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(5);
+    const collection = makeElement('div', 'hud-collection', '');
+    this.progress = makeElement('strong', '', '');
+    this.collectionProgress = makeElement('div', 'hud-accessories', '');
+    this.accessoryCounters = new Map(ACCESSORY_CATEGORIES.map(({ slot }) => {
+      const counter = makeElement('span', '', '');
+      this.collectionProgress.append(counter);
+      return [slot, counter];
+    }));
+    collection.append(this.progress, this.collectionProgress);
+    this.element.append(location, player, collection);
+    game.before(this.element);
+    this.turnPopup = makeElement('div', 'turn-popup', '');
+    this.turnPopup.setAttribute('role', 'status');
+    this.turnPopup.setAttribute('aria-live', 'polite');
+    this.turnPopup.hidden = true;
+    game.append(this.turnPopup);
 
-    this.swapButton = scene.add.text(400, 46, 'Skift tur  ·  T', {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: '14px',
-      color: '#4b5574',
-      backgroundColor: '#ffffffcc',
-      padding: { x: 8, y: 4 },
-    }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(5)
-      .setInteractive({ useHandCursor: true });
-
-    this.swapButton.on('pointerover', () => this.swapButton.setBackgroundColor('#fff2b3'));
-    this.swapButton.on('pointerout', () => this.swapButton.setBackgroundColor('#ffffffcc'));
-    this.swapButton.on('pointerdown', () => scene.swapLeader());
+    const pause = () => {
+      this.resetButton.disabled = true;
+      this.swapButton.disabled = true;
+    };
+    const resume = () => {
+      this.resetButton.disabled = false;
+      this.swapButton.disabled = false;
+      this.setLocation(false);
+    };
+    scene.events.on('pause', pause);
+    scene.events.on('resume', resume);
+    scene.events.once('shutdown', () => {
+      scene.events.off('pause', pause);
+      scene.events.off('resume', resume);
+      clearTimeout(this.turnPopupTimer);
+      this.turnPopup.remove();
+      this.element.remove();
+    });
   }
 
-  setProgress(learned, goal) {
-    this.progress.setText(`✨  ${learned} / ${goal} udfordringer løst`);
-  }
-
-  setCollectionProgress(unicorns, unicornGoal, accessories, accessoryGoal) {
-    this.collectionProgress.setText(
-      `Enhjørninger ${unicorns}/${unicornGoal} · tilbehør ${accessories}/${accessoryGoal}`,
-    );
+  setCollectionProgress(unicorns, unicornGoal, collectedAccessories, allAccessories) {
+    this.progress.textContent = `Enhjørninger: ${unicorns} / ${unicornGoal}`;
+    for (const { slot, label } of ACCESSORY_CATEGORIES) {
+      const count = collectedAccessories.filter((item) => item.slot === slot).length;
+      const total = allAccessories.filter((item) => item.slot === slot).length;
+      this.accessoryCounters.get(slot).textContent = `${label}: ${count} / ${total}`;
+    }
   }
 
   setTurn(playerName) {
-    this.turn.setText(`${playerName} har turen`);
+    this.turn.textContent = `${playerName} har turen`;
+  }
+
+  showTurnChange(playerName) {
+    clearTimeout(this.turnPopupTimer);
+    this.turnPopup.textContent = `Nu er det ${playerName}s tur!`;
+    this.turnPopup.hidden = false;
+    this.turnPopupTimer = setTimeout(() => {
+      this.turnPopup.hidden = true;
+    }, 2500);
+  }
+
+  setLocation(inStable) {
+    this.label.textContent = inStable ? 'ENHJØRNINGESTALDEN' : 'EVENTYR';
   }
 }

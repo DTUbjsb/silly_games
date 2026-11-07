@@ -1,22 +1,25 @@
 {
   "id": "flora",
   "name": "Flora",
-  "avatar": "unicorn-blue",
-  "x": 640,
-  "y": 320,
+  "avatar": "fairy-flora",
+  "x": 2192,
+  "y": 528,
   "interactionRadius": 112,
-  "repeatDialogue": "Hav en magisk dag i skoven!",
+  "repeatDialogue": "Skoven er åben. Find kronen mellem træerne!",
   "interactions": [
     {
       "type": "dialogue",
       "lines": [
-        "Velkommen til blomsterengen!",
-        "Jeg elsker at lære nye ord."
+        "Jeg hedder Flora og vogter indgangen til blomsterskoven.",
+        "Kronen ligger derinde. Svar på et spørgsmål, og hjælp mig derefter med at jage myg væk, så åbner jeg stien."
       ]
     },
     {
       "type": "challenge",
-      "challengeId": "stjerne"
+      "challengeId": "flora-forest",
+      "randomForPlayer": true,
+      "miniGame": "mosquito",
+      "opensGate": "flora"
     }
   ]
 }

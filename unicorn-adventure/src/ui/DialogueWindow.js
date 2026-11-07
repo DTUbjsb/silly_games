@@ -84,18 +84,21 @@ export class DialogueWindow {
   }
 
   showQuestOffer(speaker, quest, onChoice) {
+    this.showChoice(speaker, `${quest.title}\n${quest.description}\nBelønning: ${quest.reward}`,
+      'Vil du tage imod opgaven?', onChoice, 'Accepter', 'Afslå');
+  }
+
+  showChoice(speaker, message, prompt, onChoice, acceptLabel = 'Ja', declineLabel = 'Nej') {
     this.mode = 'quest';
     this.onChoice = onChoice;
     this.onComplete = null;
     this.open();
     this.speaker.setText(speaker);
-    this.message.setText(
-      `${quest.title}\n${quest.description}\nBelønning: ${quest.reward}`,
-    );
-    this.prompt.setPosition(58, 545).setOrigin(0, 0).setText('Vil du tage imod opgaven?').setVisible(true);
+    this.message.setText(message);
+    this.prompt.setPosition(58, 545).setOrigin(0, 0).setText(prompt).setVisible(true);
     this.continueButton.setVisible(false);
-    this.acceptButton.setVisible(true);
-    this.laterButton.setVisible(true);
+    this.acceptButton.setText(acceptLabel).setVisible(true);
+    this.laterButton.setText(declineLabel).setVisible(true);
   }
 
   advance() {

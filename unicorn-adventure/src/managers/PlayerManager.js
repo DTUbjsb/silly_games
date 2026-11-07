@@ -9,7 +9,7 @@ const GIRL_AVATARS_BY_HAIR_COLOR = new Map([
   ['brunette', 'girl-brown'],
   ['light brown', 'girl-brown'],
   ['dark brown', 'girl-brown'],
-  ['purple', 'girl'],
+  ['purple', 'girl-purple'],
 ]);
 
 export class PlayerManager {

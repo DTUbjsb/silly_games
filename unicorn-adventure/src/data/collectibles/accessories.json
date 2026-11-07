@@ -5,22 +5,298 @@
       "id": "accessory-crown",
       "name": "Krone",
       "texture": "accessory-crown",
-      "x": 384,
-      "y": 176
+      "slot": "crown",
+      "x": 1776,
+      "y": 528
     },
     {
       "id": "accessory-saddle",
-      "name": "Sadel",
-      "texture": "accessory-saddle",
-      "x": 832,
-      "y": 480
+      "name": "Pink sadel",
+      "texture": "accessory-saddle-pink",
+      "wornTexture": "saddle-worn-pink",
+      "slot": "saddle",
+      "x": 2480,
+      "y": 1680
     },
     {
       "id": "accessory-star-sticker",
       "name": "Stjernemærke",
       "texture": "accessory-star-sticker",
-      "x": 960,
-      "y": 736
+      "slot": "sticker",
+      "x": 464,
+      "y": 1584
+    },
+    {
+      "id": "accessory-heart",
+      "name": "Hjertemærke",
+      "texture": "accessory-heart",
+      "slot": "sticker",
+      "x": 848,
+      "y": 304
+    },
+    {
+      "id": "accessory-flower",
+      "name": "Blomstermærke",
+      "texture": "accessory-flower",
+      "slot": "sticker",
+      "x": 2608,
+      "y": 240
+    },
+    {
+      "id": "accessory-moon",
+      "name": "Månemærke",
+      "texture": "accessory-moon",
+      "slot": "sticker",
+      "x": 1888,
+      "y": 2800
+    },
+    {
+      "id": "accessory-saddle-blue",
+      "name": "Blå sadel",
+      "texture": "accessory-saddle-blue",
+      "slot": "saddle",
+      "wornTexture": "saddle-worn-blue",
+      "x": 3600,
+      "y": 480
+    },
+    {
+      "id": "accessory-saddle-green",
+      "name": "Grøn sadel",
+      "texture": "accessory-saddle-green",
+      "slot": "saddle",
+      "wornTexture": "saddle-worn-green",
+      "x": 1200,
+      "y": 1520
+    },
+    {
+      "id": "accessory-saddle-yellow",
+      "name": "Gul sadel",
+      "texture": "accessory-saddle-yellow",
+      "slot": "saddle",
+      "wornTexture": "saddle-worn-yellow",
+      "x": 3536,
+      "y": 1840
+    },
+    {
+      "id": "accessory-witch-hat",
+      "name": "Troldmandshat",
+      "texture": "accessory-witch-hat",
+      "slot": "crown",
+      "x": 304,
+      "y": 2336
+    },
+    {
+      "id": "accessory-flower-hat",
+      "name": "Blomsterhat",
+      "texture": "accessory-flower-hat",
+      "slot": "crown",
+      "x": 1808,
+      "y": 2256
+    },
+    {
+      "id": "accessory-party-hat",
+      "name": "Festhat",
+      "texture": "accessory-party-hat",
+      "slot": "crown",
+      "x": 3680,
+      "y": 2864
+    },
+    {
+      "id": "accessory-wave",
+      "name": "Bølgemærke",
+      "texture": "accessory-wave",
+      "slot": "sticker",
+      "x": 2704,
+      "y": 2400
+    },
+    {
+      "id": "accessory-alvina-hat",
+      "name": "Alvinas blå hat",
+      "texture": "accessory-alvina-hat",
+      "slot": "crown",
+      "x": 432,
+      "y": 432
+    },
+    {
+      "id": "accessory-ellie-hat",
+      "name": "Ellies grønne hat",
+      "texture": "accessory-ellie-hat",
+      "slot": "crown",
+      "x": 2000,
+      "y": 1904
+    },
+    {
+      "id": "accessory-saddle-purple",
+      "name": "Lilla sadel",
+      "texture": "accessory-saddle-purple",
+      "wornTexture": "saddle-worn-purple",
+      "slot": "saddle",
+      "x": 1440,
+      "y": 752
+    },
+    {
+      "id": "accessory-saddle-orange",
+      "name": "Orange sadel",
+      "texture": "accessory-saddle-orange",
+      "wornTexture": "saddle-worn-orange",
+      "slot": "saddle",
+      "x": 1232,
+      "y": 2576
+    },
+    {
+      "id": "accessory-rainbow",
+      "name": "Regnbuemærke",
+      "texture": "accessory-rainbow",
+      "slot": "sticker",
+      "x": 3392,
+      "y": 1120
+    },
+    {
+      "id": "accessory-wings-pink",
+      "name": "Lyserøde vinger",
+      "texture": "accessory-wings-pink",
+      "slot": "wings",
+      "x": 688,
+      "y": 560
+    },
+    {
+      "id": "accessory-wings-blue",
+      "name": "Blå vinger",
+      "texture": "accessory-wings-blue",
+      "slot": "wings",
+      "x": 2928,
+      "y": 656
+    },
+    {
+      "id": "accessory-wings-green",
+      "name": "Grønne vinger",
+      "texture": "accessory-wings-green",
+      "slot": "wings",
+      "x": 832,
+      "y": 1360
+    },
+    {
+      "id": "accessory-wings-purple",
+      "name": "Lilla vinger",
+      "texture": "accessory-wings-purple",
+      "slot": "wings",
+      "x": 2736,
+      "y": 1296
+    },
+    {
+      "id": "accessory-wings-orange",
+      "name": "Orange vinger",
+      "texture": "accessory-wings-orange",
+      "slot": "wings",
+      "x": 848,
+      "y": 2864
+    },
+    {
+      "id": "accessory-wings-turquoise",
+      "name": "Turkise vinger",
+      "texture": "accessory-wings-turquoise",
+      "slot": "wings",
+      "x": 3504,
+      "y": 2352
+    },
+    {
+      "id": "accessory-saddle-rose",
+      "name": "Rosengløds sadel",
+      "texture": "accessory-saddle-rose",
+      "wornTexture": "saddle-worn-rose",
+      "slot": "saddle",
+      "x": -464,
+      "y": 176
+    },
+    {
+      "id": "accessory-wings-rose",
+      "name": "Rosengløds vinger",
+      "texture": "accessory-wings-rose",
+      "slot": "wings",
+      "x": -240,
+      "y": 528
+    },
+    {
+      "id": "accessory-hat-rose",
+      "name": "Rosengløds hat",
+      "texture": "accessory-hat-rose",
+      "slot": "crown",
+      "x": -880,
+      "y": 1424
+    },
+    {
+      "id": "accessory-sticker-rose",
+      "name": "Rosengløds hjertemærke",
+      "texture": "accessory-sticker-rose",
+      "slot": "sticker",
+      "x": -528,
+      "y": 1520
+    },
+    {
+      "id": "accessory-saddle-ocean",
+      "name": "Havglimts sadel",
+      "texture": "accessory-saddle-ocean",
+      "wornTexture": "saddle-worn-ocean",
+      "slot": "saddle",
+      "x": -784,
+      "y": 784
+    },
+    {
+      "id": "accessory-wings-ocean",
+      "name": "Havglimts vinger",
+      "texture": "accessory-wings-ocean",
+      "slot": "wings",
+      "x": -592,
+      "y": 784
+    },
+    {
+      "id": "accessory-hat-ocean",
+      "name": "Havglimts hat",
+      "texture": "accessory-hat-ocean",
+      "slot": "crown",
+      "x": -784,
+      "y": 976
+    },
+    {
+      "id": "accessory-sticker-ocean",
+      "name": "Havglimts bølgemærke",
+      "texture": "accessory-sticker-ocean",
+      "slot": "sticker",
+      "x": -592,
+      "y": 976
+    },
+    {
+      "id": "accessory-saddle-sun",
+      "name": "Solglimts sadel",
+      "texture": "accessory-saddle-sun",
+      "wornTexture": "saddle-worn-sun",
+      "slot": "saddle",
+      "x": -304,
+      "y": 1936
+    },
+    {
+      "id": "accessory-wings-sun",
+      "name": "Solglimts vinger",
+      "texture": "accessory-wings-sun",
+      "slot": "wings",
+      "x": -848,
+      "y": 2064
+    },
+    {
+      "id": "accessory-hat-sun",
+      "name": "Solglimts hat",
+      "texture": "accessory-hat-sun",
+      "slot": "crown",
+      "x": -272,
+      "y": 2576
+    },
+    {
+      "id": "accessory-sticker-sun",
+      "name": "Solglimts solmærke",
+      "texture": "accessory-sticker-sun",
+      "slot": "sticker",
+      "x": -688,
+      "y": 2832
     }
   ]
 }

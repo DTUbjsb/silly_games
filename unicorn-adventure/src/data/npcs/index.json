@@ -2,6 +2,9 @@
   "npcs": [
     "luna.json",
     "flora.json",
-    "bridge-troll.json"
+    "bridge-troll.json",
+    "river-troll.json",
+    "west-fairy.json",
+    "west-troll.json"
   ]
 }

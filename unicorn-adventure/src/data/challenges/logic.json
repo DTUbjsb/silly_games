@@ -1,10 +1,94 @@
 {
   "challenges": [
     {
+      "id": "logic-one-colors",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Rød, blå, rød, blå. Hvilken farve kommer nu?",
+      "options": ["Rød", "Blå", "Gul"],
+      "correctAnswer": "Rød",
+      "story": {
+        "character": "Farvefeen",
+        "introduction": "Feen lægger røde og blå sten på skift.",
+        "success": "Rød er den næste farve!",
+        "hint": "Efter blå kommer rød igen."
+      }
+    },
+    {
+      "id": "logic-one-count",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "1, 2, 3, ... Hvilket tal kommer nu?",
+      "options": ["4", "5", "6"],
+      "correctAnswer": "4",
+      "story": {
+        "character": "Kaninen",
+        "introduction": "Kaninen tæller sine gulerødder: en, to, tre.",
+        "success": "Fire kommer efter tre!",
+        "hint": "Tæl én videre fra tre."
+      }
+    },
+    {
+      "id": "logic-one-size",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilket tal er størst: 2, 5 eller 3?",
+      "options": ["2", "5", "3"],
+      "correctAnswer": "5",
+      "story": {
+        "character": "Musen",
+        "introduction": "Musen sammenligner tallene 2, 5 og 3.",
+        "success": "Fem er det største tal!",
+        "hint": "Tæl fra ét til fem. Hvilket af tallene kommer sidst?"
+      }
+    },
+    {
+      "id": "logic-two-number-pattern",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "5, 10, 15, ... Hvilket tal kommer nu?",
+      "options": ["18", "20", "25"],
+      "correctAnswer": "20",
+      "story": {
+        "character": "Stensamleren",
+        "introduction": "Stensamleren tæller sten fem ad gangen: 5, 10, 15.",
+        "success": "Tyve kommer efter 15, når vi tæller fem videre!",
+        "hint": "Læg fem til 15."
+      }
+    },
+    {
+      "id": "logic-two-missing",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Hvilket tal mangler: 12, 14, __, 18?",
+      "options": ["15", "16", "17"],
+      "correctAnswer": "16",
+      "story": {
+        "character": "Talvogteren",
+        "introduction": "På stien står 12, 14, et tomt felt og 18. Tallene vokser med to hver gang.",
+        "success": "Seksten passer i det tomme felt!",
+        "hint": "Læg to til 14."
+      }
+    },
+    {
+      "id": "logic-two-repeating",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Sol, måne, stjerne, sol, måne, ... Hvad kommer nu?",
+      "options": ["Sol", "Måne", "Stjerne"],
+      "correctAnswer": "Stjerne",
+      "story": {
+        "character": "Stjernefeen",
+        "introduction": "Feen gentager et mønster med sol, måne og stjerne.",
+        "success": "Stjernen kommer efter månen i mønstret!",
+        "hint": "Se på de første tre: sol, måne, stjerne."
+      }
+    },
+    {
       "id": "logic-count",
       "category": "Logic",
       "difficulty": 1,
-      "question": "Hvilket tal kommer efter 2, 4 og 6?",
+      "question": "Tallene vokser med 2 hver gang: 2, 4, 6. Hvilket tal kommer nu?",
       "options": ["7", "8", "9"],
       "correctAnswer": "8",
       "story": {
