@@ -1,4 +1,37 @@
 const EFFECTS = {
+  lakeStart: [
+    { type: 'sine', from: 440, to: 600, duration: 0.22, volume: 0.06 },
+    { type: 'sine', from: 660, to: 880, duration: 0.28, volume: 0.05, delay: 0.15 },
+    { type: 'noise', from: 1200, to: 400, duration: 0.2, volume: 0.045 },
+  ],
+  lakePaddle: [
+    { type: 'noise', from: 1300, to: 450, duration: 0.18, volume: 0.055 },
+    { type: 'sine', from: 350, to: 190, duration: 0.14, volume: 0.035 },
+  ],
+  lakeFish: [
+    { type: 'noise', from: 2400, to: 650, duration: 0.16, volume: 0.07 },
+    { type: 'sine', from: 700, to: 1050, duration: 0.12, volume: 0.055 },
+  ],
+  lakeMonster: [
+    { type: 'triangle', from: 170, to: 75, duration: 0.4, volume: 0.06 },
+    { type: 'noise', from: 650, to: 240, duration: 0.3, volume: 0.055 },
+  ],
+  lakeHit: [
+    { type: 'noise', from: 1500, to: 350, duration: 0.24, volume: 0.09 },
+    { type: 'triangle', from: 250, to: 90, duration: 0.2, volume: 0.07 },
+  ],
+  lakeWin: [
+    { type: 'sine', from: 523, to: 523, duration: 0.18, volume: 0.07 },
+    { type: 'sine', from: 659, to: 659, duration: 0.18, volume: 0.07, delay: 0.15 },
+    { type: 'sine', from: 784, to: 1047, duration: 0.32, volume: 0.07, delay: 0.3 },
+  ],
+  lakeLose: [
+    { type: 'triangle', from: 310, to: 220, duration: 0.25, volume: 0.06 },
+    { type: 'sine', from: 220, to: 130, duration: 0.38, volume: 0.065, delay: 0.2 },
+  ],
+  lakeMusicLow: [{ type: 'sine', from: 392, to: 392, duration: 0.45, volume: 0.035 }],
+  lakeMusicMid: [{ type: 'sine', from: 494, to: 494, duration: 0.45, volume: 0.035 }],
+  lakeMusicHigh: [{ type: 'sine', from: 587, to: 587, duration: 0.45, volume: 0.035 }],
   catMeow: [{ type: 'triangle', from: 580, to: 420, duration: 0.24, volume: 0.075 },
     { type: 'sine', from: 850, to: 620, duration: 0.2, volume: 0.035 }],
   worldVolcanoLow: [{ type: 'triangle', from: 147, to: 140, duration: 0.4, volume: 0.04 }],

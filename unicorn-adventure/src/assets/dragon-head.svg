@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="230" height="170" viewBox="0 0 230 170">
+  <title>Dragens hoved</title>
+  <path d="M43 69L18 5L79 48M187 69L212 5L151 48" fill="#e2c697" stroke="#382637" stroke-width="6"/>
+  <path d="M24 70Q33 15 115 24Q197 15 206 70L185 130Q160 164 115 163Q70 164 45 130Z" fill="#82445b" stroke="#382637" stroke-width="6"/>
+  <path d="M58 93Q115 72 172 93L178 126Q115 153 52 126Z" fill="#b46f77"/>
+  <ellipse cx="73" cy="71" rx="16" ry="12" fill="#f7d775"/><ellipse cx="157" cy="71" rx="16" ry="12" fill="#f7d775"/>
+  <path d="M73 63V79M157 63V79" stroke="#30202d" stroke-width="5"/>
+  <path d="M72 126Q115 145 158 126" fill="none" stroke="#382637" stroke-width="5"/>
+  <circle cx="91" cy="109" r="4" fill="#573042"/><circle cx="139" cy="109" r="4" fill="#573042"/>
+</svg>

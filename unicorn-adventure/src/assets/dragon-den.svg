@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="250" viewBox="0 0 380 250">
+  <title>Dragens mørke hule</title>
+  <path d="M12 234Q8 155 45 102L65 49L111 56L151 14L191 30L241 9L285 44L329 47Q374 113 368 234Z" fill="#52515b" stroke="#32323e" stroke-width="8"/>
+  <path d="M61 234Q55 111 189 89Q317 101 319 234Z" fill="#191a28" stroke="#292935" stroke-width="6"/>
+  <path d="M121 233Q117 182 133 146Q145 109 190 107Q237 110 248 149Q264 189 258 233Z" fill="#6c374f" stroke="#382637" stroke-width="5"/>
+  <path d="M150 177Q190 157 230 177L237 233H143Z" fill="#bf8b75"/>
+  <path d="M136 164L104 190L126 211M244 164L276 190L254 211" fill="none" stroke="#6c374f" stroke-width="22" stroke-linecap="round"/>
+  <path d="M150 139L136 99L163 121M230 139L244 99L217 121" fill="#e1cf9f" stroke="#382637" stroke-width="4"/>
+  <ellipse cx="190" cy="145" rx="47" ry="38" fill="#80465b" stroke="#382637" stroke-width="4"/>
+  <circle cx="172" cy="139" r="5" fill="#f3d16f"/><circle cx="208" cy="139" r="5" fill="#f3d16f"/>
+  <path d="M171 162Q190 174 209 162" fill="none" stroke="#382637" stroke-width="4"/>
+</svg>

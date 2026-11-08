@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="64" viewBox="0 0 72 64">
+  <title>Et par lavastøvler</title>
+  <path d="M8 9H29V37Q30 42 36 45V54Q36 58 31 58H6Q3 58 3 53V43Q8 40 8 34Z" fill="#9b4036" stroke="#57342e" stroke-width="3"/>
+  <path d="M43 9H64V37Q65 42 70 45V54Q70 58 65 58H41Q38 58 38 53V43Q43 40 43 34Z" fill="#bd5337" stroke="#57342e" stroke-width="3"/>
+  <path d="M8 13H29M43 13H64" stroke="#ffd574" stroke-width="5"/>
+  <path d="M4 50H35M39 50H69" stroke="#ffb452" stroke-width="4"/>
+  <path d="M14 21L19 29L24 21M49 21L54 29L59 21" fill="none" stroke="#ffcb68" stroke-width="3"/>
+</svg>

@@ -19,6 +19,7 @@ export const WORLD_TILE = Object.freeze({
   VOLCANIC_ROCK: 16,
   VOLCANIC_GATE_A: 17,
   VOLCANIC_GATE_B: 18,
+  SOUTH_GATE: 19,
 });
 
 export const WEST_REGION_WIDTH = 32;
@@ -26,12 +27,27 @@ export const WEST_CRACK = Object.freeze({ x: -16, y: 400, radius: 115 });
 export const WEST_REGION_DATA = createWestRegion();
 export const NORTH_REGION_HEIGHT = 48;
 export const NORTH_HOLE = Object.freeze({ x: 816, y: -16, radius: 115 });
+export const LAKE = Object.freeze({
+  left: 96, right: 111, top: 4, bottom: 20,
+  islandLeft: 102, islandRight: 108, islandTop: 10, islandBottom: 14,
+  boatX: 3376, shoreY: 660, islandY: 480,
+  shoreLandingY: 698, islandLandingY: 438, radius: 85,
+});
 export const NORTH_FOREST = Object.freeze({ left: 90, right: 110, top: 10, bottom: 30 });
 export const NORTH_REGION_DATA = createNorthRegion();
 export const EAST_REGION_WIDTH = 64;
 export const EAST_ORIGIN = 128 * TEST_WORLD_TILE_SIZE;
 export const EAST_PASS = Object.freeze({ x: EAST_ORIGIN + 16, y: 400, radius: 115 });
 export const EAST_REGION_DATA = createEastRegion();
+export const SOUTH_ORIGIN = 96 * TEST_WORLD_TILE_SIZE;
+export const SOUTH_REGION_HEIGHT = 32;
+export const SOUTH_PASS = Object.freeze({ x: 2064, y: SOUTH_ORIGIN + 16, radius: 120 });
+export const DRAGON_DEN = Object.freeze({ x: 2050, y: SOUTH_ORIGIN + 810, radius: 180 });
+export const SOUTH_REGION_DATA = Array.from({ length: SOUTH_REGION_HEIGHT + 1 }, (_, y) => (
+  Array.from({ length: 128 }, (_, x) => (
+    y === 0 ? (x >= 62 && x <= 66 ? WORLD_TILE.SOUTH_GATE : WORLD_TILE.WEST_WALL) : WORLD_TILE.GRASS
+  ))
+));
 
 function createEastRegion() {
   const tiles = Array.from({ length: 96 }, (_, y) => Array.from({ length: EAST_REGION_WIDTH }, (_, x) => (
@@ -117,6 +133,7 @@ export const WORLD_GATES = Object.freeze({
   northForest: WORLD_TILE.NORTH_FOREST_GATE,
   volcanoA: WORLD_TILE.VOLCANIC_GATE_A,
   volcanoB: WORLD_TILE.VOLCANIC_GATE_B,
+  south: WORLD_TILE.SOUTH_GATE,
 });
 
 // Keep map layout separate from rendering so this test world can later be replaced with authored maps.
@@ -147,9 +164,11 @@ function createTestWorld() {
     }
   }
 
-  for (let y = 5; y < 13; y += 1) {
-    for (let x = 104; x < 112; x += 1) {
-      tiles[y][x] = WORLD_TILE.WATER;
+  for (let y = LAKE.top; y <= LAKE.bottom; y += 1) {
+    for (let x = LAKE.left; x <= LAKE.right; x += 1) {
+      const island = x >= LAKE.islandLeft && x <= LAKE.islandRight
+        && y >= LAKE.islandTop && y <= LAKE.islandBottom;
+      tiles[y][x] = island ? WORLD_TILE.PATH : WORLD_TILE.WATER;
     }
   }
 

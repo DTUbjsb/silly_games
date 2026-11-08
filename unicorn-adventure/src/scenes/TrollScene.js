@@ -1,4 +1,5 @@
 import { MovementSystem } from '../systems/MovementSystem.js';
+import { minigameSpeed } from '../systems/MinigameDifficulty.js';
 
 const APPLE_GOAL = 7;
 const MAX_HITS = 3;
@@ -16,6 +17,7 @@ export class TrollScene extends Phaser.Scene {
       throw new Error('Troldespillet mangler en spiller eller afslutningsfunktion.');
     }
     this.onComplete = onComplete;
+    this.difficulty = minigameSpeed(player.age);
     this.finished = false;
     this.applesCollected = 0;
     this.hits = 0;
@@ -106,7 +108,7 @@ export class TrollScene extends Phaser.Scene {
     }
     const rock = this.rocks.create(TROLL_X - 90, TROLL_Y, 'troll-rock');
     const direction = new Phaser.Math.Vector2(this.player.x - rock.x, this.player.y - rock.y).normalize();
-    rock.body.setVelocity(direction.x * 240, direction.y * 240);
+    rock.body.setVelocity(direction.x * 240 * this.difficulty, direction.y * 240 * this.difficulty);
     this.registry.get('soundEffects').play('trollThrow');
   }
 

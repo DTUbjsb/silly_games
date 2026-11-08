@@ -1,4 +1,5 @@
-import { MAZE_ROWS, mazePath, WitchMazeScene } from './WitchMazeScene.js';
+import { mazePath, WitchMazeScene } from './WitchMazeScene.js';
+import { minigameSpeed } from '../systems/MinigameDifficulty.js';
 
 const PLAYER_SPEED = 145;
 const CAT_SPEED = 55;
@@ -17,6 +18,8 @@ export class CatMazeScene extends WitchMazeScene {
     this.onComplete = onComplete;
     this.finished = false;
     this.escaped = false;
+    this.difficulty = minigameSpeed(player.age);
+    this.selectMaze();
     this.add.rectangle(400, 300, 800, 600, 0x321f2b);
     this.add.text(400, 24, 'FANG ILDKATTEN', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '24px', fontStyle: 'bold', color: '#ffe2a6',
@@ -24,7 +27,7 @@ export class CatMazeScene extends WitchMazeScene {
     this.add.text(400, 55, 'Piletaster / WASD: Fang katten, før den når udgangen!', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '16px', color: '#ffffff',
     }).setOrigin(0.5);
-    MAZE_ROWS.forEach((row, y) => [...row].forEach((tile, x) => {
+    this.mazeRows.forEach((row, y) => [...row].forEach((tile, x) => {
       const [px, py] = this.toWorld(x, y);
       this.add.rectangle(px, py, 43, 43, tile === '#' ? 0x70483c : 0x392c30)
         .setStrokeStyle(1, tile === '#' ? 0xba7450 : 0x5d403b);
@@ -60,7 +63,8 @@ export class CatMazeScene extends WitchMazeScene {
       this.finish(true);
       return;
     }
-    this.moveActor(this.cat, CAT_SPEED * seconds, (actor) => mazePath([actor.x, actor.y], EXIT)?.[1] ?? null);
+    this.moveActor(this.cat, CAT_SPEED * this.difficulty * seconds,
+      (actor) => mazePath([actor.x, actor.y], EXIT, this.mazeRows)?.[1] ?? null);
     if (caught()) this.finish(true);
     else if (this.escaped) this.finish(false);
   }

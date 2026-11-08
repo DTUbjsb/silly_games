@@ -6,6 +6,7 @@ export class NPCManager {
     onChallenge,
     gateIds,
     onGateOpen,
+    beforeInteraction,
   }) {
     this.scene = scene;
     this.questManager = questManager;
@@ -14,6 +15,7 @@ export class NPCManager {
     this.onChallenge = onChallenge;
     this.gateIds = new Set(gateIds);
     this.onGateOpen = onGateOpen;
+    this.beforeInteraction = beforeInteraction;
     this.npcs = [];
     this.activeNPC = null;
     this.nearbyNPCs = new Set();
@@ -153,7 +155,7 @@ export class NPCManager {
       if (interaction.opensGate !== undefined && !this.gateIds.has(interaction.opensGate)) {
         throw new Error(`Personen "${filename}" henviser til en ukendt adgang: "${interaction.opensGate}".`);
       }
-      if (interaction.miniGame !== undefined && !['mosquito', 'troll', 'volcanoCrystals', 'volcanoRunes', 'catMaze'].includes(interaction.miniGame)) {
+      if (interaction.miniGame !== undefined && !['mosquito', 'troll', 'volcanoCrystals', 'volcanoRunes', 'catMaze', 'princessDuel'].includes(interaction.miniGame)) {
         throw new Error(`Personen "${filename}" henviser til et ukendt minispil: "${interaction.miniGame}".`);
       }
       if (interaction.randomForPlayer !== undefined && typeof interaction.randomForPlayer !== 'boolean') {
@@ -239,6 +241,7 @@ export class NPCManager {
   }
 
   runInteraction(npc) {
+    this.beforeInteraction?.(npc);
     const interaction = npc.interactions[npc.interactionIndex];
     if (!interaction) {
       this.dialogueWindow.showLines(npc.name, [npc.repeatDialogue]);

@@ -1,3 +1,5 @@
+import { minigameSpeed } from '../systems/MinigameDifficulty.js';
+
 const CAVE_LENGTH = 3600;
 const MAX_LIVES = 5;
 
@@ -6,13 +8,14 @@ export class CaveScene extends Phaser.Scene {
     super('CaveScene');
   }
 
-  create({ players, onComplete }) {
+  create({ player, players, onComplete }) {
     if (!Array.isArray(players) || players.length < 2 || typeof onComplete !== 'function'
       || players.slice(0, 2).some((player) => !player.name || !this.textures.exists(player.avatar))) {
       throw new Error('Hulen mangler spillere eller afslutningsfunktion.');
     }
 
     this.onComplete = onComplete;
+    this.difficulty = minigameSpeed(player?.age);
     this.finished = false;
     this.lives = MAX_LIVES;
     this.invulnerableUntil = 0;
@@ -52,7 +55,7 @@ export class CaveScene extends Phaser.Scene {
       const enemy = this.enemies.create(x, type === 'ghost' ? 390 : 498, `cave-${type}`).setDepth(2);
       enemy.setData('originX', x).setData('kind', type);
       enemy.body.setSize(type === 'ghost' ? 42 : 34, 55);
-      enemy.body.setVelocityX(type === 'ghost' ? 65 : 48);
+      enemy.body.setVelocityX((type === 'ghost' ? 65 : 48) * this.difficulty);
     }
     this.physics.add.overlap(this.leader, this.enemies, () => this.hit(false), undefined, this);
     this.cameras.main.startFollow(this.leader, true, 0.1, 0);
@@ -165,7 +168,7 @@ export class CaveScene extends Phaser.Scene {
       if (enemy.x < origin - 80) enemy.body.setVelocityX(Math.abs(enemy.body.velocity.x));
       if (enemy.x > origin + 80) enemy.body.setVelocityX(-Math.abs(enemy.body.velocity.x));
       if (enemy.getData('kind') === 'ghost') {
-        enemy.body.setVelocityY(Math.cos(time / 650) * 55);
+        enemy.body.setVelocityY(Math.cos(time / 650) * 55 * this.difficulty);
       }
     }
     this.updateScore();

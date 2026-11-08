@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <title>En lommelygte</title>
+  <path d="M10 24L28 29V38L10 43Z" fill="#ffe38b" stroke="#b28545" stroke-width="2"/>
+  <path d="M28 28H50Q55 28 55 33V34Q55 39 50 39H28Z" fill="#7d69ba" stroke="#51447f" stroke-width="3"/>
+  <path d="M35 28V39M46 28V39" stroke="#d3b9f1" stroke-width="2"/>
+  <circle cx="40" cy="33" r="2" fill="#ffe38b"/>
+</svg>

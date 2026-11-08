@@ -28,7 +28,20 @@ export class BootScene extends Phaser.Scene {
     this.load.image('troll-arena', 'src/assets/troll-arena.svg');
     this.load.image('pterodactyl-perched', 'src/assets/pterodactyl-perched.svg');
     this.load.image('witch', 'src/assets/witch.svg');
+    this.load.image('wizard', 'src/assets/wizard.svg');
+    this.load.image('old-queen', 'src/assets/old-queen.svg');
+    this.load.image('warrior-princess', 'src/assets/warrior-princess.svg');
+    this.load.image('bow-and-arrow', 'src/assets/bow-and-arrow.svg');
+    this.load.image('dragon-den', 'src/assets/dragon-den.svg');
+    this.load.image('dragon-den-empty', 'src/assets/dragon-den-empty.svg');
+    this.load.image('dragon-head', 'src/assets/dragon-head.svg');
+    this.load.image('dragon-paw', 'src/assets/dragon-paw.svg');
+    this.load.image('prince', 'src/assets/prince.svg');
     this.load.image('red-cat', 'src/assets/red-cat.svg');
+    this.load.image('black-cat', 'src/assets/black-cat.svg');
+    this.load.image('lake-boat', 'src/assets/lake-boat.svg');
+    this.load.image('flashlight', 'src/assets/flashlight.svg');
+    this.load.image('lava-boots', 'src/assets/lava-boots.svg');
     for (const color of ['flame', 'ember', 'ash']) {
       this.load.image(`unicorn-volcano-${color}`, `src/assets/unicorn-volcano-${color}.svg`);
       for (const type of ['saddle', 'wings', 'hat', 'sticker']) {

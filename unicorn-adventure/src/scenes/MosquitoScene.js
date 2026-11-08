@@ -1,3 +1,5 @@
+import { minigameSpeed } from '../systems/MinigameDifficulty.js';
+
 const TARGET_HITS = 10;
 const MAX_ESCAPED = 20;
 const WAND_X = 400;
@@ -10,11 +12,12 @@ export class MosquitoScene extends Phaser.Scene {
     super('MosquitoScene');
   }
 
-  create({ onComplete }) {
+  create({ player, onComplete }) {
     if (typeof onComplete !== 'function') {
       throw new Error('Myggejagten mangler en afslutningsfunktion.');
     }
     this.onComplete = onComplete;
+    this.difficulty = minigameSpeed(player?.age);
     this.finished = false;
     this.hits = 0;
     this.escaped = 0;
@@ -116,7 +119,7 @@ export class MosquitoScene extends Phaser.Scene {
       return;
     }
     const mosquito = this.mosquitoes.create(Phaser.Math.Between(30, 770), -25, 'mosquito-game-mosquito');
-    mosquito.body.setVelocityY(55);
+    mosquito.body.setVelocityY(55 * this.difficulty);
   }
 
   hitMosquito(star, mosquito) {

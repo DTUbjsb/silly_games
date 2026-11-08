@@ -5,13 +5,13 @@
   "x": 2192,
   "y": 528,
   "interactionRadius": 112,
-  "repeatDialogue": "Skoven er åben. Find kronen mellem træerne!",
+  "repeatDialogue": "Stien til blomsterskoven er åben. Tak for hjælpen!",
   "interactions": [
     {
       "type": "dialogue",
       "lines": [
         "Jeg hedder Flora og vogter indgangen til blomsterskoven.",
-        "Kronen ligger derinde. Svar på et spørgsmål, og hjælp mig derefter med at jage myg væk, så åbner jeg stien."
+        "Svar på et spørgsmål, og hjælp mig derefter med at jage myg væk, så åbner jeg stien."
       ]
     },
     {

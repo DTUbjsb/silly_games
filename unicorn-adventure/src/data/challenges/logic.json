@@ -125,7 +125,7 @@
       "story": {
         "character": "Portvogteren",
         "introduction": "Portvogteren tæller stenene i en sti: 2, 4 og 6. Hvilket tal kommer nu?",
-        "success": "Rigtigt! Portvogteren åbner porten til haven.",
+        "success": "Rigtigt! Det næste tal er otte.",
         "hint": "Tallene vokser med det samme antal hver gang."
       }
     },
@@ -139,7 +139,7 @@
       "story": {
         "character": "Farvevæveren",
         "introduction": "Farvevæveren har vævet et mønster: rød, blå, rød, blå.",
-        "success": "Du fandt mønstret! Farvevæveren væver jer et farverigt flag.",
+        "success": "Du fandt mønstret! Rød kommer efter blå.",
         "hint": "Se på de to farver, der skiftes til at komme."
       }
     },
@@ -153,7 +153,7 @@
       "story": {
         "character": "Stenstatuen",
         "introduction": "En statue viser en talrække på sin sokkel: 3, 6, 9, __, 15.",
-        "success": "Du løste rækken! Statuen flytter sig og viser en skjult dør.",
+        "success": "Du løste rækken! Det manglende tal er 12.",
         "hint": "Prøv at finde forskellen mellem hvert tal."
       }
     },
@@ -167,7 +167,7 @@
       "story": {
         "character": "Krystalvogteren",
         "introduction": "Krystalvogteren følger en række, hvor hvert tal bliver dobbelt så stort.",
-        "success": "Du fandt det næste tal! Krystallen lyser og viser jer vej.",
+        "success": "Du fandt det næste tal! Dobbelt så meget som 24 er 48.",
         "hint": "Gang det sidste tal med to."
       }
     },
@@ -181,7 +181,7 @@
       "story": {
         "character": "De tre venner",
         "introduction": "Mila er højere end Noah, og Noah er højere end Liv. De skal stille sig i rækkefølge.",
-        "success": "Du fandt den laveste! Vennerne stiller sig rigtigt og åbner lågen.",
+        "success": "Du fandt den laveste! Liv er lavere end både Noah og Mila.",
         "hint": "Sammenlign Liv med Noah og Noah med Mila."
       }
     }

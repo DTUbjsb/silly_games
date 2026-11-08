@@ -1,0 +1,24 @@
+{
+  "id": "warrior-princess",
+  "name": "Krigerprinsessen",
+  "avatar": "warrior-princess",
+  "x": 2380,
+  "y": 3540,
+  "interactionRadius": 110,
+  "repeatDialogue": "Lad os hjælpe dronningen med at redde prinsen!",
+  "interactions": [
+    {
+      "type": "dialogue",
+      "lines": [
+        "Jeg er krigerprinsessen. Vil I hjælpe mig med at redde prinsen?",
+        "Svar på et spørgsmål, og lad os øve os med træsværd. Hvis du vinder, følges vi ad!"
+      ]
+    },
+    {
+      "type": "challenge",
+      "challengeId": "reading-short-lamb",
+      "randomForPlayer": true,
+      "miniGame": "princessDuel"
+    }
+  ]
+}

@@ -7,12 +7,18 @@ import {
   WEST_REGION_DATA,
   WEST_REGION_WIDTH,
   NORTH_HOLE,
+  LAKE,
   NORTH_REGION_DATA,
   NORTH_REGION_HEIGHT,
   EAST_ORIGIN,
   EAST_PASS,
   EAST_REGION_WIDTH,
   EAST_REGION_DATA,
+  SOUTH_ORIGIN,
+  SOUTH_REGION_HEIGHT,
+  SOUTH_REGION_DATA,
+  SOUTH_PASS,
+  DRAGON_DEN,
 } from '../data/testWorld.js';
 import { CollectibleManager } from '../managers/CollectibleManager.js';
 import { EducationalChallengeManager } from '../managers/EducationalChallengeManager.js';
@@ -23,7 +29,9 @@ import { QuestManager } from '../managers/QuestManager.js';
 import { LeaderFollowerSystem } from '../systems/LeaderFollowerSystem.js';
 import { MovementSystem } from '../systems/MovementSystem.js';
 import { NorthFollowerNavigator } from '../systems/NorthFollowerNavigator.js';
+import { NpcWander } from '../systems/NpcWander.js';
 import { VolcanoCatRoam } from '../systems/VolcanoCatRoam.js';
+import { wizardTeam } from '../systems/WizardTeam.js';
 import { DialogueWindow } from '../ui/DialogueWindow.js';
 import { Hud } from '../ui/Hud.js';
 import { newLayoutSeed } from '../data/collectibleLayout.js';
@@ -77,6 +85,17 @@ export class MainWorldScene extends Phaser.Scene {
     const eastTileset = this.eastMap.addTilesetImage('world-tiles', 'world-tiles', TEST_WORLD_TILE_SIZE, TEST_WORLD_TILE_SIZE, 0, 0);
     this.eastLayer = this.eastMap.createLayer(0, eastTileset, EAST_ORIGIN, 0).setDepth(-1);
     this.eastMap.setCollision([WORLD_TILE.WEST_WALL, WORLD_TILE.VOLCANIC_ROCK, WORLD_TILE.VOLCANIC_GATE_A, WORLD_TILE.VOLCANIC_GATE_B]);
+    this.southMap = this.make.tilemap({ data: SOUTH_REGION_DATA, tileWidth: TEST_WORLD_TILE_SIZE, tileHeight: TEST_WORLD_TILE_SIZE });
+    const southTileset = this.southMap.addTilesetImage('world-tiles', 'world-tiles', TEST_WORLD_TILE_SIZE, TEST_WORLD_TILE_SIZE, 0, 0);
+    this.southLayer = this.southMap.createLayer(0, southTileset, 0, SOUTH_ORIGIN).setDepth(-1);
+    this.southMap.setCollision([WORLD_TILE.WEST_WALL, WORLD_TILE.SOUTH_GATE]);
+    this.southWalls = [
+      this.add.rectangle(-westWidth / 2, SOUTH_ORIGIN + 16, westWidth, 32, 0x596378),
+      this.add.rectangle(EAST_ORIGIN + EAST_REGION_WIDTH * 16, SOUTH_ORIGIN + 16, EAST_REGION_WIDTH * 32, 32, 0x596378),
+      this.add.rectangle(-16, SOUTH_ORIGIN + 32 + SOUTH_REGION_HEIGHT * 16, 32, SOUTH_REGION_HEIGHT * 32, 0x596378),
+      this.add.rectangle(EAST_ORIGIN + 16, SOUTH_ORIGIN + 32 + SOUTH_REGION_HEIGHT * 16, 32, SOUTH_REGION_HEIGHT * 32, 0x596378),
+    ];
+    this.southWalls.forEach((wall) => this.physics.add.existing(wall, true));
     this.eastNorthWall = this.add.rectangle(EAST_ORIGIN + EAST_REGION_WIDTH * 16, -16, EAST_REGION_WIDTH * 32, 32, 0x513136);
     this.physics.add.existing(this.eastNorthWall, true);
     this.northFollowerNavigators = new Map();
@@ -96,7 +115,8 @@ export class MainWorldScene extends Phaser.Scene {
       WORLD_TILE.LUNA_GATE,
       WORLD_TILE.SECOND_BRIDGE,
     ]);
-    this.physics.world.setBounds(-westWidth, -northHeight, this.worldMap.widthInPixels + westWidth + EAST_REGION_WIDTH * 32, this.worldMap.heightInPixels + northHeight);
+    this.physics.world.setBounds(-westWidth, -northHeight, this.worldMap.widthInPixels + westWidth + EAST_REGION_WIDTH * 32,
+      SOUTH_ORIGIN + (SOUTH_REGION_HEIGHT + 1) * TEST_WORLD_TILE_SIZE + northHeight);
 
     this.stateManager = null;
     this.lastNPCChallenges = new Map();
@@ -109,6 +129,7 @@ export class MainWorldScene extends Phaser.Scene {
     this.eruptionTimeRemaining = this.nextWitchDelay();
     this.wasInVolcano = false;
     this.volcanoCatRoam = null;
+    this.princessWander = null;
     this.catMeowTimeRemaining = null;
     this.input.keyboard.on('keydown', this.handleKeyboardInput, this);
 
@@ -120,7 +141,8 @@ export class MainWorldScene extends Phaser.Scene {
     this.players = [];
     this.leaderFollowerSystem = null;
     this.movement = null;
-    this.cameras.main.setBounds(-westWidth, -northHeight, this.worldMap.widthInPixels + westWidth + EAST_REGION_WIDTH * 32, this.worldMap.heightInPixels + northHeight);
+    this.cameras.main.setBounds(-westWidth, -northHeight, this.worldMap.widthInPixels + westWidth + EAST_REGION_WIDTH * 32,
+      SOUTH_ORIGIN + (SOUTH_REGION_HEIGHT + 1) * TEST_WORLD_TILE_SIZE + northHeight);
     this.cameras.main.setZoom(0.65);
 
     this.hud = new Hud(this);
@@ -132,6 +154,7 @@ export class MainWorldScene extends Phaser.Scene {
       onChallenge: (challengeId, onCorrect, miniGame, options) => this.startNPCChallenge(challengeId, onCorrect, miniGame, options),
       gateIds: Object.keys(WORLD_GATES),
       onGateOpen: (gateId) => this.openGate(gateId),
+      beforeInteraction: (npc) => this.updateStoryDialogue(npc),
     });
     this.playerStatus = this.add.text(400, 300, 'Indlæser spilverdenen...', {
       fontFamily: 'Trebuchet MS, sans-serif',
@@ -163,6 +186,24 @@ export class MainWorldScene extends Phaser.Scene {
       color: '#294c5b', backgroundColor: '#ffffffdd', padding: { x: 10, y: 7 },
     }).setOrigin(0.5).setScrollFactor(0).setDepth(6).setVisible(false);
     this.createNorthHole();
+    this.southOpen = false;
+    this.southWizard = this.add.image(SOUTH_PASS.x, SOUTH_ORIGIN - 30, 'wizard').setScale(0.65).setDepth(2);
+    this.southPrompt = this.add.text(400, 520, 'Tryk MELLEMRUM for at tale med troldmanden', {
+      fontFamily: 'Trebuchet MS, sans-serif', fontSize: '16px', fontStyle: 'bold',
+      color: '#294c5b', backgroundColor: '#ffffffdd', padding: { x: 10, y: 7 },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(6).setVisible(false);
+    this.dragonRescued = false;
+    this.dragonDen = this.add.image(DRAGON_DEN.x, DRAGON_DEN.y, 'dragon-den').setDepth(1);
+    this.dragonPrompt = this.add.text(400, 520, 'Tryk MELLEMRUM for at undersøge dragens hule', {
+      fontFamily: 'Trebuchet MS, sans-serif', fontSize: '16px', fontStyle: 'bold',
+      color: '#294c5b', backgroundColor: '#ffffffdd', padding: { x: 10, y: 7 },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(6).setVisible(false);
+    this.boatOnIsland = false;
+    this.lakeBoat = this.add.image(LAKE.boatX, LAKE.shoreY, 'lake-boat').setScale(0.7).setDepth(1);
+    this.boatPrompt = this.add.text(400, 520, 'Tryk MELLEMRUM for at sejle med båden', {
+      fontFamily: 'Trebuchet MS, sans-serif', fontSize: '16px', fontStyle: 'bold',
+      color: '#294c5b', backgroundColor: '#ffffffdd', padding: { x: 10, y: 7 },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(6).setVisible(false);
     this.eastPrompt = this.add.text(400, 520, 'Tryk MELLEMRUM for at undersøge lavakløften', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '16px', fontStyle: 'bold',
       color: '#294c5b', backgroundColor: '#ffffffdd', padding: { x: 10, y: 7 },
@@ -178,7 +219,7 @@ export class MainWorldScene extends Phaser.Scene {
       camera.width / 2 * (1 - 1 / camera.zoom),
       camera.height / 2 * (1 - 1 / camera.zoom),
       [
-        this.npcManager.interactionPrompt, this.stablePrompt, this.crackPrompt, this.holePrompt, this.eastPrompt, this.witchAppearance,
+        this.npcManager.interactionPrompt, this.stablePrompt, this.crackPrompt, this.holePrompt, this.eastPrompt, this.boatPrompt, this.southPrompt, this.dragonPrompt, this.witchAppearance,
         this.dialogueWindow.background, this.dialogueWindow.speaker, this.dialogueWindow.message,
         this.dialogueWindow.prompt, this.dialogueWindow.continueButton,
         this.dialogueWindow.acceptButton, this.dialogueWindow.laterButton, this.playerStatus,
@@ -200,6 +241,11 @@ export class MainWorldScene extends Phaser.Scene {
       this.volcanoCatRoam.update(delta);
     }
     if (cat?.following && !this.isAnswering && !this.dialogueWindow.isOpen) this.updateCatMeow(delta);
+    const princess = this.npcManager.npcs.find((npc) => npc.id === 'warrior-princess');
+    if (princess && !this.princessWander) this.princessWander = new NpcWander(princess);
+    if (princess && !princess.following && !this.isAnswering && !this.dialogueWindow.isOpen) {
+      this.princessWander.update(delta);
+    }
     this.updateWorldMusic(time, leader);
     this.updateWitchEncounter(delta, leader);
     this.updateEruptionEncounter(delta, leader);
@@ -212,6 +258,9 @@ export class MainWorldScene extends Phaser.Scene {
     const nearCrack = this.isNearWestCrack();
     const nearHole = this.isNearNorthHole();
     const nearEast = this.isNearEastPass();
+    const nearBoat = this.isNearBoat();
+    const nearSouth = this.isNearSouthPass();
+    const nearDragon = this.isNearDragonDen();
     this.stablePrompt.setVisible(
       nearStable && !this.isAnswering && !this.dialogueWindow.isOpen,
     );
@@ -222,9 +271,12 @@ export class MainWorldScene extends Phaser.Scene {
       nearHole && !nearStable && !nearCrack && !this.isAnswering && !this.dialogueWindow.isOpen,
     );
     this.eastPrompt.setVisible(nearEast && !this.isAnswering && !this.dialogueWindow.isOpen);
+    this.boatPrompt.setVisible(nearBoat && !this.isAnswering && !this.dialogueWindow.isOpen);
+    this.southPrompt.setVisible(nearSouth && !this.isAnswering && !this.dialogueWindow.isOpen);
+    this.dragonPrompt.setVisible(nearDragon && !this.isAnswering && !this.dialogueWindow.isOpen);
     this.npcManager.update(
       leader,
-      this.isAnswering || this.dialogueWindow.isOpen || nearStable || nearCrack || nearHole || nearEast,
+      this.isAnswering || this.dialogueWindow.isOpen || nearStable || nearCrack || nearHole || nearEast || nearBoat || nearSouth || nearDragon,
     );
 
     if (!this.isAnswering && !this.dialogueWindow.isOpen) {
@@ -240,6 +292,11 @@ export class MainWorldScene extends Phaser.Scene {
     this.leaderFollowerSystem.update(delta);
     for (const follower of followers) {
       const { sprite } = follower;
+      if (leader.sprite.x > (LAKE.left - 2) * TEST_WORLD_TILE_SIZE
+        && leader.sprite.x < (LAKE.right + 3) * TEST_WORLD_TILE_SIZE
+        && leader.sprite.y >= 0 && leader.sprite.y < (LAKE.bottom + 3) * TEST_WORLD_TILE_SIZE) {
+        this.constrainFollowerToLayer(sprite, follower.x, follower.y, this.worldLayer);
+      }
       if (leader.sprite.x >= EAST_ORIGIN && leader.sprite.y >= 0) {
         const attemptedX = sprite.x;
         const attemptedY = sprite.y;
@@ -301,6 +358,9 @@ export class MainWorldScene extends Phaser.Scene {
         sprite.x += EAST_ORIGIN + 32 - sprite.body.left;
         sprite.body.updateFromGameObject();
       }
+      if (leader.sprite.y > SOUTH_ORIGIN - 200 || follower.y > SOUTH_ORIGIN - 200) {
+        this.constrainFollowerToLayer(sprite, follower.x, follower.y, this.southLayer, this.southWalls);
+      }
     }
     this.playerManager.update();
   }
@@ -315,6 +375,27 @@ export class MainWorldScene extends Phaser.Scene {
     cat.nameTag.setVisible(false);
     this.leaderFollowerSystem.addCompanion(cat);
     this.catMeowTimeRemaining = Phaser.Math.Between(10000, 15000);
+  }
+
+  recruitPrincess() {
+    const princess = this.npcManager.npcs.find((npc) => npc.id === 'warrior-princess');
+    if (!princess || princess.following) throw new Error('Krigerprinsessen kan ikke slutte sig til gruppen.');
+    try {
+      this.collectibleManager.unlockReward('princess-bows');
+    } catch (error) {
+      console.error('Kunne ikke gemme buerne.', error);
+      this.isAnswering = false;
+      this.dialogueWindow.showLines('Krigerprinsessen', [
+        `${error.message} Venskabet og buerne blev ikke gemt. Prøv igen, eller kontrollér browserens lager.`,
+      ]);
+      return false;
+    }
+    this.physics.add.existing(princess.sprite);
+    princess.sprite.body.setSize(55, 85).setCollideWorldBounds(true);
+    princess.following = true;
+    princess.nameTag.setVisible(false);
+    this.leaderFollowerSystem.addCompanion(princess);
+    return true;
   }
 
   updateCatMeow(delta) {
@@ -401,7 +482,7 @@ export class MainWorldScene extends Phaser.Scene {
     });
   }
 
-  constrainFollowerToLayer(sprite, startX, startY, layer) {
+  constrainFollowerToLayer(sprite, startX, startY, layer, walls = []) {
     const targetX = sprite.x;
     const targetY = sprite.y;
     const steps = Math.max(1, Math.ceil(Phaser.Math.Distance.Between(startX, startY, targetX, targetY) / 8));
@@ -415,7 +496,7 @@ export class MainWorldScene extends Phaser.Scene {
       sprite.body.updateFromGameObject();
       if (layer.getTilesWithinWorldXY(
         sprite.body.left, sprite.body.top, sprite.body.width, sprite.body.height, { isColliding: true },
-      ).length > 0) {
+      ).length > 0 || walls.some((wall) => Phaser.Geom.Intersects.RectangleToRectangle(sprite.body, wall.body))) {
         break;
       }
       safeX = sprite.x;
@@ -463,6 +544,12 @@ export class MainWorldScene extends Phaser.Scene {
         this.interactWithNorthHole();
       } else if (this.isNearEastPass()) {
         this.interactWithEastPass();
+      } else if (this.isNearBoat()) {
+        this.interactWithBoat();
+      } else if (this.isNearSouthPass()) {
+        this.interactWithSouthPass();
+      } else if (this.isNearDragonDen()) {
+        this.interactWithDragonDen();
       } else {
         this.npcManager.interact();
       }
@@ -493,12 +580,227 @@ export class MainWorldScene extends Phaser.Scene {
     ) <= EAST_PASS.radius);
   }
 
-  interactWithEastPass() {
+  isNearBoat() {
+    return Boolean(this.player && Phaser.Math.Distance.Between(
+      this.player.sprite.x, this.player.sprite.y, this.lakeBoat.x, this.lakeBoat.y,
+    ) <= LAKE.radius);
+  }
+
+  isNearSouthPass() {
+    return Boolean(!this.southOpen && this.player && Phaser.Math.Distance.Between(
+      this.player.sprite.x, this.player.sprite.y, SOUTH_PASS.x, SOUTH_PASS.y,
+    ) <= SOUTH_PASS.radius);
+  }
+
+  isNearDragonDen() {
+    return Boolean(this.player && Phaser.Math.Distance.Between(
+      this.player.sprite.x, this.player.sprite.y, DRAGON_DEN.x, DRAGON_DEN.y,
+    ) <= DRAGON_DEN.radius);
+  }
+
+  interactWithDragonDen() {
+    if (this.dragonRescued) {
+      this.dialogueWindow.showLines('Dragens hule', [
+        'Hurra! Dragen er besejret, og prinsen er fri. Nu kan han og prinsessen leve lykkeligt til deres dages ende!',
+      ]);
+      return;
+    }
+    const hasPrincess = this.leaderFollowerSystem.companions.some((companion) => companion.id === 'warrior-princess');
+    const bows = this.collectibleManager.getCollectedItems('tool').filter((item) => item.kind === 'bow-and-arrow').length;
+    if (!hasPrincess || bows < 2) {
+      this.dialogueWindow.showLines('Dragens hule', [
+        'Dragen er stærk! Tag krigerprinsessen med, og find to buer med pile i det sydlige område.',
+      ]);
+      return;
+    }
+    this.dialogueWindow.showChoice('Dragens hule',
+      'Sammen kan I redde prinsen! Før kampen skal I svare på fire spørgsmål.',
+      'Er I klar?', (accepted) => { if (accepted) this.startDragonChallenge(); });
+  }
+
+  startDragonChallenge() {
+    let challenges;
+    try {
+      const age = this.leaderFollowerSystem.leader.age;
+      const excluded = this.stateManager.getLearnedChallengeIds();
+      const reserved = this.npcManager.getGateChallengeIds();
+      challenges = ['Math', 'English', 'Logic', 'Reading'].map((category) => (
+        this.challengeManager.getChallengeForCategory(age, category, excluded, reserved)
+      ));
+    } catch (error) {
+      console.error('Kunne ikke finde spørgsmål til dragekampen.', error);
+      this.dialogueWindow.showLines('Dragens hule', [`${error.message} Prøv igen senere.`]);
+      return;
+    }
+    this.isAnswering = true;
+    this.scene.pause();
+    const ask = (index) => {
+      const challenge = challenges[index];
+      this.scene.launch('ChallengeScene', {
+        challenge: this.challengeManager.rotateOptions(challenge),
+        evaluateAnswer: (answer) => this.challengeManager.evaluateAnswer(challenge.id, answer),
+        onComplete: () => {
+          if (index + 1 < challenges.length) {
+            ask(index + 1);
+          } else {
+            this.scene.launch('DragonBattleScene', {
+              player: { age: this.player.age },
+              players: this.leaderFollowerSystem.players.map((member) => ({ avatar: member.avatar, name: member.name })),
+              onComplete: (won) => this.finishDragonChallenge(won, challenges),
+            });
+          }
+          return false;
+        },
+      });
+    };
+    ask(0);
+  }
+
+  finishDragonChallenge(won, challenges) {
+    this.isAnswering = false;
+    if (!won) {
+      this.swapLeader();
+      this.dialogueWindow.showLines('Dragens hule', [
+        'Krigerprinsessen blev ramt af 15 ildkugler. Prøv spørgsmålene og kampen igen!',
+      ]);
+      return;
+    }
+    try {
+      const state = this.collectibleManager.store.loadState();
+      state.unlockedGates.add('dragon');
+      this.collectibleManager.store.save(state.collectedIds, state.equipment, state.layoutSeed, state.unlockedGates, state.unlockedRewards);
+    } catch (error) {
+      console.error('Kunne ikke gemme redningen af prinsen.', error);
+      this.dialogueWindow.showLines('Dragens hule', [
+        `${error.message} Redningen blev ikke gemt. Prøv igen, eller kontrollér browserens lager.`,
+      ]);
+      return;
+    }
+    this.rescuePrince();
+    challenges.forEach((challenge) => {
+      this.stateManager.learn(challenge.id);
+      if (this.stateManager.recordQuestion(this.player.id)) this.swapLeader();
+    });
+    this.dialogueWindow.showLines('Krigerprinsessen', [
+      'Hurra! Sammen besejrede vi dragen og reddede prinsen!',
+      'Prinsen er tilbage hos dronningen ved stalden. Lad os besøge dem!',
+    ]);
+  }
+
+  rescuePrince() {
+    this.dragonRescued = true;
+    this.dragonDen.setTexture('dragon-den-empty');
+    const queen = this.npcManager.npcs.find((npc) => npc.id === 'old-queen');
+    if (!queen) throw new Error('Dronningen mangler i spilverdenen.');
+    queen.interactions = [];
+    queen.repeatDialogue = 'Min søde søn er hjemme igen! Tusind tak, fordi I reddede prinsen.';
+    const princess = this.npcManager.npcs.find((npc) => npc.id === 'warrior-princess');
+    if (!princess) throw new Error('Krigerprinsessen mangler i spilverdenen.');
+    princess.interactions[0].lines = [
+      'Vi reddede prinsen, og dragen er besejret! Tak for hjælpen.',
+      'Vil du øve dig med træsværd igen? Svar på et spørgsmål, så kan vi følges ad bagefter.',
+    ];
+    princess.repeatDialogue = 'Vi reddede prinsen sammen. Nu kan vi leve lykkeligt til vores dages ende!';
+    this.add.image(410, 112, 'prince').setScale(0.72).setDepth(2);
+    this.add.text(410, 58, 'Prinsen', {
+      fontFamily: 'Trebuchet MS, sans-serif', fontSize: '14px', fontStyle: 'bold',
+      color: '#294c5b', backgroundColor: '#ffffffdd', padding: { x: 7, y: 4 },
+    }).setOrigin(0.5, 1).setDepth(4);
+  }
+
+  updateStoryDialogue(npc) {
+    if (npc.id !== 'old-queen' || this.dragonRescued) return;
+    const princess = this.leaderFollowerSystem?.companions.some((companion) => companion.id === 'warrior-princess');
+    const bows = this.collectibleManager.getCollectedItems('tool').filter((item) => item.kind === 'bow-and-arrow').length;
+    const direction = this.southOpen
+      ? 'I har åbnet vejen mod syd. Min søn er stadig i dragens hule.'
+      : 'Min søn er i dragens hule mod syd. I har brug for alle enhjørningernes kræfter for at komme derhen.';
+    const help = princess
+      ? bows >= 2 ? 'I har krigerprinsessen og begge buer med pile. Sammen kan I redde ham!'
+        : bows === 1 ? 'Krigerprinsessen er med jer. Find den sidste bue med pile i det sydlige område, før I møder dragen.'
+          : 'Krigerprinsessen er med jer. Find begge buer med pile i det sydlige område, før I møder dragen.'
+      : 'Find krigerprinsessen i det sydlige område. Hun kan hjælpe jer med at besejre dragen.';
+    npc.interactions[0].lines = [
+      'Åh, hjælp mig! Min søn, den søde prins, er blevet bortført af en frygtelig drage.',
+      direction,
+      help,
+    ];
+    npc.repeatDialogue = `${direction} ${help}`;
+  }
+
+  interactWithSouthPass() {
+    const unicorns = this.collectibleManager.getCollectedItems('unicorn');
     const accessories = this.collectibleManager.getCollectedItems('accessory');
-    if (this.collectibleManager.getCollectedCount('unicorn') < 2
-      || accessories.filter((item) => item.slot === 'saddle').length < 2
-      || accessories.filter((item) => item.slot === 'wings').length < 2) {
-      this.dialogueWindow.showLines('Lavakløften', ['Kom tilbage med to enhjørninger, to sadler og to sæt vinger.']);
+    if (!wizardTeam(unicorns, accessories)) {
+      this.dialogueWindow.showLines('Troldmanden', [
+        'Jeg er for stærk for jer! Find en enhjørning fra hver af de fire verdener og fire mærker, fire sæt vinger, fire hatte og fire sadler.',
+      ]);
+      return;
+    }
+    this.dialogueWindow.showChoice('Troldmanden', 'Vil I udfordre mig sammen med jeres fire enhjørninger?',
+      'Er I klar til kampen?', (accepted) => {
+        if (accepted) this.startNPCChallenge(null, null, 'wizard', { randomForPlayer: true, npcId: 'south-wizard' });
+      });
+  }
+
+  unlockSouthPass() {
+    try {
+      const state = this.collectibleManager.store.loadState();
+      state.unlockedGates.add('south');
+      this.collectibleManager.store.save(state.collectedIds, state.equipment, state.layoutSeed, state.unlockedGates);
+    } catch (error) {
+      console.error('Kunne ikke gemme den sydlige passage.', error);
+      this.isAnswering = false;
+      this.dialogueWindow.showLines('Troldmanden', [
+        `${error.message} Passagen blev ikke åbnet. Prøv igen, eller kontrollér browserens lager.`,
+      ]);
+      return false;
+    }
+    this.openSouthPass();
+    return true;
+  }
+
+  openSouthPass() {
+    this.openGate('south');
+    this.southOpen = true;
+    this.southWizard.setVisible(false);
+  }
+
+  interactWithBoat() {
+    if (this.boatOnIsland) {
+      this.dialogueWindow.showChoice('Båden', 'Båden kan sejle jer tilbage til bredden.',
+        'Vil I sejle tilbage?', (accepted) => {
+          if (accepted) this.crossLake(false);
+        });
+      return;
+    }
+    this.dialogueWindow.showChoice('Båden', this.collectibleManager.collectedIds.has('flashlight')
+      ? 'Båden kan sejle jer til øen. Pas på fiskene og søuhyret!'
+      : 'En lommelygte venter på øen. Pas på fiskene og søuhyret!',
+      'Vil I sejle til øen?', (accepted) => {
+        if (accepted) this.startNPCChallenge(null, () => this.crossLake(true), 'boat',
+          { randomForPlayer: true, npcId: 'lake-boat' });
+      });
+  }
+
+  crossLake(toIsland) {
+    this.boatOnIsland = toIsland;
+    this.lakeBoat.setPosition(LAKE.boatX, toIsland ? LAKE.islandY : LAKE.shoreY);
+    this.leaderFollowerSystem.players.forEach((player, index) => {
+      player.sprite.body.reset(LAKE.boatX - index * 75, toIsland ? LAKE.islandLandingY : LAKE.shoreLandingY);
+    });
+    this.moveCompanionsAcrossWall();
+    this.leaderFollowerSystem.setLeader(this.player.id);
+    this.playerManager.update();
+    this.cameras.main.centerOn(this.player.sprite.x, this.player.sprite.y);
+  }
+
+  interactWithEastPass() {
+    const boots = this.collectibleManager.getCollectedItems('tool').filter((item) => item.kind === 'lava-boots').length;
+    if (boots < 2) {
+      this.dialogueWindow.showLines('Lavakløften', [
+        `I har fundet ${boots} af 2 par lavastøvler. Find begge par i den vestlige verden syd for troldens bro.`,
+      ]);
       return;
     }
     this.dialogueWindow.showChoice('Lavakløften', 'Tør I bygge en bro over lavakløften?',
@@ -521,12 +823,9 @@ export class MainWorldScene extends Phaser.Scene {
   }
 
   interactWithNorthHole() {
-    const unicorns = this.collectibleManager.getCollectedCount('unicorn');
-    const accessories = this.collectibleManager.getCollectedItems('accessory');
-    if (unicorns < 2 || accessories.filter((item) => item.slot === 'saddle').length < 2
-      || accessories.filter((item) => item.slot === 'wings').length < 2) {
+    if (!this.collectibleManager.collectedIds.has('flashlight')) {
       this.dialogueWindow.showLines('Hullet i muren', [
-        'Kom tilbage med to enhjørninger, to sadler og to sæt vinger. Så kan I undersøge hulen sammen.',
+        'Hulen er for mørk. Find lommelygten på øen i søen, før I går ind.',
       ]);
       return;
     }
@@ -658,13 +957,13 @@ export class MainWorldScene extends Phaser.Scene {
       return;
     }
     if (!window.confirm(
-      'Vil du nulstille spillet? Alle indsamlede enhjørninger og alt tilbehør slettes, og eventyret starter forfra.',
+      'Vil du nulstille spillet? Alle indsamlede enhjørninger, redskaber og alt tilbehør slettes, og eventyret starter forfra.',
     )) {
       return;
     }
     try {
       const previousSeed = this.collectibleManager.store.loadState().layoutSeed;
-      this.collectibleManager.store.save(new Set(), new Map(), newLayoutSeed(previousSeed));
+      this.collectibleManager.store.save(new Set(), new Map(), newLayoutSeed(previousSeed), new Set(), new Set());
     } catch (error) {
       console.error('Kunne ikke nulstille spillet.', error);
       this.dialogueWindow.showLines('Nulstil spil', [
@@ -689,6 +988,9 @@ export class MainWorldScene extends Phaser.Scene {
         }
 
         this.stateManager = new GameStateManager();
+        const unlockedGates = this.collectibleManager.store.loadState().unlockedGates;
+        if (unlockedGates.has('south')) this.openSouthPass();
+        if (unlockedGates.has('dragon')) this.rescuePrince();
         this.updateCollectionProgress();
 
         this.players = profiles.map((profile, index) => this.playerManager.addPlayer(
@@ -703,6 +1005,8 @@ export class MainWorldScene extends Phaser.Scene {
           this.physics.add.collider(player.sprite, this.westLayer);
           this.physics.add.collider(player.sprite, this.northLayer);
           this.physics.add.collider(player.sprite, this.eastLayer);
+          this.physics.add.collider(player.sprite, this.southLayer);
+          this.southWalls.forEach((wall) => this.physics.add.collider(player.sprite, wall));
           this.physics.add.collider(player.sprite, this.eastNorthWall);
           this.physics.add.overlap(
             player.sprite,
@@ -837,7 +1141,11 @@ export class MainWorldScene extends Phaser.Scene {
       graphics.lineStyle(3, 0xffbd63).strokeRect(x + 3, 3, tileSize - 6, tileSize - 6);
       graphics.fillStyle(0xff9a42).fillCircle(x + 16, 16, 5);
     }
-    graphics.generateTexture('world-tiles', tileSize * (WORLD_TILE.VOLCANIC_GATE_B + 1), tileSize);
+    const southGate = tileSize * WORLD_TILE.SOUTH_GATE;
+    graphics.fillStyle(0x596378).fillRect(southGate, 0, tileSize, tileSize);
+    graphics.lineStyle(3, 0xb990dd).strokeRect(southGate + 3, 3, tileSize - 6, tileSize - 6);
+    graphics.fillStyle(0xffe6a3).fillCircle(southGate + 16, 16, 4);
+    graphics.generateTexture('world-tiles', tileSize * (WORLD_TILE.SOUTH_GATE + 1), tileSize);
     graphics.destroy();
   }
 
@@ -856,7 +1164,7 @@ export class MainWorldScene extends Phaser.Scene {
       return;
     }
 
-    if (item.type === 'accessory') {
+    if (item.type === 'accessory' || item.type === 'tool') {
       this.collectPickup(pickup);
       return;
     }
@@ -894,6 +1202,8 @@ export class MainWorldScene extends Phaser.Scene {
 
     if (item.type === 'accessory') {
       this.registry.get('soundEffects').play(ACCESSORY_PICKUP_SOUNDS[item.slot]);
+    } else if (item.type === 'tool') {
+      this.registry.get('soundEffects').play('star');
     }
     this.updateCollectionProgress();
     if (item.type === 'accessory' && this.stateManager.recordAccessory(this.leaderFollowerSystem.leader.id)) {
@@ -903,10 +1213,12 @@ export class MainWorldScene extends Phaser.Scene {
 
   updateCollectionProgress() {
     this.hud.setCollectionProgress(
-      this.collectibleManager.getCollectedCount('unicorn'),
-      this.collectibleManager.getTotalCount('unicorn'),
+      this.collectibleManager.getCollectedItems('unicorn'),
+      this.collectibleManager.getAllItems().filter((item) => item.type === 'unicorn'),
       this.collectibleManager.getCollectedItems('accessory'),
       this.collectibleManager.getAllItems().filter((item) => item.type === 'accessory'),
+      this.collectibleManager.getCollectedItems('tool'),
+      this.collectibleManager.getAllItems().filter((item) => item.type === 'tool'),
     );
   }
 
@@ -937,7 +1249,7 @@ export class MainWorldScene extends Phaser.Scene {
       throw new Error(`Læringsudfordringen "${challengeId}" findes ikke.`);
     }
 
-    this.startChallenge(challenge, onCorrect, miniGame);
+    this.startChallenge(challenge, onCorrect, miniGame, options.npcId);
   }
 
   openGate(gateId) {
@@ -945,7 +1257,7 @@ export class MainWorldScene extends Phaser.Scene {
     if (tile === undefined) {
       throw new Error(`Ukendt adgang: "${gateId}".`);
     }
-    const map = ['volcanoA', 'volcanoB'].includes(gateId) ? this.eastMap : gateId === 'northForest' ? this.northMap
+    const map = gateId === 'south' ? this.southMap : ['volcanoA', 'volcanoB'].includes(gateId) ? this.eastMap : gateId === 'northForest' ? this.northMap
       : ['westBridge', 'westForest'].includes(gateId) ? this.westMap : this.worldMap;
     map.setCollision(tile, false);
     if (![WORLD_TILE.BRIDGE, WORLD_TILE.SECOND_BRIDGE, WORLD_TILE.WEST_BRIDGE].includes(tile)) {
@@ -960,7 +1272,7 @@ export class MainWorldScene extends Phaser.Scene {
     }
   }
 
-  startChallenge(challenge, onCorrect = null, miniGame = undefined) {
+  startChallenge(challenge, onCorrect = null, miniGame = undefined, npcId = undefined) {
     this.isAnswering = true;
     const playerId = this.leaderFollowerSystem.leader.id;
     const complete = () => {
@@ -976,24 +1288,32 @@ export class MainWorldScene extends Phaser.Scene {
       evaluateAnswer: (answer) => this.challengeManager.evaluateAnswer(challenge.id, answer),
       onComplete: (isCorrect) => {
         if (isCorrect) {
-          if (miniGame === 'mosquito' || miniGame === 'troll' || miniGame === 'flight' || miniGame === 'cave'
-            || miniGame === 'witch' || miniGame === 'catMaze'
+          if (miniGame === 'mosquito' || miniGame === 'troll' || miniGame === 'flight' || miniGame === 'cave' || miniGame === 'boat' || miniGame === 'wizard'
+            || miniGame === 'witch' || miniGame === 'catMaze' || miniGame === 'princessDuel'
             || ['volcanoBridge', 'volcanoCrystals', 'volcanoRunes', 'volcanoEruption'].includes(miniGame)) {
             const trollGame = miniGame === 'troll';
             const flightGame = miniGame === 'flight';
             const caveGame = miniGame === 'cave';
+            const boatGame = miniGame === 'boat';
+            const wizardGame = miniGame === 'wizard';
             const witchGame = miniGame === 'witch';
             const catGame = miniGame === 'catMaze';
+            const princessGame = miniGame === 'princessDuel';
             const volcanoMode = {
               volcanoBridge: 'bridge', volcanoCrystals: 'crystals',
               volcanoRunes: 'runes', volcanoEruption: 'eruption',
             }[miniGame];
             const unicorns = this.collectibleManager.getCollectedItems('unicorn');
             const accessories = this.collectibleManager.getCollectedItems('accessory');
-            this.scene.launch(catGame ? 'CatMazeScene' : volcanoMode ? 'VolcanoScene' : witchGame ? 'WitchMazeScene' : caveGame ? 'CaveScene'
+            this.scene.launch(princessGame ? 'PrincessDuelScene' : wizardGame ? 'WizardBattleScene' : boatGame ? 'LakeBoatScene' : catGame ? 'CatMazeScene' : volcanoMode ? 'VolcanoScene' : witchGame ? 'WitchMazeScene' : caveGame ? 'CaveScene'
               : flightGame ? 'FlightScene' : trollGame ? 'TrollScene' : 'MosquitoScene', {
-              player: { name: this.player.name, avatar: this.player.avatar },
+              player: { name: this.player.name, avatar: this.player.avatar, age: this.player.age },
               ...(volcanoMode ? { mode: volcanoMode } : {}),
+              ...(wizardGame ? {
+                players: this.leaderFollowerSystem.players.map((member) => ({ name: member.name, avatar: member.avatar })),
+                unicorns: wizardTeam(unicorns, accessories),
+                accessories,
+              } : {}),
               ...(caveGame ? {
                 players: this.leaderFollowerSystem.players.map((player) => ({ name: player.name, avatar: player.avatar })),
               } : {}),
@@ -1006,16 +1326,31 @@ export class MainWorldScene extends Phaser.Scene {
               } : {}),
               onComplete: (won) => {
                 if (won) {
+                  if (wizardGame && !this.unlockSouthPass()) return;
+                  if (princessGame && !this.recruitPrincess()) return;
                   complete();
                   if (catGame) this.captureCat();
                   if (!this.dialogueWindow.isOpen) {
-                    this.dialogueWindow.showLines(catGame ? 'Ildkatten' : volcanoMode ? 'Vulkanen' : witchGame ? 'Heksens labyrint' : caveGame ? 'Hulen' : flightGame ? 'Flyveturen' : trollGame ? 'Troldens æbler' : 'Myggejagten', [
-                      catGame ? 'Flot! Du fangede ildkatten, før den slap væk.'
+                    const bows = princessGame
+                      ? this.collectibleManager.getCollectedItems('tool').filter((item) => item.kind === 'bow-and-arrow').length : 0;
+                    this.dialogueWindow.showLines(princessGame ? 'Krigerprinsessen' : wizardGame ? 'Troldmanden' : boatGame ? 'Bådturen' : catGame ? 'Ildkatten' : volcanoMode ? 'Vulkanen' : witchGame ? 'Heksens labyrint' : caveGame ? 'Hulen' : flightGame ? 'Flyveturen' : trollGame ? 'Troldens æbler' : 'Myggejagten', [
+                      princessGame ? (this.dragonRescued
+                        ? 'Flot kæmpet! Jeg følger gerne med jer igen.'
+                        : bows === 2
+                          ? 'Flot kæmpet! Jeg følger med jer, og I har allerede begge buer med pile.'
+                         : bows === 1 ? 'Flot kæmpet! Jeg følger med jer. Find den sidste bue med pile i det sydlige område!'
+                           : 'Flot kæmpet! Jeg følger med jer. Find de to buer med pile i det sydlige område!')
+                        : wizardGame ? 'Flot! Troldmanden er besejret, og vejen mod syd er åben.'
+                        : boatGame ? (this.collectibleManager.collectedIds.has('flashlight')
+                          ? 'Flot! I sejlede til øen.' : 'Flot! I sejlede til øen. Find lommelygten!')
+                        : catGame ? 'Flot! Du fangede ildkatten, før den slap væk.'
                         : volcanoMode ? 'Flot! I klarede vulkanens udfordring.'
                         : witchGame ? 'Flot! Du fandt ud af heksens labyrint.'
                         : caveGame ? 'Flot! I krydsede hulen sammen.'
                         : flightGame ? 'Flot! I fløj over revnen sammen.'
-                        : trollGame ? 'Flot! Du samlede syv æbler, og broen er åben.'
+                        : trollGame ? (npcId === 'north-troll'
+                          ? 'Flot! Du samlede syv æbler, og stien til mørkeskoven er åben.'
+                          : 'Flot! Du samlede syv æbler, og broen er åben.')
                         : 'Flot! Du ramte 10 myg, og stien til skoven er åben.',
                     ]);
                   }
@@ -1026,8 +1361,11 @@ export class MainWorldScene extends Phaser.Scene {
                     this.volcanoCatRoam.respawn();
                   }
                   this.swapLeader();
-                  this.dialogueWindow.showLines(catGame ? 'Ildkatten' : volcanoMode ? 'Vulkanen' : witchGame ? 'Heksens labyrint' : caveGame ? 'Hulen' : flightGame ? 'Flyveturen' : trollGame ? 'Troldens æbler' : 'Myggejagten', [
-                    catGame ? 'Katten slap væk og gemmer sig et andet sted i vulkanområdet. Nu er det den anden spillers tur.'
+                  this.dialogueWindow.showLines(princessGame ? 'Krigerprinsessen' : wizardGame ? 'Troldmanden' : boatGame ? 'Bådturen' : catGame ? 'Ildkatten' : volcanoMode ? 'Vulkanen' : witchGame ? 'Heksens labyrint' : caveGame ? 'Hulen' : flightGame ? 'Flyveturen' : trollGame ? 'Troldens æbler' : 'Myggejagten', [
+                    princessGame ? 'God træning! Prøv spørgsmålet og kampen igen. Nu er det den anden spillers tur.'
+                      : wizardGame ? 'Pigerne mistede alle fem liv. Prøv spørgsmålet og kampen igen!'
+                      : boatGame ? 'Båden blev ramt tre gange. Nu er det den anden spillers tur.'
+                      : catGame ? 'Katten slap væk og gemmer sig et andet sted i vulkanområdet. Nu er det den anden spillers tur.'
                       : volcanoMode ? 'Du blev ramt tre gange. Nu er det den anden spillers tur.'
                       : witchGame ? 'Heksen fangede dig! Nu er det den anden spillers tur.'
                       : caveGame ? 'I mistede alle fem liv. Prøv spørgsmålet og hulen igen!'

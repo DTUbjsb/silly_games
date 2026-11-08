@@ -1,0 +1,562 @@
+{
+  "challenges": [
+    {
+      "id": "reading-extra-1-dog",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En ko ser en mus. En ... ser en mus?",
+      "options": [
+        "ko",
+        "ræv",
+        "kat"
+      ],
+      "correctAnswer": "ko",
+      "story": {
+        "character": "En ko",
+        "introduction": "Se og læs.",
+        "success": "Ja! ko.",
+        "hint": "Se på: En ko ser en mus."
+      }
+    },
+    {
+      "id": "reading-extra-1-bee",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En bi er gul. En bi er ...?",
+      "options": [
+        "gul",
+        "rød",
+        "blå"
+      ],
+      "correctAnswer": "gul",
+      "story": {
+        "character": "En bi",
+        "introduction": "Se og læs.",
+        "success": "Ja! gul.",
+        "hint": "Se på: En bi er gul."
+      }
+    },
+    {
+      "id": "reading-extra-1-egg",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "Mor har et æg. Mor har et ...?",
+      "options": [
+        "æg",
+        "hus",
+        "ur"
+      ],
+      "correctAnswer": "æg",
+      "story": {
+        "character": "En mor",
+        "introduction": "Se og læs.",
+        "success": "Ja! æg.",
+        "hint": "Se på: Mor har et æg."
+      }
+    },
+    {
+      "id": "reading-extra-1-pig",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En ko ser en sø. En ko ser en ...?",
+      "options": [
+        "sø",
+        "ås",
+        "bil"
+      ],
+      "correctAnswer": "sø",
+      "story": {
+        "character": "En ko",
+        "introduction": "Se og læs.",
+        "success": "Ja! sø.",
+        "hint": "Se på: En ko ser en sø."
+      }
+    },
+    {
+      "id": "reading-extra-1-ship",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "Bo ser en båd. Bo ser en ...?",
+      "options": [
+        "båd",
+        "bil",
+        "bus"
+      ],
+      "correctAnswer": "båd",
+      "story": {
+        "character": "En båd",
+        "introduction": "Se og læs.",
+        "success": "Ja! båd.",
+        "hint": "Se på: Bo ser en båd."
+      }
+    },
+    {
+      "id": "reading-extra-1-tea",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "Mor får en kop te. Mor får en kop ...?",
+      "options": [
+        "te",
+        "is",
+        "ost"
+      ],
+      "correctAnswer": "te",
+      "story": {
+        "character": "En kop",
+        "introduction": "Se og læs.",
+        "success": "Ja! te.",
+        "hint": "Se på: Mor får en kop te."
+      }
+    },
+    {
+      "id": "reading-extra-1-rain",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En sky har sne. En sky har ...?",
+      "options": [
+        "sne",
+        "sol",
+        "is"
+      ],
+      "correctAnswer": "sne",
+      "story": {
+        "character": "En sky",
+        "introduction": "Se og læs.",
+        "success": "Ja! sne.",
+        "hint": "Se på: En sky har sne."
+      }
+    },
+    {
+      "id": "reading-extra-1-foot",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En fod har en sko. En fod har en ...?",
+      "options": [
+        "sko",
+        "hat",
+        "kop"
+      ],
+      "correctAnswer": "sko",
+      "story": {
+        "character": "En fod",
+        "introduction": "Se og læs.",
+        "success": "Ja! sko.",
+        "hint": "Se på: En fod har en sko."
+      }
+    },
+    {
+      "id": "reading-extra-1-cow",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En ko kan gå. En ko kan ...?",
+      "options": [
+        "gå",
+        "se",
+        "sy"
+      ],
+      "correctAnswer": "gå",
+      "story": {
+        "character": "En ko",
+        "introduction": "Se og læs.",
+        "success": "Ja! gå.",
+        "hint": "Se på: En ko kan gå."
+      }
+    },
+    {
+      "id": "reading-extra-1-dad",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "Far har en ny bil. Far har en ny ...?",
+      "options": [
+        "bil",
+        "hat",
+        "bog"
+      ],
+      "correctAnswer": "bil",
+      "story": {
+        "character": "Far",
+        "introduction": "Se og læs.",
+        "success": "Ja! bil.",
+        "hint": "Se på: Far har en ny bil."
+      }
+    },
+    {
+      "id": "reading-extra-1-sea",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En ål bor i et hav. En ål bor i et ...?",
+      "options": [
+        "hav",
+        "hus",
+        "bur"
+      ],
+      "correctAnswer": "hav",
+      "story": {
+        "character": "En ål",
+        "introduction": "Se og læs.",
+        "success": "Ja! hav.",
+        "hint": "Se på: En ål bor i et hav."
+      }
+    },
+    {
+      "id": "reading-extra-1-ice",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En is er god. En is er ...?",
+      "options": [
+        "god",
+        "gul",
+        "ny"
+      ],
+      "correctAnswer": "god",
+      "story": {
+        "character": "En is",
+        "introduction": "Se og læs.",
+        "success": "Ja! god.",
+        "hint": "Se på: En is er god."
+      }
+    },
+    {
+      "id": "reading-extra-1-hat",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En hat er blå. En hat er ...?",
+      "options": [
+        "blå",
+        "rød",
+        "gul"
+      ],
+      "correctAnswer": "blå",
+      "story": {
+        "character": "En hat",
+        "introduction": "Se og læs.",
+        "success": "Ja! blå.",
+        "hint": "Se på: En hat er blå."
+      }
+    },
+    {
+      "id": "reading-extra-1-fox",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En ræv ser en mus. En ræv ser en ...?",
+      "options": [
+        "mus",
+        "ko",
+        "ål"
+      ],
+      "correctAnswer": "mus",
+      "story": {
+        "character": "En ræv",
+        "introduction": "Se og læs.",
+        "success": "Ja! mus.",
+        "hint": "Se på: En ræv ser en mus."
+      }
+    },
+    {
+      "id": "reading-extra-1-hay",
+      "category": "Reading",
+      "difficulty": 1,
+      "question": "En ko får hø. En ko får ...?",
+      "options": [
+        "hø",
+        "te",
+        "is"
+      ],
+      "correctAnswer": "hø",
+      "story": {
+        "character": "En ko",
+        "introduction": "Se og læs.",
+        "success": "Ja! hø.",
+        "hint": "Se på: En ko får hø."
+      }
+    },
+    {
+      "id": "reading-extra-2-library",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Maja låner en bog på biblioteket.” Hvor låner Maja en bog?",
+      "options": [
+        "På biblioteket",
+        "På stranden",
+        "I bussen"
+      ],
+      "correctAnswer": "På biblioteket",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, på biblioteket!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-umbrella",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Det regner, så Noah tager sin paraply med.” Hvorfor tager Noah sin paraply med?",
+      "options": [
+        "Fordi det regner",
+        "Fordi det sner",
+        "Fordi solen skinner"
+      ],
+      "correctAnswer": "Fordi det regner",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, fordi det regner!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-basket",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Liva lægger tre røde æbler i en kurv.” Hvad lægger Liva i kurven?",
+      "options": [
+        "Røde æbler",
+        "Gule pærer",
+        "Blå sten"
+      ],
+      "correctAnswer": "Røde æbler",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, røde æbler!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-rabbit",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Kaninen gemmer sig bag den store sten.” Hvor gemmer kaninen sig?",
+      "options": [
+        "Bag stenen",
+        "Under broen",
+        "Oppe i træet"
+      ],
+      "correctAnswer": "Bag stenen",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, bag stenen!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-boots",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Før Alma går ud i mudderet, tager hun støvler på.” Hvad tager Alma på?",
+      "options": [
+        "Støvler",
+        "Vanter",
+        "En hat"
+      ],
+      "correctAnswer": "Støvler",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, støvler!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-letter",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Emil skriver et brev til sin bedstemor.” Hvem skriver Emil til?",
+      "options": [
+        "Sin bedstemor",
+        "Sin lærer",
+        "Sin nabo"
+      ],
+      "correctAnswer": "Sin bedstemor",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, sin bedstemor!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-soup",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Suppen er varm, så Ida venter med at spise.” Hvorfor venter Ida?",
+      "options": [
+        "Suppen er varm",
+        "Suppen er kold",
+        "Hun mangler en stol"
+      ],
+      "correctAnswer": "Suppen er varm",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, suppen er varm!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-seed",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Ali sår et frø og vander jorden.” Hvad gør Ali efter at have sået?",
+      "options": [
+        "Han vander jorden",
+        "Han plukker blomsten",
+        "Han lukker bogen"
+      ],
+      "correctAnswer": "Han vander jorden",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, han vander jorden!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-bird",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“En fugl bygger rede højt oppe i et træ.” Hvor bygger fuglen rede?",
+      "options": [
+        "I et træ",
+        "I vandet",
+        "Under en sten"
+      ],
+      "correctAnswer": "I et træ",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, i et træ!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-lamp",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Da det bliver mørkt, tænder Sofia lampen.” Hvornår tænder Sofia lampen?",
+      "options": [
+        "Da det bliver mørkt",
+        "Da det begynder at regne",
+        "Da hun står op"
+      ],
+      "correctAnswer": "Da det bliver mørkt",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, da det bliver mørkt!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-key",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Nøglen ligger i skuffen ved siden af sengen.” Hvor ligger nøglen?",
+      "options": [
+        "I skuffen",
+        "Under sengen",
+        "På taget"
+      ],
+      "correctAnswer": "I skuffen",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, i skuffen!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-sharing",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Ella deler sine fire kiks med sin ven.” Hvad deler Ella?",
+      "options": [
+        "Sine kiks",
+        "Sin cykel",
+        "Sin bog"
+      ],
+      "correctAnswer": "Sine kiks",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, sine kiks!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-boat",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Båden sejler langsomt over den stille sø.” Hvor sejler båden?",
+      "options": [
+        "På søen",
+        "På vejen",
+        "I skoven"
+      ],
+      "correctAnswer": "På søen",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, på søen!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-cake",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“August bager en kage, fordi hans søster har fødselsdag.” Hvorfor bager August en kage?",
+      "options": [
+        "Hans søster har fødselsdag",
+        "Han skal i skole",
+        "Hans cykel er gået i stykker"
+      ],
+      "correctAnswer": "Hans søster har fødselsdag",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, hans søster har fødselsdag!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-scarf",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Vinden er kold, men Leas halstørklæde holder hende varm.” Hvad holder Lea varm?",
+      "options": [
+        "Hendes halstørklæde",
+        "Hendes paraply",
+        "Hendes rygsæk"
+      ],
+      "correctAnswer": "Hendes halstørklæde",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, hendes halstørklæde!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    },
+    {
+      "id": "reading-extra-2-return",
+      "category": "Reading",
+      "difficulty": 2,
+      "question": "“Først leger børnene i haven. Bagefter går de ind.” Hvad gør børnene til sidst?",
+      "options": [
+        "De går ind",
+        "De går i haven",
+        "De tager i skole"
+      ],
+      "correctAnswer": "De går ind",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs sætningen og find svaret.",
+        "success": "Ja, de går ind!",
+        "hint": "Læs sætningen igen og se efter svaret."
+      }
+    }
+  ]
+}

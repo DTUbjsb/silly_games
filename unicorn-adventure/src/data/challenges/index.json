@@ -3,6 +3,10 @@
     "reading.json",
     "math.json",
     "english.json",
-    "logic.json"
+    "logic.json",
+    "reading-extra.json",
+    "math-extra.json",
+    "english-extra.json",
+    "logic-extra.json"
   ]
 }

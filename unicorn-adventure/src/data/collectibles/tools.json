@@ -1,0 +1,47 @@
+{
+  "type": "tool",
+  "items": [
+    {
+      "id": "flashlight",
+      "kind": "flashlight",
+      "name": "Lommelygte",
+      "texture": "flashlight",
+      "x": 3376,
+      "y": 354
+    },
+    {
+      "id": "lava-boots-1",
+      "kind": "lava-boots",
+      "name": "Lavastøvler",
+      "texture": "lava-boots",
+      "x": -496,
+      "y": 1904
+    },
+    {
+      "id": "lava-boots-2",
+      "kind": "lava-boots",
+      "name": "Lavastøvler",
+      "texture": "lava-boots",
+      "x": -592,
+      "y": 2512
+    },
+    {
+      "id": "bow-and-arrow-1",
+      "kind": "bow-and-arrow",
+      "name": "Bue og pile",
+      "texture": "bow-and-arrow",
+      "unlockReward": "princess-bows",
+      "x": 1120,
+      "y": 3520
+    },
+    {
+      "id": "bow-and-arrow-2",
+      "kind": "bow-and-arrow",
+      "name": "Bue og pile",
+      "texture": "bow-and-arrow",
+      "unlockReward": "princess-bows",
+      "x": 3200,
+      "y": 3840
+    }
+  ]
+}

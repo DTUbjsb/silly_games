@@ -1,0 +1,19 @@
+{
+  "id": "old-queen",
+  "name": "Den gamle dronning",
+  "avatar": "old-queen",
+  "x": 304,
+  "y": 160,
+  "interactionRadius": 85,
+  "repeatDialogue": "Min søde søn er i dragens hule mod syd. I har brug for alle enhjørningernes kræfter og hjælp fra krigerprinsessen i det sydlige område.",
+  "interactions": [
+    {
+      "type": "dialogue",
+      "lines": [
+        "Åh, hjælp mig! Min søn, den søde prins, er blevet bortført af en frygtelig drage.",
+        "Han er i dragens hule mod syd. I får brug for alle enhjørningernes kræfter for at komme derhen.",
+        "I det sydlige område finder I krigerprinsessen. Hun kan hjælpe jer med at besejre dragen og redde min søn."
+      ]
+    }
+  ]
+}

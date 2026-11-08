@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="96" viewBox="0 0 72 96">
+  <title>En lille båd</title>
+  <path d="M36 4Q60 20 62 57Q59 84 36 93Q13 84 10 57Q12 20 36 4Z" fill="#98623f" stroke="#573c32" stroke-width="4"/>
+  <path d="M36 14Q52 28 53 56Q50 76 36 83Q22 76 19 56Q20 28 36 14Z" fill="#cf9a65"/>
+  <path d="M19 48H53M22 68H50" stroke="#70482f" stroke-width="6"/>
+</svg>

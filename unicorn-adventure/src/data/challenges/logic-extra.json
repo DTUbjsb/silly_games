@@ -1,0 +1,616 @@
+{
+  "challenges": [
+    {
+      "id": "logic-extra-1-repeat-sun",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Sol, måne, sol, måne. Hvad kommer nu?",
+      "options": [
+        "Sol",
+        "Måne",
+        "Sky"
+      ],
+      "correctAnswer": "Sol",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, sol!",
+        "hint": "De to tegn skifter plads."
+      }
+    },
+    {
+      "id": "logic-extra-1-repeat-fruit",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Æble, pære, æble, pære. Hvad kommer nu?",
+      "options": [
+        "Æble",
+        "Pære",
+        "Banan"
+      ],
+      "correctAnswer": "Æble",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, æble!",
+        "hint": "Se, hvad der kom efter pære før."
+      }
+    },
+    {
+      "id": "logic-extra-1-repeat-shapes",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Trekant, cirkel, trekant, cirkel. Hvad kommer nu?",
+      "options": [
+        "Trekant",
+        "Cirkel",
+        "Firkant"
+      ],
+      "correctAnswer": "Trekant",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, trekant!",
+        "hint": "De to former skiftes."
+      }
+    },
+    {
+      "id": "logic-extra-1-count-up",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "4, 5, 6, ... Hvilket tal kommer nu?",
+      "options": [
+        "7",
+        "5",
+        "8"
+      ],
+      "correctAnswer": "7",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 7!",
+        "hint": "Tæl én videre fra seks."
+      }
+    },
+    {
+      "id": "logic-extra-1-count-down",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "8, 7, 6, ... Hvilket tal kommer nu?",
+      "options": [
+        "5",
+        "7",
+        "9"
+      ],
+      "correctAnswer": "5",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 5!",
+        "hint": "Tæl én tilbage fra seks."
+      }
+    },
+    {
+      "id": "logic-extra-1-small-number",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilket tal er mindst: 2, 6 eller 8?",
+      "options": [
+        "2",
+        "6",
+        "8"
+      ],
+      "correctAnswer": "2",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 2!",
+        "hint": "Hvilket af tallene kommer først, når du tæller?"
+      }
+    },
+    {
+      "id": "logic-extra-1-large-number",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilket tal er størst: 3, 7 eller 4?",
+      "options": [
+        "7",
+        "3",
+        "4"
+      ],
+      "correctAnswer": "7",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 7!",
+        "hint": "Hvilket af tallene kommer sidst, når du tæller?"
+      }
+    },
+    {
+      "id": "logic-extra-1-animal-group",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilken af disse kan flyve: fisk, fugl eller snegl?",
+      "options": [
+        "Fugl",
+        "Fisk",
+        "Snegl"
+      ],
+      "correctAnswer": "Fugl",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, fugl!",
+        "hint": "Hvilket dyr har vinger?"
+      }
+    },
+    {
+      "id": "logic-extra-1-clothing",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilken ting tager man normalt på fødderne?",
+      "options": [
+        "Sko",
+        "Hat",
+        "Vanter"
+      ],
+      "correctAnswer": "Sko",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, sko!",
+        "hint": "Man går med dem på fødderne."
+      }
+    },
+    {
+      "id": "logic-extra-1-time-day",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvad kommer efter morgen: middag, nat eller i går?",
+      "options": [
+        "Middag",
+        "Nat",
+        "I går"
+      ],
+      "correctAnswer": "Middag",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, middag!",
+        "hint": "Tænk på dagens rækkefølge."
+      }
+    },
+    {
+      "id": "logic-extra-1-odd-fruit",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilken er ikke en frugt: æble, pære eller sko?",
+      "options": [
+        "Sko",
+        "Æble",
+        "Pære"
+      ],
+      "correctAnswer": "Sko",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, sko!",
+        "hint": "Hvilken ting kan man have på?"
+      }
+    },
+    {
+      "id": "logic-extra-1-count-ahead",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "6, 7, 8, ... Hvilket tal kommer nu?",
+      "options": [
+        "9",
+        "7",
+        "10"
+      ],
+      "correctAnswer": "9",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 9!",
+        "hint": "Tæl én videre fra otte."
+      }
+    },
+    {
+      "id": "logic-extra-1-count-back",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "4, 3, 2, ... Hvilket tal kommer nu?",
+      "options": [
+        "1",
+        "3",
+        "5"
+      ],
+      "correctAnswer": "1",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 1!",
+        "hint": "Tæl én tilbage fra to."
+      }
+    },
+    {
+      "id": "logic-extra-1-repeat-animals",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Kat, hund, kat, hund. Hvad kommer nu?",
+      "options": [
+        "Kat",
+        "Hund",
+        "Mus"
+      ],
+      "correctAnswer": "Kat",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, kat!",
+        "hint": "Se, hvad der kom efter hund før."
+      }
+    },
+    {
+      "id": "logic-extra-1-opposite",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvad er det modsatte af stor?",
+      "options": [
+        "Lille",
+        "Høj",
+        "Rund"
+      ],
+      "correctAnswer": "Lille",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, lille!",
+        "hint": "Tænk på en meget lille ting."
+      }
+    },
+    {
+      "id": "logic-extra-1-number-between",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilket tal ligger mellem 2 og 4?",
+      "options": [
+        "3",
+        "1",
+        "5"
+      ],
+      "correctAnswer": "3",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 3!",
+        "hint": "Tæl fra to til fire."
+      }
+    },
+    {
+      "id": "logic-extra-1-find-shape",
+      "category": "Logic",
+      "difficulty": 1,
+      "question": "Hvilken form har tre hjørner?",
+      "options": [
+        "Trekant",
+        "Cirkel",
+        "Firkant"
+      ],
+      "correctAnswer": "Trekant",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, trekant!",
+        "hint": "Tæl hjørnerne i en trekant."
+      }
+    },
+    {
+      "id": "logic-extra-2-twos",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "2, 4, 6, 8, ... Hvilket tal kommer nu?",
+      "options": [
+        "10",
+        "9",
+        "12"
+      ],
+      "correctAnswer": "10",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 10!",
+        "hint": "Læg to til otte."
+      }
+    },
+    {
+      "id": "logic-extra-2-fives",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "10, 15, 20, ... Hvilket tal kommer nu?",
+      "options": [
+        "25",
+        "21",
+        "30"
+      ],
+      "correctAnswer": "25",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 25!",
+        "hint": "Læg fem til tyve."
+      }
+    },
+    {
+      "id": "logic-extra-2-descending",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "20, 17, 14, ... Hvilket tal kommer nu?",
+      "options": [
+        "11",
+        "12",
+        "13"
+      ],
+      "correctAnswer": "11",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 11!",
+        "hint": "Træk tre fra fjorten."
+      }
+    },
+    {
+      "id": "logic-extra-2-three-colors",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Rød, gul, blå, rød, gul, ... Hvad kommer nu?",
+      "options": [
+        "Blå",
+        "Rød",
+        "Gul"
+      ],
+      "correctAnswer": "Blå",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, blå!",
+        "hint": "De samme tre farver gentages."
+      }
+    },
+    {
+      "id": "logic-extra-2-pairs",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Cirkel, cirkel, firkant, firkant, cirkel, ... Hvad kommer nu?",
+      "options": [
+        "Cirkel",
+        "Firkant",
+        "Trekant"
+      ],
+      "correctAnswer": "Cirkel",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, cirkel!",
+        "hint": "Hver form vises to gange i træk."
+      }
+    },
+    {
+      "id": "logic-extra-2-order-height",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Ella er højere end Bo. Bo er højere end Ida. Hvem er lavest?",
+      "options": [
+        "Ida",
+        "Bo",
+        "Ella"
+      ],
+      "correctAnswer": "Ida",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, ida!",
+        "hint": "Hvem er lavere end Bo?"
+      }
+    },
+    {
+      "id": "logic-extra-2-order-weight",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "En kasse er tungere end en bog. En bog er tungere end et blad. Hvad er lettest?",
+      "options": [
+        "Bladet",
+        "Bogen",
+        "Kassen"
+      ],
+      "correctAnswer": "Bladet",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, bladet!",
+        "hint": "Hvilken ting er lettere end bogen?"
+      }
+    },
+    {
+      "id": "logic-extra-2-order-queue",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Mia står foran Leo, og Leo står foran Ali. Hvem står sidst?",
+      "options": [
+        "Ali",
+        "Leo",
+        "Mia"
+      ],
+      "correctAnswer": "Ali",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, ali!",
+        "hint": "Hvem står bag Leo?"
+      }
+    },
+    {
+      "id": "logic-extra-2-missing",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "3, 5, 7, __, 11. Hvilket tal mangler?",
+      "options": [
+        "9",
+        "8",
+        "10"
+      ],
+      "correctAnswer": "9",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 9!",
+        "hint": "Tallene stiger med to hver gang."
+      }
+    },
+    {
+      "id": "logic-extra-2-days",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Hvis det er mandag i dag, hvilken dag er det så i overmorgen?",
+      "options": [
+        "Onsdag",
+        "Tirsdag",
+        "Torsdag"
+      ],
+      "correctAnswer": "Onsdag",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, onsdag!",
+        "hint": "Tæl to dage frem fra mandag."
+      }
+    },
+    {
+      "id": "logic-extra-2-sequence",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Et frø spirer, planten vokser, og blomsten springer ud. Hvad sker først?",
+      "options": [
+        "Frøet spirer",
+        "Blomsten springer ud",
+        "Planten vokser"
+      ],
+      "correctAnswer": "Frøet spirer",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, frøet spirer!",
+        "hint": "Hvad sker før planten kan vokse?"
+      }
+    },
+    {
+      "id": "logic-extra-2-odd-group",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Hvilken hører ikke til: cirkel, trekant, firkant eller banan?",
+      "options": [
+        "Banan",
+        "Cirkel",
+        "Trekant"
+      ],
+      "correctAnswer": "Banan",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, banan!",
+        "hint": "Tre af ordene er geometriske former."
+      }
+    },
+    {
+      "id": "logic-extra-2-doubling",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "1, 2, 4, 8, ... Hvilket tal kommer nu?",
+      "options": [
+        "16",
+        "10",
+        "12"
+      ],
+      "correctAnswer": "16",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 16!",
+        "hint": "Hvert tal er dobbelt så stort som det forrige."
+      }
+    },
+    {
+      "id": "logic-extra-2-before",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Lørdag kommer efter fredag. Hvilken dag kommer lige før fredag?",
+      "options": [
+        "Torsdag",
+        "Onsdag",
+        "Lørdag"
+      ],
+      "correctAnswer": "Torsdag",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, torsdag!",
+        "hint": "Tænk på ugedagenes rækkefølge."
+      }
+    },
+    {
+      "id": "logic-extra-2-route",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "Gå først til broen og derefter til skoven. Hvad besøger du først?",
+      "options": [
+        "Broen",
+        "Skoven",
+        "Begge på én gang"
+      ],
+      "correctAnswer": "Broen",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, broen!",
+        "hint": "Se på ordet først."
+      }
+    },
+    {
+      "id": "logic-extra-2-compare",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "En rød snor er længere end en blå. Den blå er længere end en grøn. Hvilken er længst?",
+      "options": [
+        "Den røde",
+        "Den blå",
+        "Den grønne"
+      ],
+      "correctAnswer": "Den røde",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, den røde!",
+        "hint": "Hvilken snor er længere end den blå?"
+      }
+    },
+    {
+      "id": "logic-extra-2-pattern-grow",
+      "category": "Logic",
+      "difficulty": 2,
+      "question": "1, 3, 5, 7, ... Hvilket tal kommer nu?",
+      "options": [
+        "9",
+        "8",
+        "10"
+      ],
+      "correctAnswer": "9",
+      "story": {
+        "character": "Tænkevennen",
+        "introduction": "Se på opgaven og tænk dig om.",
+        "success": "Ja, 9!",
+        "hint": "Læg to til syv."
+      }
+    }
+  ]
+}

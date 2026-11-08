@@ -5,7 +5,7 @@
   "x": -368,
   "y": 880,
   "interactionRadius": 112,
-  "repeatDialogue": "Skoven er åben. Find enhjørningen og skattene derinde!",
+  "repeatDialogue": "Stien til skoven er åben. Tak for hjælpen!",
   "interactions": [
     {
       "type": "dialogue",

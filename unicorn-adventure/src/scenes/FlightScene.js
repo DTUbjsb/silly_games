@@ -1,3 +1,5 @@
+import { minigameSpeed } from '../systems/MinigameDifficulty.js';
+
 const FLIGHT_DURATION = 20000;
 const MAX_LIVES = 5;
 const LAVA_BASE = 526;
@@ -7,7 +9,7 @@ export class FlightScene extends Phaser.Scene {
     super('FlightScene');
   }
 
-  create({ players, unicorns, saddles, wings, goingWest, onComplete }) {
+  create({ player, players, unicorns, saddles, wings, goingWest, onComplete }) {
     if (!Array.isArray(players) || players.length < 2
       || !Array.isArray(unicorns) || unicorns.length < 2
       || !Array.isArray(saddles) || saddles.length < 2
@@ -20,6 +22,7 @@ export class FlightScene extends Phaser.Scene {
     }
 
     this.onComplete = onComplete;
+    this.difficulty = minigameSpeed(player?.age);
     this.finished = false;
     this.started = false;
     this.lives = MAX_LIVES;
@@ -117,7 +120,8 @@ export class FlightScene extends Phaser.Scene {
     const y = Phaser.Math.Between(145, 460);
     const bird = this.pterodactyls.create(x, y, 'flight-pterodactyl');
     bird.body.setSize(70, 32);
-    bird.body.setVelocity(-this.direction * 185, Phaser.Math.Clamp((this.leader.y - y) * 0.06, -20, 20));
+    bird.body.setVelocity(-this.direction * 185 * this.difficulty,
+      Phaser.Math.Clamp((this.leader.y - y) * 0.06, -20, 20) * this.difficulty);
     this.registry.get('soundEffects').play('flightBird');
   }
 

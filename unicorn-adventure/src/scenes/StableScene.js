@@ -58,11 +58,11 @@ export class StableScene extends Phaser.Scene {
     }));
     this.followers = new LeaderFollowerSystem(this.players, { spacing: 75 });
     const world = this.scene.get('MainWorldScene');
-    if (world.leaderFollowerSystem.companions.some((companion) => companion.id === 'volcano-cat')) {
-      const sprite = this.physics.add.image(250, 195, 'red-cat').setScale(0.72).setDepth(2);
+    world.leaderFollowerSystem.companions.forEach((companion, index) => {
+      const sprite = this.physics.add.image(250 - index * 75, 195, companion.avatar).setScale(0.72).setDepth(2);
       sprite.body.setCollideWorldBounds(true);
-      this.followers.addCompanion({ id: 'volcano-cat', sprite });
-    }
+      this.followers.addCompanion({ id: companion.id, sprite });
+    });
     this.movement = new MovementSystem(this, this.followers.leader.sprite);
     this.cameras.main.startFollow(this.followers.leader.sprite, true, 0.12, 0.12);
     this.scene.get('MainWorldScene').hud.setLocation(true);
@@ -100,7 +100,7 @@ export class StableScene extends Phaser.Scene {
       this.movement.update();
     }
     this.followers.update(delta);
-    if (this.followers.companions.length && !this.detailPanel.isOpen) {
+    if (this.followers.companions.some((companion) => companion.id === 'volcano-cat') && !this.detailPanel.isOpen) {
       this.scene.get('MainWorldScene').updateCatMeow(delta);
     }
     this.players.forEach((player) => player.updateNameTag());

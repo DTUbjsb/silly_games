@@ -121,6 +121,15 @@ export class EducationalChallengeManager {
   }
 
   getChallengeForAge(age, excludedIds = [], reservedIds = []) {
+    return this.selectChallenge(age, excludedIds, reservedIds);
+  }
+
+  getChallengeForCategory(age, category, excludedIds = [], reservedIds = []) {
+    if (!CATEGORIES.has(category)) throw new Error(`Ukendt udfordringskategori: "${category}".`);
+    return this.selectChallenge(age, excludedIds, reservedIds, category);
+  }
+
+  selectChallenge(age, excludedIds, reservedIds, category = null) {
     if (!Number.isInteger(age) || age < 0) {
       throw new RangeError('Alderen skal være et helt tal på mindst 0.');
     }
@@ -131,9 +140,10 @@ export class EducationalChallengeManager {
     const targetDifficulty = this.getDifficultyForAge(age);
     const reserved = new Set(reservedIds);
     const suitable = Array.from(this.challenges.values())
-      .filter((challenge) => challenge.difficulty <= targetDifficulty && !reserved.has(challenge.id));
+      .filter((challenge) => challenge.difficulty <= targetDifficulty && !reserved.has(challenge.id)
+        && (category === null || challenge.category === category));
     if (suitable.length === 0) {
-      throw new Error('Der findes ingen udfordringer på et passende niveau.');
+      throw new Error(`Der findes ingen udfordringer på et passende niveau${category ? ` i kategorien ${category}` : ''}.`);
     }
 
     const excluded = new Set(excludedIds);

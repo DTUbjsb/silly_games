@@ -1,16 +1,57 @@
 import { createGameConfig } from '../src/config.js';
 import { TEST_WORLD_DATA, WORLD_GATES, WORLD_TILE, WEST_CRACK, WEST_REGION_DATA, WEST_REGION_WIDTH,
-  NORTH_HOLE, NORTH_REGION_DATA, NORTH_REGION_HEIGHT, EAST_ORIGIN, EAST_REGION_DATA, EAST_REGION_WIDTH } from '../src/data/testWorld.js';
+  NORTH_HOLE, NORTH_REGION_DATA, NORTH_REGION_HEIGHT, EAST_ORIGIN, EAST_REGION_DATA, EAST_REGION_WIDTH, LAKE,
+  SOUTH_ORIGIN, SOUTH_PASS, SOUTH_REGION_DATA, DRAGON_DEN } from '../src/data/testWorld.js';
 import { CollectionStore } from '../src/managers/CollectionStore.js';
 import { GameStateManager } from '../src/managers/GameStateManager.js';
 import { SoundEffects } from '../src/audio/SoundEffects.js';
 import { arrangeCollectibles } from '../src/data/collectibleLayout.js';
-import { mazePath, MAZE_ROWS } from '../src/scenes/WitchMazeScene.js';
+import { mazePath, MAZE_LAYOUTS } from '../src/scenes/WitchMazeScene.js';
+import { CatMazeScene } from '../src/scenes/CatMazeScene.js';
+import { minigameSpeed } from '../src/systems/MinigameDifficulty.js';
 import { NorthFollowerNavigator } from '../src/systems/NorthFollowerNavigator.js';
+import { wizardTeam } from '../src/systems/WizardTeam.js';
 
 function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
+  }
+}
+
+function testCatMazeLayouts() {
+  for (const rows of MAZE_LAYOUTS) {
+    for (const age of [6, 7, 8]) {
+      for (const chasing of [false, true]) {
+        const scene = Object.create(CatMazeScene.prototype);
+        Object.assign(scene, {
+          mazeRows: rows, difficulty: minigameSpeed(age), finished: false, escaped: false,
+          cursors: { up: {}, down: {}, left: {}, right: {} },
+          keys: { W: {}, A: {}, S: {}, D: {} },
+          finish(won) { this.finished = true; this.won = won; },
+        });
+        const actor = (x, y) => {
+          const [px, py] = scene.toWorld(x, y);
+          return {
+            x, y, next: null, progress: 0,
+            sprite: { x: px, y: py, setPosition(nextX, nextY) { this.x = nextX; this.y = nextY; } },
+          };
+        };
+        scene.runner = actor(1, 1);
+        scene.cat = actor(1, 9);
+        for (let frame = 0; frame < 1500 && !scene.finished; frame += 1) {
+          if (chasing && !scene.runner.next) {
+            const next = mazePath([scene.runner.x, scene.runner.y], [13, 1], rows)?.[1];
+            scene.keys.W.isDown = Boolean(next && next[1] < scene.runner.y);
+            scene.keys.S.isDown = Boolean(next && next[1] > scene.runner.y);
+            scene.keys.A.isDown = Boolean(next && next[0] < scene.runner.x);
+            scene.keys.D.isDown = Boolean(next && next[0] > scene.runner.x);
+          }
+          scene.update(0, 50);
+        }
+        assert(scene.finished && scene.won === chasing && scene.escaped !== chasing,
+          `Cat maze could not ${chasing ? 'be won' : 'be lost'} at age ${age}.`);
+      }
+    }
   }
 }
 
@@ -22,6 +63,8 @@ async function testSoundSynthesis() {
     'trollThrow', 'trollRockHit', 'trollApple', 'trollWin', 'trollLose', 'trollMusicLow', 'trollMusicHigh',
     'flightStart', 'flightFlap', 'flightBird', 'flightBirdHit', 'flightLava',
     'flightWin', 'flightLose', 'flightMusicLow', 'flightMusicMid', 'flightMusicHigh',
+    'lakeStart', 'lakePaddle', 'lakeFish', 'lakeMonster', 'lakeHit', 'lakeWin', 'lakeLose',
+    'lakeMusicLow', 'lakeMusicMid', 'lakeMusicHigh',
     'worldHappyC', 'worldHappyE', 'worldHappyF', 'worldHappyG', 'worldHappyA',
     'worldDarkLow', 'worldDarkMid', 'worldDarkHigh', 'worldVolcanoLow', 'worldVolcanoHigh', 'catMeow',
   ];
@@ -260,7 +303,7 @@ async function testVolcano(world) {
   const start = async (mode) => {
     outcome = undefined;
     world.scene.launch('VolcanoScene', {
-      player: { name: world.player.name, avatar: world.player.avatar }, mode, onComplete: (won) => { outcome = won; },
+      player: { name: world.player.name, avatar: world.player.avatar, age: world.player.age }, mode, onComplete: (won) => { outcome = won; },
     });
     world.scene.pause();
     const scene = world.game.scene.getScene('VolcanoScene');
@@ -269,16 +312,36 @@ async function testVolcano(world) {
   };
   try {
     world.player.sprite.body.reset(EAST_ORIGIN - 60, 400);
-    world.collectibleManager.collectedIds = new Set();
-    world.interactWithEastPass();
-    assert(world.dialogueWindow.message.text.includes('to enhjørninger'), 'Eastern crossing skipped collection requirements.');
-    world.dialogueWindow.close();
     const items = world.collectibleManager.getAllItems();
-    world.collectibleManager.collectedIds = new Set([
+    const boots = items.filter((item) => item.type === 'tool' && item.kind === 'lava-boots');
+    assert(boots.length === 2, 'The western region must contain two pairs of lava boots.');
+    const westClosed = reachableWest([]);
+    const westOpen = reachableWest([WORLD_TILE.WEST_BRIDGE]);
+    for (const boot of boots) {
+      assert(boot.y > 54 * 32 && !canReachWest(westClosed, boot) && canReachWest(westOpen, boot),
+        `${boot.id} is not reachable exclusively beyond the western troll bridge.`);
+      for (let seed = 0; seed < 10; seed += 1) {
+        const placed = arrangeCollectibles(items, seed).find((item) => item.id === boot.id);
+        assert(placed.x === boot.x && placed.y === boot.y, 'Lava boots moved during reshuffling.');
+      }
+    }
+    const oldRequirements = [
       ...items.filter((item) => item.type === 'unicorn').slice(0, 2),
       ...items.filter((item) => item.slot === 'saddle').slice(0, 2),
       ...items.filter((item) => item.slot === 'wings').slice(0, 2),
-    ].map((item) => item.id));
+    ].map((item) => item.id);
+    for (const count of [0, 1]) {
+      world.collectibleManager.collectedIds = new Set([...oldRequirements, ...boots.slice(0, count).map((item) => item.id)]);
+      world.updateCollectionProgress();
+      world.interactWithEastPass();
+      assert(world.dialogueWindow.mode === 'dialogue'
+        && world.dialogueWindow.message.text.includes(`${count} af 2`)
+        && world.dialogueWindow.message.text.includes('vestlige verden syd for troldens bro')
+        && world.hud.toolCounters.get('lava-boots').textContent.includes(`${count} / 2`),
+      'Eastern crossing did not require both boots or provide guidance and progress.');
+      world.dialogueWindow.close();
+    }
+    world.collectibleManager.collectedIds = new Set(boots.map((item) => item.id));
     let requested = false;
     world.startNPCChallenge = (id, onCorrect, miniGame, options) => {
       requested = miniGame === 'volcanoBridge' && options.randomForPlayer;
@@ -292,6 +355,26 @@ async function testVolcano(world) {
     world.dialogueWindow.chooseQuest(true);
     assert(world.player.sprite.x < EAST_ORIGIN, 'Eastern return crossing failed.');
     world.startNPCChallenge = originalStart;
+    world.interactWithEastPass();
+    world.dialogueWindow.chooseQuest(true);
+    const bridgeQuestion = world.game.scene.getScene('ChallengeScene');
+    await waitUntil(() => bridgeQuestion.sys.isActive(), 'Boots did not lead to the volcano question.');
+    const bridgeChallenge = bridgeQuestion.challenge;
+    const correctBridge = bridgeChallenge.options.findIndex((option) => (
+      world.challengeManager.answersMatch(option, bridgeChallenge.correctAnswer)
+    ));
+    bridgeQuestion.answerButtons[correctBridge].emit('pointerdown');
+    bridgeQuestion.continueButton.emit('pointerdown');
+    const bridgeGame = world.game.scene.getScene('VolcanoScene');
+    await waitUntil(() => bridgeGame.sys.isActive() && bridgeGame.mode === 'bridge',
+      'Answering the volcano question did not start the bridge game.');
+    assert(!world.stateManager.learnedChallengeIds.has(bridgeChallenge.id), 'Bridge question was credited too early.');
+    bridgeGame.finish(true);
+    await waitUntil(() => world.sys.isActive() && !bridgeGame.sys.isActive(), 'Bridge victory did not resume the world.');
+    assert(world.player.sprite.x > EAST_ORIGIN && world.stateManager.learnedChallengeIds.has(bridgeChallenge.id),
+      'Bridge victory did not cross the wall and credit the question.');
+    world.dialogueWindow.close();
+    world.crossEastPass();
     world.player.sprite.body.reset(EAST_ORIGIN - 75, 400);
     world.movement.keys.D.isDown = true;
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -347,15 +430,20 @@ async function testVolcano(world) {
       'Failed eruption did not switch players or left the question credited.');
     world.dialogueWindow.close();
     let scene = await start('bridge');
+    assert(scene.difficulty === minigameSpeed(world.player.age), 'Volcano game used the wrong player age.');
+    scene.spawnHazard();
+    assert(scene.hazards.getChildren()[0].body.velocity.y >= 100 * scene.difficulty,
+      'Volcano hazard speed did not use the difficulty.');
+    scene.hazards.clear(true, true);
     assert(scene.bridgeBarrier.body.enable, 'Bridge could be crossed before collecting pieces.');
-    for (let i = 0; i < 5; i += 1) scene.collect(scene.player, scene.items.getChildren()[0]);
+    while (scene.progress < 5) scene.collect(scene.player, scene.items.getChildren()[0]);
     assert(!scene.bridgeBarrier.body.enable && outcome === undefined, 'Bridge did not require reaching the exit.');
     scene.player.setPosition(690, 480);
     scene.update(0, 16);
     assert(outcome === true, 'Built bridge did not allow victory.');
     await waitUntil(() => !scene.sys.isActive(), 'Bridge scene did not stop.');
     scene = await start('crystals');
-    for (let i = 0; i < 7; i += 1) scene.collect(scene.player, scene.items.getChildren()[0]);
+    while (scene.progress < 7) scene.collect(scene.player, scene.items.getChildren()[0]);
     assert(outcome === true, 'Crystal collection did not lead to victory.');
     await waitUntil(() => !scene.sys.isActive(), 'Crystal scene did not stop.');
     scene = await start('runes');
@@ -422,6 +510,7 @@ async function testVolcanoCat(world) {
     question.continueButton.emit('pointerdown');
     const maze = world.game.scene.getScene('CatMazeScene');
     await waitUntil(() => maze.sys.isActive(), 'Cat maze did not start after the correct answer.');
+    assert(maze.difficulty === minigameSpeed(world.player.age), 'Cat maze used the wrong player age.');
     assert(!world.stateManager.learnedChallengeIds.has('volcano-cat-reading'), 'Cat question was credited before capture.');
     return maze;
   };
@@ -434,7 +523,7 @@ async function testVolcanoCat(world) {
     const beforeEscape = { x: cat.x, y: cat.y };
     let maze = await begin();
     const playerBeforeFailure = world.player.id;
-    for (let i = 0; i < 500 && !maze.finished; i += 1) maze.update(0, 50);
+    for (let i = 0; i < 1000 && !maze.finished; i += 1) maze.update(0, 50);
     assert(maze.finished && maze.escaped, 'Cat did not follow the maze to its exit.');
     await waitUntil(() => !maze.sys.isActive() && world.sys.isActive(), 'World did not resume after the cat escaped.');
     assert(Phaser.Math.Distance.Between(beforeEscape.x, beforeEscape.y, cat.x, cat.y) >= 900
@@ -457,7 +546,7 @@ async function testVolcanoCat(world) {
     maze = await begin();
     for (let i = 0; i < 500 && !maze.finished; i += 1) {
       if (!maze.runner.next) {
-        const path = mazePath([maze.runner.x, maze.runner.y], [13, 1]);
+        const path = mazePath([maze.runner.x, maze.runner.y], [13, 1], maze.mazeRows);
         const next = path?.[1];
         maze.keys.W.isDown = Boolean(next && next[1] < maze.runner.y);
         maze.keys.S.isDown = Boolean(next && next[1] > maze.runner.y);
@@ -598,10 +687,12 @@ function testMap(scene) {
   assert(!canReach(bridgeOpen, items['accessory-wave'])
     && canReach(bothBridgesOpen, items['accessory-wave']),
   'Second river can be crossed without its troll, or its bridge is blocked.');
-  for (const item of Object.values(items).filter((item) => item.x >= 0 && item.x < EAST_ORIGIN && item.y >= 0)) {
+  for (const item of Object.values(items).filter((item) => item.type !== 'tool' && item.x >= 0 && item.x < EAST_ORIGIN && item.y >= 0)) {
     assert(canReach(allOpen, item), `${item.id} is unreachable with all gates open.`);
   }
-  for (const npc of scene.npcManager.npcs.filter((npc) => npc.x >= 0 && npc.x < EAST_ORIGIN && npc.y >= 0)) {
+  assert(!canReach(allOpen, items.flashlight)
+    && canReach(closed, { x: LAKE.boatX, y: LAKE.shoreLandingY }), 'Island or shore boat is incorrectly accessible.');
+  for (const npc of scene.npcManager.npcs.filter((npc) => npc.x >= 0 && npc.x < EAST_ORIGIN && npc.y >= 0 && npc.y < SOUTH_ORIGIN)) {
     const access = ['luna', 'river-troll'].includes(npc.id) ? bridgeOpen : closed;
     assert(canReach(access, npc), `${npc.id} is unreachable before its own gate opens.`);
   }
@@ -986,15 +1077,65 @@ async function testWitchEncounter(world) {
     assert(world.dialogueWindow.speaker.text === 'Prøve' && world.witchTimeRemaining === 1,
       'Witch interrupted another dialogue.');
     world.dialogueWindow.close();
-    const exitPath = mazePath([1, 1], [13, 9]);
-    assert(exitPath && exitPath.length > 10 && mazePath([13, 1], [1, 1])
-      && MAZE_ROWS[9][13] === '.', 'Maze has no route to the exit or player.');
-    for (let y = 0; y < MAZE_ROWS.length; y += 1) {
-      for (let x = 0; x < MAZE_ROWS[y].length; x += 1) {
-        if (MAZE_ROWS[y][x] === '.') assert(mazePath([x, y], [13, 9]), 'Maze has an isolated passage.');
+    assert(minigameSpeed(6) === 0.9 && minigameSpeed(7) === 1 && minigameSpeed(8) === 1.1,
+      'Minigame difficulty does not respect the age boundaries.');
+    assert(MAZE_LAYOUTS.length === 4 && new Set(MAZE_LAYOUTS.map((rows) => rows.join('\n'))).size === 4,
+      'The maze must have four distinct configurations.');
+    testCatMazeLayouts();
+    for (const rows of MAZE_LAYOUTS) {
+      assert(mazePath([1, 1], [13, 9], rows) && mazePath([13, 1], [1, 1], rows)
+        && mazePath([1, 9], [13, 1], rows), 'A maze has no route between the starts and exits.');
+      for (let y = 0; y < rows.length; y += 1) {
+        for (let x = 0; x < rows[y].length; x += 1) {
+          if (rows[y][x] === '.') assert(mazePath([x, y], [13, 9], rows), 'Maze has an isolated passage.');
+        }
       }
     }
     let { maze, challenge } = await start();
+    assert(maze.difficulty === minigameSpeed(world.player.age) && maze.blackCat.sprite.texture.key === 'black-cat',
+      'Witch maze did not use the active player age or create the black cat.');
+    const selection = {};
+    const selected = [];
+    for (let count = 0; count < 5; count += 1) {
+      maze.selectMaze.call(selection);
+      selected.push(selection.mazeIndex);
+    }
+    assert(new Set(selected.slice(0, 4)).size === 4 && selected[0] === selected[4],
+      'Maze layouts do not rotate through all four before repeating.');
+    maze.blackCat.x = maze.runner.x;
+    maze.blackCat.y = maze.runner.y;
+    maze.blackCat.next = null;
+    maze.blackCat.progress = 0;
+    maze.blackCat.sprite.setPosition(maze.runner.sprite.x, maze.runner.sprite.y);
+    maze.update(maze.time.now, 0);
+    assert(maze.captured && !maze.finished, 'Black cat did not capture the player.');
+    const heldWitch = { x: maze.witch.sprite.x, y: maze.witch.sprite.y };
+    maze.update(maze.time.now, 50);
+    assert(maze.witch.sprite.x === heldWitch.x && maze.witch.sprite.y === heldWitch.y,
+      'The witch moved while the player was held by the cat.');
+    maze.input.keyboard.emit('keydown', { key: 'ArrowLeft', repeat: false });
+    maze.handleWiggle({ key: 'a', repeat: false });
+    maze.handleWiggle({ key: 'ArrowRight', repeat: true });
+    assert(maze.wiggles.left === 1 && maze.wiggles.right === 0,
+      'Repeated directions or key repeats incorrectly counted.');
+    for (let count = 0; count < 4; count += 1) {
+      maze.handleWiggle({ key: 'd', repeat: false });
+      maze.handleWiggle({ key: 'a', repeat: false });
+    }
+    assert(maze.captured && maze.wiggles.left === 5 && maze.wiggles.right === 4,
+      'The cat released the player before five wiggles on each side.');
+    maze.handleWiggle({ key: 'ArrowRight', repeat: false });
+    assert(!maze.captured && maze.catFleeRemaining > 0 && maze.catFleeGoal,
+      'Completing the wiggles did not make the cat flee.');
+    const catStart = { x: maze.blackCat.sprite.x, y: maze.blackCat.sprite.y };
+    maze.update(maze.time.now, 50);
+    assert(Phaser.Math.Distance.Between(catStart.x, catStart.y, maze.blackCat.sprite.x, maze.blackCat.sprite.y) > 0
+      && !maze.captured, 'The released cat did not move away safely.');
+    maze.blackCat.x = 1;
+    maze.blackCat.y = 9;
+    maze.blackCat.next = null;
+    maze.blackCat.progress = 0;
+    maze.blackCat.sprite.setPosition(...maze.toWorld(1, 9));
     const witchStart = { x: maze.witch.sprite.x, y: maze.witch.sprite.y };
     maze.keys.D.isDown = true;
     await new Promise((resolve) => setTimeout(resolve, 350));
@@ -1010,7 +1151,7 @@ async function testWitchEncounter(world) {
       'Witch capture did not switch players or left the question completed.');
     world.dialogueWindow.close();
     ({ maze, challenge } = await start());
-    const route = mazePath([1, 1], [13, 9]);
+    const route = mazePath([1, 1], [13, 9], maze.mazeRows);
     for (const step of route.slice(1)) {
       const dx = step[0] - maze.runner.x;
       const dy = step[1] - maze.runner.y;
@@ -1094,17 +1235,17 @@ async function testNorthCave(world) {
       && world.leaderFollowerSystem.players.every((player) => player.sprite.body.top >= -1),
     'The northern wall allowed walking through the hole.');
     world.player.sprite.body.reset(NORTH_HOLE.x, 70);
-    collection.collectedIds = new Set();
+    collection.collectedIds = new Set(collection.getAllItems()
+      .filter((item) => item.type === 'unicorn' || item.slot === 'saddle' || item.slot === 'wings')
+      .map((item) => item.id));
     world.handleSpace();
-    assert(world.dialogueWindow.message.text.includes('to enhjørninger'), 'Northern crossing omitted its prerequisites.');
+    assert(world.dialogueWindow.message.text.includes('lommelygten'), 'Northern crossing omitted the flashlight requirement.');
     world.dialogueWindow.close();
-    const items = collection.getAllItems();
-    collection.collectedIds = new Set([
-      ...items.filter((item) => item.type === 'unicorn').slice(0, 2),
-      ...items.filter((item) => item.slot === 'saddle').slice(0, 2),
-      ...items.filter((item) => item.slot === 'wings').slice(0, 2),
-    ].map((item) => item.id));
+    collection.collectedIds = new Set(['flashlight']);
     let { cave, challenge } = await start();
+    assert(cave.difficulty === minigameSpeed(world.player.age)
+      && Math.abs(cave.enemies.getChildren()[0].body.velocity.x) === 48 * cave.difficulty,
+    'Cave enemies did not use the active player age.');
     assert(cave.lives === 5 && cave.enemies.getChildren().length === 5
       && cave.enemies.getChildren().some((enemy) => enemy.getData('kind') === 'ghost')
       && cave.enemies.getChildren().some((enemy) => enemy.getData('kind') === 'skeleton'),
@@ -1170,6 +1311,748 @@ async function testNorthCave(world) {
   }
 }
 
+async function testDragonBattle(world) {
+  const game = world.game;
+  const collection = world.collectibleManager;
+  const saved = collection.store.loadState();
+  const originalStore = collection.store;
+  const savedIds = collection.collectedIds;
+  const princess = world.npcManager.npcs.find((npc) => npc.id === 'warrior-princess');
+  const queen = world.npcManager.npcs.find((npc) => npc.id === 'old-queen');
+  const queenState = {
+    interactions: queen.interactions, lines: queen.interactions[0].lines, repeatDialogue: queen.repeatDialogue,
+  };
+  const princessState = { lines: princess.interactions[0].lines, repeatDialogue: princess.repeatDialogue };
+  const learned = new Set(world.stateManager.learnedChallengeIds);
+  const points = new Map(world.stateManager.turnPoints);
+  const leaderId = world.player.id;
+  const positions = world.players.map((player) => ({ player, x: player.sprite.x, y: player.sprite.y }));
+  const beforeChildren = new Set(world.children.list);
+  const waitUntil = async (condition, message) => {
+    const deadline = Date.now() + 10000;
+    while (!condition() && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 25));
+    assert(condition(), message);
+  };
+  const start = async () => {
+    world.player.sprite.body.reset(DRAGON_DEN.x, DRAGON_DEN.y + 110);
+    world.handleSpace();
+    assert(world.dialogueWindow.mode === 'quest', 'Ready dragon encounter did not offer the fight.');
+    world.dialogueWindow.chooseQuest(true);
+    const selected = [];
+    for (const category of ['Math', 'English', 'Logic', 'Reading']) {
+      const question = game.scene.getScene('ChallengeScene');
+      await waitUntil(() => question.sys.isActive() && question.challenge?.category === category,
+        `${category} dragon question did not start.`);
+      const challenge = question.challenge;
+      selected.push(challenge);
+      assert(!question.children.list.some((object) => typeof object.text === 'string'
+        && /^(Læs|Læsning|Matematik|Engelsk|Logik) · (niveau )?\d+$/.test(object.text)),
+      'A dragon question displayed its category or difficulty.');
+      assert(challenge.difficulty <= world.challengeManager.getDifficultyForAge(world.player.age),
+        'Dragon question was not age-appropriate.');
+      const wrong = challenge.options.findIndex((option) => !world.challengeManager.answersMatch(option, challenge.correctAnswer));
+      const right = challenge.options.findIndex((option) => world.challengeManager.answersMatch(option, challenge.correctAnswer));
+      question.answerButtons[wrong].emit('pointerdown');
+      assert(!question.isResolved && !game.scene.isActive('DragonBattleScene'), 'A wrong answer started the dragon battle.');
+      question.answerButtons[right].emit('pointerdown');
+      question.continueButton.emit('pointerdown');
+    }
+    const battle = game.scene.getScene('DragonBattleScene');
+    await waitUntil(() => battle.sys.isActive(), 'Dragon battle did not start after four questions.');
+    assert(selected.every((challenge) => !world.stateManager.learnedChallengeIds.has(challenge.id)),
+      'Dragon questions were credited before victory.');
+    return { battle, selected };
+  };
+  try {
+    assert(world.dragonDen.texture.key === 'dragon-den' && !world.dragonRescued, 'Dragon den is missing.');
+    collection.store = {
+      loadState: () => ({ ...saved, unlockedGates: new Set(saved.unlockedGates) }),
+      save: () => { throw new Error('Lageret er spærret.'); },
+    };
+    world.finishDragonChallenge(true, []);
+    assert(!world.dragonRescued && world.dialogueWindow.message.text.includes('ikke gemt'),
+      'A failed rescue save did not preserve the encounter and report the error.');
+    world.dialogueWindow.close();
+    collection.store = originalStore;
+    world.player.sprite.body.reset(DRAGON_DEN.x, DRAGON_DEN.y + 110);
+    world.handleSpace();
+    assert(world.dialogueWindow.mode === 'dialogue' && world.dialogueWindow.message.text.includes('krigerprinsessen'),
+      'Dragon den did not explain its requirements.');
+    world.dialogueWindow.close();
+    collection.collectedIds = new Set([...savedIds, 'bow-and-arrow-1', 'bow-and-arrow-2']);
+    world.handleSpace();
+    assert(world.dialogueWindow.mode === 'dialogue', 'Two bows without the princess started the fight.');
+    world.dialogueWindow.close();
+    collection.collectedIds = new Set([...savedIds, 'bow-and-arrow-1']);
+    assert(world.recruitPrincess(), 'Could not recruit princess for dragon test.');
+    world.handleSpace();
+    assert(world.dialogueWindow.mode === 'dialogue', 'One bow with the princess started the fight.');
+    world.dialogueWindow.close();
+    world.updateStoryDialogue(queen);
+    assert(queen.interactions[0].lines.some((line) => line.includes('den sidste bue')),
+      'Queen did not acknowledge the first collected bow.');
+    collection.collectedIds.add('bow-and-arrow-2');
+    world.updateStoryDialogue(queen);
+    assert(queen.interactions[0].lines.some((line) => line.includes('begge buer'))
+      && !queen.repeatDialogue.includes('Find krigerprinsessen'),
+    'Queen did not acknowledge the princess and collected bows.');
+    let { battle, selected } = await start();
+    battle.time.removeAllEvents();
+    assert(battle.dragonLives === 50 && battle.princessLives === 15 && battle.girls.length === 2
+      && battle.difficulty === minigameSpeed(world.player.age), 'Dragon battle initialization failed.');
+    const startX = battle.princess.x;
+    battle.cursors.right.isDown = true;
+    await waitUntil(() => battle.princess.x > startX + 10, 'Princess did not move with arrow keys.');
+    battle.cursors.right.isDown = false;
+    battle.pointBow({ x: battle.head.x, y: battle.head.y });
+    battle.fireArrow({ repeat: false });
+    assert(battle.arrows.getLength() === 1 && battle.arrows.getChildren()[0].body.velocity.y < 0,
+      'Bow did not fire an aimed arrow.');
+    battle.fireArrow({ repeat: true });
+    assert(battle.arrows.getLength() === 1, 'Repeating space fired extra arrows.');
+    await waitUntil(() => battle.dragonLives === 49, 'A fired arrow did not reach the dragon.');
+    battle.shootFireball();
+    assert(battle.fireballs.getLength() === 1 && battle.fireballs.getChildren()[0].body.velocity.length() > 0,
+      'Dragon did not fire a moving fireball.');
+    battle.fireballs.clear(true, true);
+    for (let hit = 0; hit < 15; hit += 1) {
+      const fireball = battle.fireballs.create(battle.princess.x, battle.princess.y, 'dragon-fireball');
+      battle.physics.overlap(battle.princess, fireball, battle.hitPrincess, undefined, battle);
+      if (hit < 14) assert(!battle.finished, 'Dragon battle lost before 15 fireballs.');
+    }
+    await waitUntil(() => world.sys.isActive() && !battle.sys.isActive(), 'Dragon loss did not resume the world.');
+    assert(!world.dragonRescued && selected.every((challenge) => !world.stateManager.learnedChallengeIds.has(challenge.id)),
+      'Dragon loss rescued the prince or credited questions.');
+    world.dialogueWindow.close();
+    ({ battle, selected } = await start());
+    battle.time.removeAllEvents();
+    for (const target of [battle.head, battle.leftPaw, battle.rightPaw]) {
+      battle.princess.body.reset(target === battle.head ? 400 : target === battle.leftPaw ? 100 : 700,
+        target === battle.head ? 235 : 270);
+      battle.nextSwordHit = 0;
+      const before = battle.dragonLives;
+      battle.update(battle.time.now);
+      assert(battle.dragonLives === before - 1, 'Automatic sword did not hit a dragon body part.');
+    }
+    battle.princess.body.reset(400, 390);
+    for (let hit = 0; hit < 47; hit += 1) {
+      const arrow = battle.arrows.create(battle.head.x, battle.head.y, 'dragon-arrow');
+      battle.physics.overlap(arrow, battle.head, battle.hitDragon, undefined, battle);
+      if (hit < 46) assert(!battle.finished, 'Dragon was defeated before 50 combined hits.');
+    }
+    await waitUntil(() => world.sys.isActive() && !battle.sys.isActive(), 'Dragon victory did not resume the world.');
+    assert(world.dragonRescued && collection.store.loadState().unlockedGates.has('dragon')
+      && selected.every((challenge) => world.stateManager.learnedChallengeIds.has(challenge.id))
+      && queen.repeatDialogue.includes('hjemme igen') && world.dragonDen.texture.key === 'dragon-den-empty',
+    'Victory did not save the rescue, update the queen, and credit all four questions.');
+    world.dialogueWindow.close();
+    world.npcManager.runInteraction(queen);
+    assert(world.dialogueWindow.message.text.includes('hjemme igen'), 'Queen did not celebrate the rescue in conversation.');
+    world.dialogueWindow.close();
+    world.interactWithDragonDen();
+    assert(world.dialogueWindow.mode === 'dialogue' && world.dialogueWindow.message.text.includes('prinsen er fri')
+      && world.dialogueWindow.message.text.includes('prinsessen') && world.dialogueWindow.message.text.includes('besejret'),
+    'Empty den did not celebrate the ending.');
+  } finally {
+    collection.store = originalStore;
+    if (game.scene.isActive('DragonBattleScene')) world.scene.stop('DragonBattleScene');
+    if (!world.sys.isActive()) world.scene.resume();
+    if (world.dialogueWindow.isOpen) world.dialogueWindow.close();
+    collection.pickups.getChildren().filter((pickup) => pickup.getData('collectibleId').startsWith('bow-and-arrow-'))
+      .forEach((pickup) => pickup.destroy());
+    collection.store.save(saved.collectedIds, saved.equipment, saved.layoutSeed, saved.unlockedGates, saved.unlockedRewards);
+    collection.collectedIds = savedIds;
+    world.updateCollectionProgress();
+    world.leaderFollowerSystem.companions = world.leaderFollowerSystem.companions.filter((companion) => companion !== princess);
+    if (princess.sprite.body) world.physics.world.disable(princess.sprite);
+    princess.following = false;
+    princess.nameTag.setVisible(true);
+    queen.interactions = queenState.interactions;
+    queen.interactions[0].lines = queenState.lines;
+    queen.repeatDialogue = queenState.repeatDialogue;
+    princess.interactions[0].lines = princessState.lines;
+    princess.repeatDialogue = princessState.repeatDialogue;
+    world.dragonRescued = false;
+    world.dragonDen.setTexture('dragon-den');
+    world.children.list.filter((child) => !beforeChildren.has(child) && (child.texture?.key === 'prince' || child.text === 'Prinsen'))
+      .forEach((child) => child.destroy());
+    world.stateManager.learnedChallengeIds = learned;
+    world.stateManager.turnPoints = points;
+    positions.forEach(({ player, x, y }) => player.sprite.body.reset(x, y));
+    world.setLeader(leaderId);
+  }
+}
+
+async function testWarriorPrincess(world) {
+  const princess = world.npcManager.npcs.find((npc) => npc.id === 'warrior-princess');
+  const collection = world.collectibleManager;
+  const saved = collection.store.loadState();
+  const originalStore = collection.store;
+  const savedIds = collection.collectedIds;
+  const positions = world.players.map((player) => ({ player, x: player.sprite.x, y: player.sprite.y }));
+  const leaderId = world.player.id;
+  const learned = new Set(world.stateManager.learnedChallengeIds);
+  const points = new Map(world.stateManager.turnPoints);
+  const waitUntil = async (condition, message) => {
+    const deadline = Date.now() + 10000;
+    while (!condition() && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 25));
+    assert(condition(), message);
+  };
+  const pickups = () => collection.pickups.getChildren().filter(
+    (pickup) => pickup.getData('collectibleId').startsWith('bow-and-arrow-'),
+  );
+  const begin = async () => {
+    world.player.sprite.body.reset(princess.x, princess.y);
+    world.npcManager.update(world.player);
+    assert(world.npcManager.activeNPC === princess, 'Wandering princess could not be approached.');
+    world.handleSpace();
+    while (world.dialogueWindow.mode === 'dialogue') world.dialogueWindow.advance();
+    const question = world.game.scene.getScene('ChallengeScene');
+    await waitUntil(() => question.sys.isActive(), 'Princess question did not start.');
+    const challenge = question.challenge;
+    const wrong = challenge.options.findIndex((option) => !world.challengeManager.answersMatch(option, challenge.correctAnswer));
+    const correct = challenge.options.findIndex((option) => world.challengeManager.answersMatch(option, challenge.correctAnswer));
+    question.answerButtons[wrong].emit('pointerdown');
+    assert(!question.isResolved && !world.game.scene.isActive('PrincessDuelScene'), 'Wrong answer started the duel.');
+    question.answerButtons[correct].emit('pointerdown');
+    question.continueButton.emit('pointerdown');
+    const duel = world.game.scene.getScene('PrincessDuelScene');
+    await waitUntil(() => duel.sys.isActive(), 'Princess duel did not start.');
+    assert(!world.stateManager.learnedChallengeIds.has(challenge.id), 'Princess question was credited before victory.');
+    return { duel, challenge };
+  };
+  try {
+    assert(princess && world.princessWander && princess.y > SOUTH_ORIGIN + 32
+      && pickups().length === 0 && world.hud.toolCounters.get('bow-and-arrow').textContent === 'Buer og pile: 0 / 2',
+    'Princess or locked bows are not initialized correctly.');
+    collection.store = {
+      loadState: () => ({ ...saved, unlockedRewards: new Set(saved.unlockedRewards) }),
+      save: () => { throw new Error('Lageret er spærret.'); },
+    };
+    assert(!world.recruitPrincess() && !princess.following && pickups().length === 0
+      && world.dialogueWindow.message.text.includes('ikke gemt'),
+    'A failed reward save recruited the princess, spawned bows, or hid the error.');
+    world.dialogueWindow.close();
+    collection.store = originalStore;
+    const oldX = princess.x;
+    world.princessWander.update(1000);
+    assert(princess.x !== oldX && princess.sprite.x === princess.x, 'Princess did not wander with her interaction position.');
+    let { duel, challenge } = await begin();
+    assert(duel.difficulty === minigameSpeed(world.player.age) && duel.playerLives === 5 && duel.princessLives === 5,
+      'Duel difficulty or lives are incorrect.');
+    await waitUntil(() => duel.player.body.blocked.down, 'Duel player did not land.');
+    duel.jump({ repeat: false });
+    assert(duel.player.body.velocity.y < 0, 'Duel player cannot jump.');
+    duel.player.body.reset(300, 450);
+    duel.princess.body.reset(600, 450);
+    duel.keys.D.isDown = true;
+    await waitUntil(() => duel.player.x > 320, 'Duel player cannot move horizontally.');
+    duel.keys.D.isDown = false;
+    duel.player.body.reset(340, 480);
+    duel.princess.body.reset(420, 480);
+    duel.princessAttackAt = duel.time.now + 10000;
+    duel.keys.D.isDown = true;
+    await waitUntil(() => duel.player.x > duel.princess.x + 25, 'Fighters could not pass through each other.');
+    duel.keys.D.isDown = false;
+    duel.princessAttackAt = null;
+    duel.player.body.reset(400, 450);
+    duel.princess.body.reset(420, 450);
+    duel.update(duel.time.now);
+    assert(!duel.player.flipX && duel.princess.flipX, 'Fighters do not face each other.');
+    duel.player.body.reset(450, 450);
+    duel.update(duel.time.now);
+    assert(duel.player.flipX && !duel.princess.flipX, 'Fighters did not turn after passing.');
+    duel.swing({ repeat: false });
+    duel.swing({ repeat: true });
+    assert(duel.princessLives === 4, 'Practice swing missed or repeated without a new press.');
+    duel.player.body.reset(300, 450);
+    duel.princess.body.reset(600, 450);
+    duel.nextPlayerSwing = 0;
+    duel.swing({ repeat: false });
+    assert(duel.princessLives === 4, 'A distant practice swing hit the princess.');
+    duel.player.body.reset(400, 320);
+    duel.princess.body.reset(450, 450);
+    duel.princessAttackAt = duel.time.now;
+    duel.update(duel.time.now);
+    assert(duel.playerLives === 5, 'Princess hit a player who jumped out of reach.');
+    for (let hit = 0; hit < 5; hit += 1) {
+      duel.player.body.reset(400, 450);
+      duel.princess.body.reset(450, 450);
+      duel.princessAttackAt = duel.time.now;
+      duel.update(duel.time.now);
+    }
+    await waitUntil(() => world.sys.isActive() && !duel.sys.isActive(), 'World did not resume after losing the duel.');
+    assert(!princess.following && pickups().length === 0 && !world.stateManager.learnedChallengeIds.has(challenge.id),
+      'Losing the duel awarded the princess, bows, or question.');
+    world.dialogueWindow.close();
+    ({ duel, challenge } = await begin());
+    for (let hit = 0; hit < 5; hit += 1) {
+      duel.player.body.reset(400, 450);
+      duel.princess.body.reset(450, 450);
+      duel.nextPlayerSwing = 0;
+      duel.swing({ repeat: false });
+    }
+    await waitUntil(() => world.sys.isActive() && !duel.sys.isActive(), 'World did not resume after winning the duel.');
+    assert(princess.following && world.leaderFollowerSystem.companions.includes(princess)
+      && !princess.nameTag.visible && world.stateManager.learnedChallengeIds.has(challenge.id)
+      && collection.store.loadState().unlockedRewards.has('princess-bows') && pickups().length === 2,
+    'Winning did not recruit the princess and unlock two bows.');
+    world.dialogueWindow.close();
+    for (const [index, pickup] of [...pickups()].entries()) {
+      world.player.sprite.body.reset(pickup.x, pickup.y);
+      await waitUntil(() => !pickup.active, 'Walking over a bow did not collect it.');
+      assert(world.hud.toolCounters.get('bow-and-arrow').textContent === `Buer og pile: ${index + 1} / 2`,
+        'The bow counter did not update.');
+    }
+    assert(collection.store.loadState().collectedIds.has('bow-and-arrow-1')
+      && collection.store.loadState().collectedIds.has('bow-and-arrow-2'), 'Collected bows were not saved.');
+    collection.unlockReward('princess-bows');
+    assert(pickups().length === 0, 'Re-recruiting duplicated collected bows.');
+    world.enterStable();
+    const stable = world.game.scene.getScene('StableScene');
+    await waitUntil(() => stable.sys.isActive(), 'Stable did not open with the princess.');
+    assert(stable.followers.companions.some((companion) => companion.id === princess.id
+      && companion.sprite.texture.key === 'warrior-princess'), 'Princess did not follow into the stable.');
+    const before = world.catMeowTimeRemaining;
+    stable.update(0, 100);
+    assert(world.catMeowTimeRemaining === before, 'Princess alone caused cat meows.');
+    stable.scene.stop();
+    world.scene.resume();
+    await waitUntil(() => world.sys.isActive(), 'World did not resume after stable visit.');
+  } finally {
+    collection.store = originalStore;
+    if (world.game.scene.isActive('PrincessDuelScene')) world.scene.stop('PrincessDuelScene');
+    if (world.game.scene.isActive('StableScene')) world.scene.stop('StableScene');
+    if (!world.sys.isActive()) world.scene.resume();
+    if (world.dialogueWindow.isOpen) world.dialogueWindow.close();
+    pickups().forEach((pickup) => pickup.destroy());
+    collection.store.save(saved.collectedIds, saved.equipment, saved.layoutSeed, saved.unlockedGates, saved.unlockedRewards);
+    collection.collectedIds = savedIds;
+    world.updateCollectionProgress();
+    world.leaderFollowerSystem.companions = world.leaderFollowerSystem.companions.filter((companion) => companion !== princess);
+    if (princess.sprite.body) world.physics.world.disable(princess.sprite);
+    princess.following = false;
+    princess.nameTag.setVisible(true);
+    princess.interactionIndex = 0;
+    world.stateManager.learnedChallengeIds = learned;
+    world.stateManager.turnPoints = points;
+    world.catMeowTimeRemaining = null;
+    world.lastNPCChallenges.delete('warrior-princess');
+    positions.forEach(({ player, x, y }) => player.sprite.body.reset(x, y));
+    world.setLeader(leaderId);
+  }
+}
+
+function testOldQueen(world) {
+  const queen = world.npcManager.npcs.find((npc) => npc.id === 'old-queen');
+  assert(queen && queen.sprite.texture.key === 'old-queen' && world.textures.exists('old-queen'),
+    'The old queen or her artwork did not load.');
+  const leader = world.player;
+  const { x, y } = leader.sprite;
+  try {
+    leader.sprite.body.reset(queen.x, queen.y);
+    assert(!world.isNearStable(), 'The stable entrance prevents talking to the queen.');
+    world.npcManager.update(leader);
+    assert(world.npcManager.activeNPC === queen && world.npcManager.interactionPrompt.visible,
+      'The queen cannot be approached for an interaction.');
+    world.handleSpace();
+    assert(world.dialogueWindow.speakerName === queen.name
+      && world.dialogueWindow.message.text.includes('søn')
+      && world.dialogueWindow.message.text.includes('prins')
+      && world.dialogueWindow.message.text.includes('bortført')
+      && world.dialogueWindow.message.text.includes('drage'),
+    'The queen did not explain that the dragon abducted her son.');
+    world.dialogueWindow.advance();
+    assert(world.dialogueWindow.message.text.includes('dragens hule')
+      && world.dialogueWindow.message.text.includes('syd')
+      && world.dialogueWindow.message.text.includes('alle enhjørningernes kræfter'),
+    'The queen did not describe the southern lair and unicorn powers.');
+    world.dialogueWindow.advance();
+    assert(world.dialogueWindow.message.text.includes('krigerprinsessen')
+      && world.dialogueWindow.message.text.includes('sydlige område')
+      && world.dialogueWindow.message.text.includes('besejre dragen'),
+    'The queen did not explain the warrior princess help.');
+    world.dialogueWindow.advance();
+    world.handleSpace();
+    assert(world.dialogueWindow.message.text.includes('dragens hule')
+      && world.dialogueWindow.message.text.includes('alle enhjørningernes kræfter')
+      && world.dialogueWindow.message.text.includes('krigerprinsessen'),
+    'The queen does not repeat the guidance when spoken to again.');
+  } finally {
+    world.dialogueWindow.close();
+    queen.interactionIndex = 0;
+    leader.sprite.body.reset(x, y);
+    world.npcManager.update(leader);
+  }
+}
+
+async function testSouthWizard(world) {
+  const game = world.game;
+  const collection = world.collectibleManager;
+  const saved = collection.store.loadState();
+  const originalStore = collection.store;
+  const savedIds = collection.collectedIds;
+  const savedEquipment = new Map(collection.equipment);
+  const learned = new Set(world.stateManager.learnedChallengeIds);
+  const points = new Map(world.stateManager.turnPoints);
+  const leaderId = world.player.id;
+  const positions = world.players.map((player) => ({ player, x: player.sprite.x, y: player.sprite.y }));
+  const waitUntil = async (condition, message) => {
+    const deadline = Date.now() + 10000;
+    while (!condition() && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 25));
+    assert(condition(), message);
+  };
+  const all = collection.getAllItems();
+  const unicorns = all.filter((item) => item.type === 'unicorn');
+  const accessories = all.filter((item) => item.type === 'accessory');
+  const team = wizardTeam(unicorns, accessories);
+  const selectedAccessories = ['sticker', 'wings', 'crown', 'saddle'].flatMap(
+    (slot) => accessories.filter((item) => item.slot === slot).slice(0, 4),
+  );
+  const selected = [...team, ...selectedAccessories];
+  const start = async () => {
+    world.player.sprite.body.reset(SOUTH_PASS.x, SOUTH_ORIGIN - 60);
+    world.handleSpace();
+    assert(world.dialogueWindow.mode === 'quest', 'Ready wizard did not offer the battle.');
+    world.dialogueWindow.chooseQuest(true);
+    const question = game.scene.getScene('ChallengeScene');
+    await waitUntil(() => question.sys.isActive(), 'Wizard question did not start.');
+    const challenge = question.challenge;
+    const correct = challenge.options.findIndex((option) => world.challengeManager.answersMatch(option, challenge.correctAnswer));
+    const wrong = challenge.options.findIndex((option) => !world.challengeManager.answersMatch(option, challenge.correctAnswer));
+    question.answerButtons[wrong].emit('pointerdown');
+    assert(!question.isResolved && !game.scene.isActive('WizardBattleScene'), 'A wrong answer started the wizard battle.');
+    question.answerButtons[correct].emit('pointerdown');
+    question.continueButton.emit('pointerdown');
+    const battle = game.scene.getScene('WizardBattleScene');
+    await waitUntil(() => battle.sys.isActive(), 'Wizard battle did not start.');
+    assert(!world.stateManager.learnedChallengeIds.has(challenge.id), 'Wizard question was credited before victory.');
+    return { battle, challenge };
+  };
+  try {
+    assert(SOUTH_REGION_DATA.slice(1).every((row) => row.every((tile) => tile === WORLD_TILE.GRASS))
+      && world.southMap.getTileAt(64, 0).collides && world.southMap.getTileAt(30, 0).collides,
+    'Southern area is not empty grass behind a closed wall.');
+    collection.store = {
+      loadState: () => ({ ...saved, unlockedGates: new Set(saved.unlockedGates) }),
+      save: () => { throw new Error('Lageret er spærret.'); },
+    };
+    assert(!world.unlockSouthPass() && !world.southOpen && world.dialogueWindow.message.text.includes('ikke åbnet'),
+      'A storage failure opened the southern passage or failed to report the error.');
+    world.dialogueWindow.close();
+    collection.store = originalStore;
+    assert(team?.length === 4, 'Could not select one unicorn from each group.');
+    for (const removed of team) {
+      const familyPrefix = removed.texture.match(/^unicorn-(rainbow|dark|volcano)-/)?.[0];
+      const withoutFamily = unicorns.filter((item) => familyPrefix
+        ? !item.texture.startsWith(familyPrefix)
+        : /^(unicorn-rainbow-|unicorn-dark-|unicorn-volcano-)/.test(item.texture));
+      assert(!wizardTeam(withoutFamily, accessories), 'Extra unicorns replaced a missing family.');
+    }
+    for (const x of [SOUTH_PASS.x, 1000, -500, EAST_ORIGIN + 500]) {
+      world.player.sprite.body.reset(x, SOUTH_ORIGIN - 60);
+      world.movement.keys.S.isDown = true;
+      await new Promise((resolve) => setTimeout(resolve, 550));
+      world.movement.keys.S.isDown = false;
+      assert(world.player.sprite.body.bottom <= SOUTH_ORIGIN + 1, `Southern wall was bypassed at x=${x}.`);
+    }
+    const follower = world.leaderFollowerSystem.followers[0].sprite;
+    for (const x of [SOUTH_PASS.x, 1000, -500, EAST_ORIGIN + 500]) {
+      follower.body.reset(x, SOUTH_ORIGIN - 60);
+      follower.setPosition(x, SOUTH_ORIGIN + 80);
+      world.constrainFollowerToLayer(follower, x, SOUTH_ORIGIN - 60, world.southLayer, world.southWalls);
+      assert(follower.body.bottom <= SOUTH_ORIGIN + 1, `Follower bypassed southern wall at x=${x}.`);
+    }
+    for (const removed of selected) {
+      collection.collectedIds = new Set(selected.filter((item) => item !== removed).map((item) => item.id));
+      world.player.sprite.body.reset(SOUTH_PASS.x, SOUTH_ORIGIN - 60);
+      world.handleSpace();
+      assert(world.dialogueWindow.mode === 'dialogue' && !world.southOpen,
+        `Wizard allowed entry without ${removed.id}.`);
+      world.dialogueWindow.close();
+    }
+    collection.collectedIds = new Set(selected.map((item) => item.id));
+    let { battle, challenge } = await start();
+    battle.time.removeAllEvents();
+    assert(battle.girls.length === 2 && battle.unicorns.length === 4 && battle.wizardLives === 7 && battle.girlLives === 5
+      && battle.difficulty === minigameSpeed(world.player.age), 'Wizard battle did not initialize correctly.');
+    const chosenEquipment = battle.equipment.flat();
+    assert(chosenEquipment.length === 16 && new Set(chosenEquipment.map((item) => item.id)).size === 16
+      && battle.equipment.every((items) => new Set(items.map((item) => item.slot)).size === 4)
+      && chosenEquipment.every((item) => selectedAccessories.some((candidate) => candidate.id === item.id))
+      && JSON.stringify([...collection.equipment]) === JSON.stringify([...savedEquipment]),
+    'Unicorn equipment was not drawn uniquely from the collected accessories.');
+    const before = battle.girls.map((girl) => girl.x);
+    battle.keys.D.isDown = true;
+    await waitUntil(() => battle.girls[0].x > before[0] + 10, 'Girls did not move together.');
+    battle.keys.D.isDown = false;
+    assert(battle.girls[1].x > before[1] + 10, 'Second girl did not follow the controls.');
+    battle.shootStar();
+    assert(battle.stars.getLength() === 1 && battle.stars.getChildren()[0].body.velocity.length() > 0,
+      'Wizard did not shoot a moving star.');
+    const firstStar = battle.stars.getChildren()[0];
+    firstStar.body.reset(battle.girls[0].x, battle.girls[0].y);
+    await waitUntil(() => battle.girlLives === 4, 'The registered star collider did not hit a girl.');
+    assert(!firstStar.active && battle.girls[0].active, 'A star hit destroyed the girl instead of the star.');
+    battle.hitGirls(battle.girls[1], battle.stars.create(400, 300, 'wizard-star'));
+    assert(battle.girlLives === 4, 'Shared lives or invulnerability failed.');
+    for (let hit = 0; hit < 4; hit += 1) {
+      battle.invulnerableUntil = 0;
+      battle.hitGirls(battle.girls[hit % 2], battle.stars.create(400, 300, 'wizard-star'));
+    }
+    await waitUntil(() => world.sys.isActive() && !battle.sys.isActive(), 'Wizard defeat did not resume the world.');
+    assert(!world.southOpen && !world.stateManager.learnedChallengeIds.has(challenge.id),
+      'Losing the battle opened the passage or credited the question.');
+    world.dialogueWindow.close();
+    ({ battle, challenge } = await start());
+    battle.time.removeAllEvents();
+    for (let index = 0; index < 4; index += 1) {
+      battle.input.keyboard.emit('keydown', { key: String(index + 1), repeat: false });
+    }
+    assert(battle.beams.getLength() === 4, 'Keys 1–4 did not fire all four unicorns.');
+    battle.handleShot({ key: '1', repeat: true });
+    battle.handleShot({ key: '5', repeat: false });
+    assert(battle.beams.getLength() === 4, 'Repeated or invalid key fired another beam.');
+    battle.beams.clear(true, true);
+    const dodgeBeam = battle.beams.create(battle.wizard.x - 100, battle.wizard.y - 20, 'wizard-beam');
+    battle.update();
+    assert(battle.wizard.body.velocity.y > 0, 'Wizard did not try to dodge an approaching beam.');
+    dodgeBeam.destroy();
+    battle.lastShots[0] = -Infinity;
+    battle.handleShot({ key: '1', repeat: false });
+    const firstBeam = battle.beams.getChildren()[0];
+    firstBeam.body.reset(battle.wizard.x, battle.wizard.y);
+    await waitUntil(() => battle.wizardLives === 6, 'The registered beam collider did not hit the wizard.');
+    assert(!firstBeam.active && battle.wizard.active && battle.wizard.body
+      && battle.score.text.includes('6 / 7') && !battle.finished,
+    'A real beam hit destroyed the wizard or failed to update his lives.');
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    assert(battle.wizard.active && battle.wizard.body, 'Wizard did not remain active after the first physics update.');
+    for (let hit = 1; hit < 7; hit += 1) {
+      battle.beams.create(battle.wizard.x, battle.wizard.y, 'wizard-beam');
+      await waitUntil(() => battle.wizardLives === 6 - hit, 'A beam did not remove exactly one wizard life.');
+      if (hit < 6) assert(!battle.finished && battle.wizard.active, 'Wizard lost before seven hits.');
+    }
+    await waitUntil(() => world.sys.isActive() && !battle.sys.isActive(), 'Wizard victory did not resume the world.');
+    assert(world.southOpen && !world.southMap.getTileAt(64, 0).collides
+      && world.southMap.getTileAt(30, 0).collides
+      && collection.store.loadState().unlockedGates.has('south')
+      && world.stateManager.learnedChallengeIds.has(challenge.id), 'Victory did not save and open the southern gate.');
+    world.dialogueWindow.close();
+    world.player.sprite.body.reset(SOUTH_PASS.x, SOUTH_ORIGIN - 60);
+    world.leaderFollowerSystem.followers[0].sprite.body.reset(SOUTH_PASS.x, SOUTH_ORIGIN - 150);
+    world.setLeader(world.player.id);
+    world.movement.keys.S.isDown = true;
+    await waitUntil(() => world.players.every((player) => player.sprite.y > SOUTH_ORIGIN + 70),
+      'Both players could not walk through the opened southern gate.');
+    world.movement.keys.S.isDown = false;
+    world.movement.keys.W.isDown = true;
+    await waitUntil(() => world.players.every((player) => player.sprite.y < SOUTH_ORIGIN - 30),
+      'Both players could not walk back through the opened southern gate.');
+    world.movement.keys.W.isDown = false;
+  } finally {
+    collection.store = originalStore;
+    if (game.scene.isActive('WizardBattleScene')) world.scene.stop('WizardBattleScene');
+    if (!world.sys.isActive()) world.scene.resume();
+    world.movement.keys.S.isDown = false;
+    world.movement.keys.W.isDown = false;
+    if (world.dialogueWindow.isOpen) world.dialogueWindow.close();
+    collection.store.save(saved.collectedIds, saved.equipment, saved.layoutSeed, saved.unlockedGates);
+    collection.collectedIds = savedIds;
+    world.southMap.setCollision(WORLD_TILE.SOUTH_GATE, true);
+    for (let x = 62; x <= 66; x += 1) world.southMap.putTileAt(WORLD_TILE.SOUTH_GATE, x, 0);
+    world.southOpen = false;
+    world.southWizard.setVisible(true);
+    world.stateManager.learnedChallengeIds = learned;
+    world.stateManager.turnPoints = points;
+    world.lastNPCChallenges.delete('south-wizard');
+    positions.forEach(({ player, x, y }) => player.sprite.body.reset(x, y));
+    world.setLeader(leaderId);
+  }
+}
+
+async function testLavaBootPickups(world) {
+  const collection = world.collectibleManager;
+  const saved = collection.store.loadState();
+  const previousIds = collection.collectedIds;
+  const leaderId = world.player.id;
+  const positions = world.players.map((player) => ({ player, x: player.sprite.x, y: player.sprite.y }));
+  try {
+    for (const id of ['lava-boots-1', 'lava-boots-2']) {
+      const item = collection.items.get(id);
+      world.player.sprite.body.reset(item.x - 75, item.y);
+      world.setLeader(world.player.id);
+      world.movement.keys.D.isDown = true;
+      const deadline = Date.now() + 5000;
+      while (!collection.collectedIds.has(id) && Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 25));
+      }
+      world.movement.keys.D.isDown = false;
+      assert(collection.collectedIds.has(id) && collection.store.load().has(id),
+        `Walking over ${id} did not collect and save it.`);
+    }
+    assert(world.hud.toolCounters.get('lava-boots').textContent.includes('2 / 2')
+      && world.hud.toolProgress.textContent.includes('0 / 1'), 'Boot pickups changed the wrong counter.');
+  } finally {
+    world.movement.keys.D.isDown = false;
+    collection.store.save(saved.collectedIds, saved.equipment, saved.layoutSeed);
+    collection.collectedIds = previousIds;
+    for (const id of ['lava-boots-1', 'lava-boots-2']) {
+      if (!collection.pickups.getChildren().some((pickup) => pickup.getData('collectibleId') === id)) {
+        collection.createPickup(collection.items.get(id));
+      }
+    }
+    positions.forEach(({ player, x, y }) => player.sprite.body.reset(x, y));
+    world.setLeader(leaderId);
+    world.updateCollectionProgress();
+  }
+}
+
+async function testLakeBoat(world) {
+  const game = world.game;
+  const collection = world.collectibleManager;
+  const saved = collection.store.loadState();
+  const collected = collection.collectedIds;
+  const learned = new Set(world.stateManager.learnedChallengeIds);
+  const points = new Map(world.stateManager.turnPoints);
+  const leaderId = world.player.id;
+  const positions = world.players.map((player) => ({ player, x: player.sprite.x, y: player.sprite.y }));
+  const sounds = world.registry.get('soundEffects');
+  const originalPlay = sounds.play;
+  const heard = [];
+  const waitUntil = async (condition, message) => {
+    const deadline = Date.now() + 10000;
+    while (!condition() && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 25));
+    assert(condition(), message);
+  };
+  const start = async () => {
+    world.player.sprite.body.reset(LAKE.boatX, LAKE.shoreLandingY);
+    world.handleSpace();
+    assert(world.dialogueWindow.mode === 'quest', 'Shore boat did not offer a crossing.');
+    world.dialogueWindow.chooseQuest(true);
+    const question = game.scene.getScene('ChallengeScene');
+    await waitUntil(() => question.sys.isActive(), 'Boat question did not start.');
+    const challenge = question.challenge;
+    const wrong = challenge.options.findIndex((option) => !world.challengeManager.answersMatch(option, challenge.correctAnswer));
+    question.answerButtons[wrong].emit('pointerdown');
+    assert(!question.isResolved && !game.scene.isActive('LakeBoatScene'), 'A wrong answer started the boat game.');
+    const correct = challenge.options.findIndex((option) => world.challengeManager.answersMatch(option, challenge.correctAnswer));
+    question.answerButtons[correct].emit('pointerdown');
+    question.continueButton.emit('pointerdown');
+    const boat = game.scene.getScene('LakeBoatScene');
+    await waitUntil(() => boat.sys.isActive(), 'Boat game did not start.');
+    assert(world.sys.isPaused() && boat.difficulty === minigameSpeed(world.player.age)
+      && !world.stateManager.learnedChallengeIds.has(challenge.id), 'Boat game credited the question too early or used the wrong age.');
+    return { boat, challenge };
+  };
+  try {
+    sounds.play = (name) => heard.push(name);
+    assert(TEST_WORLD_DATA[LAKE.top][LAKE.left] === WORLD_TILE.WATER
+      && TEST_WORLD_DATA[LAKE.bottom][LAKE.right] === WORLD_TILE.WATER
+      && TEST_WORLD_DATA[LAKE.islandTop][LAKE.islandLeft] !== WORLD_TILE.WATER,
+    'The larger lake or its island is missing.');
+    const flashlight = collection.items.get('flashlight');
+    assert(flashlight && collection.getTotalCount('tool') === 5
+      && world.hud.toolProgress.textContent.includes('0 / 1'), 'Flashlight or its counter is missing.');
+    for (let seed = 0; seed < 10; seed += 1) {
+      const item = arrangeCollectibles(collection.getAllItems(), seed).find((candidate) => candidate.id === 'flashlight');
+      assert(item.x === flashlight.x && item.y === flashlight.y, 'Flashlight moved off the island during shuffle.');
+    }
+    world.interactWithBoat();
+    assert(world.dialogueWindow.message.text.includes('lommelygte'), 'Boat did not mention the uncollected flashlight.');
+    world.dialogueWindow.close();
+    collection.collectedIds = new Set([...collected, 'flashlight']);
+    world.interactWithBoat();
+    assert(!world.dialogueWindow.message.text.includes('lommelygte'), 'Boat still promised a collected flashlight.');
+    world.dialogueWindow.close();
+    collection.collectedIds = collected;
+    let { boat, challenge } = await start();
+    assert(heard.includes('lakeStart') && heard.includes('lakeMusicLow'), 'Lake start or music did not play.');
+    await waitUntil(() => heard.includes('lakeMusicMid'), 'Lake music did not continue automatically.');
+    boat.time.removeAllEvents();
+    boat.playMusicBeat();
+    assert(heard.includes('lakeMusicMid') && heard.includes('lakeMusicHigh'), 'Lake music did not advance.');
+    boat.spawnFish();
+    boat.spawnMonster();
+    assert(heard.includes('lakeFish') && heard.includes('lakeMonster'), 'Lake hazards did not play their sounds.');
+    const [fish, monster] = boat.hazards.getChildren();
+    assert(fish.getData('kind') === 'fish' && fish.body.velocity.y === 150 * boat.difficulty
+      && monster.getData('kind') === 'monster' && monster.body.velocity.y === 115 * boat.difficulty,
+    'Boat hazards or their age-scaled speeds are incorrect.');
+    const startX = boat.boat.x;
+    boat.movement.keys.D.isDown = true;
+    await waitUntil(() => boat.boat.x > startX + 10, 'Boat did not respond to steering.');
+    boat.movement.keys.D.isDown = false;
+    assert(heard.includes('lakePaddle'), 'Steering did not play a paddling sound.');
+    fish.body.reset(boat.boat.x, boat.boat.y);
+    boat.physics.overlap(boat.boat, fish, boat.hit, undefined, boat);
+    assert(boat.hits === 1 && !fish.active, 'Jumping fish did not hit the boat.');
+    assert(heard.filter((name) => name === 'lakeHit').length === 1, 'Boat hit did not play its sound.');
+    boat.hit(boat.boat, monster);
+    assert(boat.hits === 1 && !monster.active && heard.filter((name) => name === 'lakeHit').length === 1,
+      'Boat hit invulnerability did not prevent repeated damage and sound.');
+    const failedPlayer = world.player.id;
+    for (let hit = 0; hit < 2; hit += 1) {
+      boat.invulnerableUntil = 0;
+      boat.hit(boat.boat, boat.hazards.getChildren()[0] ?? boat.hazards.create(400, 200, 'lake-fish'));
+    }
+    await waitUntil(() => world.sys.isActive() && !boat.sys.isActive(), 'Failed crossing did not resume the world.');
+    assert(heard.includes('lakeLose'), 'Failed crossing did not play its sound.');
+    assert(!world.boatOnIsland && world.player.id !== failedPlayer
+      && !world.stateManager.learnedChallengeIds.has(challenge.id), 'Failed crossing changed island or question progress.');
+    world.dialogueWindow.close();
+    ({ boat, challenge } = await start());
+    boat.time.removeAllEvents();
+    boat.hazards.clear(true, true);
+    boat.elapsed = 0;
+    boat.update(0, 17999);
+    assert(!boat.finished, 'Boat game ended too early.');
+    boat.update(0, 1);
+    await waitUntil(() => world.sys.isActive() && !boat.sys.isActive(), 'Successful crossing did not resume the world.');
+    assert(heard.includes('lakeWin'), 'Successful crossing did not play its sound.');
+    const soundCount = heard.length;
+    boat.playMusicBeat();
+    boat.spawnFish();
+    boat.spawnMonster();
+    boat.update(boat.time.now + 1000, 16);
+    assert(heard.length === soundCount, 'Lake sounds continued after the game finished.');
+    assert(world.boatOnIsland && world.stateManager.learnedChallengeIds.has(challenge.id)
+      && world.players.every((player) => player.sprite.y === LAKE.islandLandingY),
+    'Successful crossing did not move both players to the island or credit the question.');
+    world.dialogueWindow.close();
+    world.movement.keys.W.isDown = true;
+    await waitUntil(() => collection.collectedIds.has('flashlight'), 'Walking on the island did not collect the flashlight.');
+    world.movement.keys.W.isDown = false;
+    assert(collection.collectedIds.has('flashlight') && collection.store.load().has('flashlight')
+      && world.hud.toolProgress.textContent.includes('1 / 1'), 'Flashlight pickup was not saved or counted.');
+    world.player.sprite.body.reset(LAKE.boatX, LAKE.islandLandingY);
+    world.handleSpace();
+    assert(world.dialogueWindow.mode === 'quest', 'Island boat did not offer a return trip.');
+    world.dialogueWindow.chooseQuest(true);
+    assert(!world.boatOnIsland && world.players.every((player) => player.sprite.y === LAKE.shoreLandingY),
+      'Return trip did not bring both players to the shore.');
+  } finally {
+    sounds.play = originalPlay;
+    if (game.scene.isActive('LakeBoatScene')) world.scene.stop('LakeBoatScene');
+    if (!world.sys.isActive()) world.scene.resume();
+    world.movement.keys.W.isDown = false;
+    if (world.dialogueWindow.isOpen) world.dialogueWindow.close();
+    collection.store.save(saved.collectedIds, saved.equipment, saved.layoutSeed);
+    collection.collectedIds = collected;
+    if (!collection.pickups.getChildren().some((pickup) => pickup.getData('collectibleId') === 'flashlight')) {
+      collection.createPickup(collection.items.get('flashlight'));
+    }
+    world.updateCollectionProgress();
+    world.stateManager.learnedChallengeIds = learned;
+    world.stateManager.turnPoints = points;
+    world.lastNPCChallenges.delete('lake-boat');
+    world.boatOnIsland = false;
+    world.lakeBoat.setPosition(LAKE.boatX, LAKE.shoreY);
+    positions.forEach(({ player, x, y }) => player.sprite.body.reset(x, y));
+    world.setLeader(leaderId);
+  }
+}
+
 async function testFlight(world) {
   const game = world.game;
   const collection = world.collectibleManager;
@@ -1230,6 +2113,7 @@ async function testFlight(world) {
     ].map((item) => item.id));
     world.player.sprite.body.reset(50, WEST_CRACK.y);
     let { flight, challenge } = await start();
+    assert(flight.difficulty === minigameSpeed(world.player.age), 'Flight used the wrong player age.');
     assert(flight.lives === 5 && flight.elapsed === 0 && flight.scoreText.text.includes('Tid tilbage: 20 sek.')
       && flight.direction === -1
       && flight.leader.list[1].text === world.player.name,
@@ -1248,7 +2132,8 @@ async function testFlight(world) {
     assert(flight.follower.y === 570 && flight.lives === 5, 'Lava damaged the following rider.');
     flight.spawnBird();
     let bird = flight.pterodactyls.getChildren()[0];
-    assert(bird.body.velocity.x > 0 && heard.includes('flightBird'), 'Bird did not fly against westbound riders.');
+    assert(bird.body.velocity.x === 185 * flight.difficulty && heard.includes('flightBird'),
+      'Bird did not fly against westbound riders at the age-scaled speed.');
     bird.body.reset(flight.follower.x, flight.follower.y);
     flight.physics.overlap(flight.follower, bird, flight.hitBird, undefined, flight);
     assert(flight.lives === 5 && bird.active, 'Follower was vulnerable to a bird.');
@@ -1343,7 +2228,8 @@ function testGateInteractions(scene) {
   const byId = (id) => manager.npcs.find((npc) => npc.id === id);
   const blocked = (x, y) => scene.worldMap.getTileAt(x, y).collides;
   const gateClosed = (gate) => {
-    const layer = [WORLD_TILE.VOLCANIC_GATE_A, WORLD_TILE.VOLCANIC_GATE_B].includes(gate) ? scene.eastLayer
+    const layer = gate === WORLD_TILE.SOUTH_GATE ? scene.southLayer
+      : [WORLD_TILE.VOLCANIC_GATE_A, WORLD_TILE.VOLCANIC_GATE_B].includes(gate) ? scene.eastLayer
       : gate === WORLD_TILE.NORTH_FOREST_GATE ? scene.northLayer
       : [WORLD_TILE.WEST_BRIDGE, WORLD_TILE.WEST_FOREST_GATE].includes(gate) ? scene.westLayer : scene.worldLayer;
     const tiles = layer.filterTiles((tile) => tile.index === gate);
@@ -1461,7 +2347,61 @@ function collect(scene, type, count) {
   for (const pickup of pickups.slice(0, count)) {
     scene.collectPickup(pickup);
     assertAccessoryCounters(scene);
+    assertUnicornCounters(scene);
   }
+}
+
+function assertUnicornCounters(scene) {
+  const all = scene.collectibleManager.getAllItems().filter((item) => item.type === 'unicorn');
+  const collected = scene.collectibleManager.getCollectedItems('unicorn');
+  const categories = [
+    ['original', 'Hvide', (item) => !/^unicorn-(rainbow|dark|volcano)-/.test(item.texture), 6],
+    ['rainbow', 'Regnbue', (item) => item.texture.startsWith('unicorn-rainbow-'), 3],
+    ['dark', 'Mørke', (item) => item.texture.startsWith('unicorn-dark-'), 3],
+    ['volcano', 'Vulkan', (item) => item.texture.startsWith('unicorn-volcano-'), 3],
+  ];
+  assert(scene.hud.unicornCounters.size === 4, 'Unicorn family counters are missing.');
+  for (const [id, label, matches, expected] of categories) {
+    const count = collected.filter(matches).length;
+    const total = all.filter(matches).length;
+    assert(total === expected && scene.hud.unicornCounters.get(id).textContent === `${label}: ${count} / ${total}`,
+      `${label} unicorn counter does not match the collected items.`);
+  }
+}
+
+function testUnicornCounters(scene) {
+  const collection = scene.collectibleManager;
+  const originalIds = collection.collectedIds;
+  const unicorns = collection.getAllItems().filter((item) => item.type === 'unicorn');
+  try {
+    collection.collectedIds = new Set([
+      unicorns.find((item) => item.texture === 'unicorn-purple').id,
+      unicorns.find((item) => item.texture.startsWith('unicorn-rainbow-')).id,
+      unicorns.find((item) => item.texture.startsWith('unicorn-volcano-')).id,
+    ]);
+    scene.updateCollectionProgress();
+    assertUnicornCounters(scene);
+    assert(scene.hud.unicornCounters.get('original').textContent === 'Hvide: 1 / 6'
+      && scene.hud.unicornCounters.get('rainbow').textContent === 'Regnbue: 1 / 3'
+      && scene.hud.unicornCounters.get('dark').textContent === 'Mørke: 0 / 3'
+      && scene.hud.unicornCounters.get('volcano').textContent === 'Vulkan: 1 / 3',
+    'Unicorn family counters did not distinguish mixed progress.');
+  } finally {
+    collection.collectedIds = originalIds;
+    scene.updateCollectionProgress();
+  }
+}
+
+function testHudLayout(scene) {
+  const hud = scene.hud.element;
+  const controls = hud.querySelector('.hud-controls').getBoundingClientRect();
+  const unicorns = hud.querySelector('.hud-unicorns').getBoundingClientRect();
+  const collection = hud.querySelector('.hud-collection').getBoundingClientRect();
+  const reset = scene.hud.resetButton.getBoundingClientRect();
+  const player = scene.hud.turn.getBoundingClientRect();
+  assert(controls.right <= unicorns.left && unicorns.right <= collection.left
+    && reset.top < player.top && hud.scrollWidth <= hud.clientWidth,
+  'HUD columns overlap or are incorrectly ordered.');
 }
 
 function assertAccessoryCounters(scene) {
@@ -1488,7 +2428,7 @@ function testCollection(scene, firstType, secondType) {
   'Collecting three of each did not update the collection.');
   assert(scene.sys.isActive() && !scene.ui.list.some((object) => object.text === 'Fortsæt eventyret'),
     'Collecting three of each interrupted the adventure.');
-  assert(scene.hud.progress.textContent.includes('3 / 15'), 'Unicorn counter is incorrect.');
+  assertUnicornCounters(scene);
   assertAccessoryCounters(scene);
 }
 
@@ -1508,11 +2448,20 @@ function testChallenges(scene) {
       && challenge.options.some((option) => !manager.evaluateAnswer(challenge.id, option)),
     `${challenge.id} does not have a correct answer and a wrong answer.`);
   }
-  for (const category of ['Reading', 'Math', 'English', 'Logic']) {
-    for (const difficulty of [1, 2]) {
-      assert(challenges.filter((challenge) => challenge.category === category
-        && challenge.difficulty === difficulty).length >= 4,
-      `Too few ${category} challenges at level ${difficulty}.`);
+  for (const difficulty of [1, 2]) {
+    const englishCount = challenges.filter((challenge) => challenge.category === 'English'
+      && challenge.difficulty === difficulty).length;
+    assert(englishCount >= 12, `Too few English challenges at level ${difficulty}.`);
+    for (const category of ['Reading', 'Math', 'Logic']) {
+      const count = challenges.filter((challenge) => challenge.category === category
+        && challenge.difficulty === difficulty).length;
+      assert(count === englishCount * 2, `${category} is not twice the English pool at level ${difficulty}.`);
+    }
+    for (const challenge of challenges.filter((item) => item.difficulty === difficulty)) {
+      assert(challenge.options.length === 3
+        && challenge.options.filter((option) => manager.answersMatch(option, challenge.correctAnswer)).length === 1
+        && new Set(challenge.options.map((option) => String(option).trim().toLocaleLowerCase())).size === 3,
+      `${challenge.id} must have three distinct options and exactly one correct answer.`);
     }
   }
   const reserved = scene.npcManager.getGateChallengeIds();
@@ -1757,6 +2706,9 @@ async function testBeginnerReadingScene(scene) {
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
   assert(challengeScene.sys.isActive(), 'Beginner reading challenge did not open.');
+  assert(!challengeScene.children.list.some((object) => typeof object.text === 'string'
+    && (/^Læs · 1$/.test(object.text) || object.text === 'LÆS')),
+  'Beginner question displayed its category or difficulty.');
   const sounds = scene.registry.get('soundEffects');
   const originalPlay = sounds.play;
   const heard = [];
@@ -1978,6 +2930,7 @@ async function testFairyShooter(world) {
     question.continueButton.emit('pointerdown');
     const shooter = game.scene.getScene('MosquitoScene');
     await waitUntil(() => shooter.sys.isActive(), `${id} shooter did not start.`);
+    assert(shooter.difficulty === minigameSpeed(world.player.age), 'Mosquito game used the wrong player age.');
     assert(world.sys.isPaused() && world.isAnswering && !world.stateManager.getLearnedChallengeIds().includes(challenge.id),
       `${id} was marked complete before the shooter was won.`);
     return { shooter, challenge };
@@ -2033,6 +2986,8 @@ async function testFairyShooter(world) {
   };
   shooter.time.removeAllEvents();
   shooter.spawnMosquito();
+  assert(shooter.mosquitoes.getChildren()[0].body.velocity.y === 55 * shooter.difficulty,
+    'Mosquito speed did not use the difficulty.');
   shooter.update();
   shooter.update();
   assert(buzzStarted === 1 && buzzStopped === 0, 'Buzz did not start once for mosquitoes.');
@@ -2158,6 +3113,7 @@ async function testTrollGame(world) {
     question.continueButton.emit('pointerdown');
     const troll = game.scene.getScene('TrollScene');
     await waitUntil(() => troll.sys.isActive(), `${npcId} game did not start.`);
+    assert(troll.difficulty === minigameSpeed(player.age), 'Troll game used the wrong player age.');
     const map = npcId === 'north-troll' ? world.northMap : npcId === 'west-troll' ? world.westMap : world.worldMap;
     assert(world.sys.isPaused() && world.isAnswering && map.getTileAt(gateX, gateY).collides
       && !world.stateManager.getLearnedChallengeIds().includes(challengeId)
@@ -2178,6 +3134,8 @@ async function testTrollGame(world) {
     let troll = await start('bridge-troll', 'math-addition', 31, 32);
     assert(heard.includes('trollMusicLow'), 'Troll music did not start.');
     await waitUntil(() => troll.rocks.getLength() > 0, 'Troll did not throw rocks automatically.');
+    assert(Math.abs(troll.rocks.getChildren()[0].body.velocity.length() - 240 * troll.difficulty) < 0.001,
+      'Rock speed did not use the difficulty.');
     assert(heard.includes('trollMusicHigh') && heard.includes('trollThrow'),
       'Troll music or automatic throwing did not continue.');
     troll.rocks.clear(true, true);
@@ -2273,7 +3231,7 @@ async function testTrollGame(world) {
     world.dialogueWindow.close();
     troll = await start('west-troll', 'west-troll-apples', 23, 52);
     troll.time.removeAllEvents();
-    for (let count = 0; count < 7; count += 1) {
+    while (troll.applesCollected < 7) {
       overlap(troll, troll.apples, troll.collectApple);
     }
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after western troll win.');
@@ -2295,10 +3253,12 @@ async function testTrollGame(world) {
     world.dialogueWindow.close();
     troll = await start('north-troll', 'north-troll-stones', 91, 20);
     troll.time.removeAllEvents();
-    for (let count = 0; count < 7; count += 1) overlap(troll, troll.apples, troll.collectApple);
+    while (troll.applesCollected < 7) overlap(troll, troll.apples, troll.collectApple);
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after northern troll win.');
     assert(!world.northMap.getTileAt(91, 20).collides
-      && world.stateManager.getLearnedChallengeIds().includes('north-troll-stones'),
+      && world.stateManager.getLearnedChallengeIds().includes('north-troll-stones')
+      && world.dialogueWindow.message.text.includes('mørkeskoven')
+      && !world.dialogueWindow.message.text.includes('broen'),
     'Winning the northern troll game did not open the forest.');
     world.dialogueWindow.close();
   } finally {
@@ -2424,6 +3384,26 @@ async function run() {
     invalidSeedRejected = error.message.includes('ugyldigt format');
   }
   assert(invalidSeedRejected, 'Invalid layout seed was accepted.');
+  const invalidGateStore = new CollectionStore({
+    getItem: () => '{"version":1,"collectedIds":[],"unlockedGates":["unknown"]}',
+  });
+  let invalidGateRejected = false;
+  try {
+    invalidGateStore.loadState();
+  } catch (error) {
+    invalidGateRejected = error.message.includes('ugyldigt format');
+  }
+  assert(invalidGateRejected, 'Invalid saved gate was accepted.');
+  const invalidRewardStore = new CollectionStore({
+    getItem: () => '{"version":1,"collectedIds":[],"unlockedRewards":["unknown"]}',
+  });
+  let invalidRewardRejected = false;
+  try {
+    invalidRewardStore.loadState();
+  } catch (error) {
+    invalidRewardRejected = error.message.includes('ugyldigt format');
+  }
+  assert(invalidRewardRejected, 'Invalid saved reward was accepted.');
   const failingStore = new CollectionStore({
     getItem: () => { throw new Error('blocked'); },
     setItem: () => { throw new Error('blocked'); },
@@ -2448,6 +3428,9 @@ async function run() {
   const firstLayout = JSON.stringify(scene.collectibleManager.getAllItems().map(({ id, x, y }) => [id, x, y]));
   assert(Number.isInteger(firstSeed), 'A fresh game did not persist its layout seed.');
   assertAccessoryCounters(scene);
+  assertUnicornCounters(scene);
+  testUnicornCounters(scene);
+  testHudLayout(scene);
   assert(scene.cameras.main.zoom === 0.65 && scene.movement.speed === 242,
     'World zoom or movement speed is incorrect.');
   scene.movement.keys.D.isDown = true;
@@ -2490,10 +3473,16 @@ async function run() {
   assert(!scene.dialogueWindow.isOpen, 'Dialogue button did not close after changing zoom.');
   await testBeginnerReadingScene(scene);
   testMap(scene);
+  testOldQueen(scene);
   await testVolcanoCat(scene);
+  await testWarriorPrincess(scene);
+  await testDragonBattle(scene);
+  await testLavaBootPickups(scene);
   await testVolcano(scene);
   testNorthFollowerAndMusic(scene);
   await testWorldMusicPause(scene);
+  await testSouthWizard(scene);
+  await testLakeBoat(scene);
   await testNorthCave(scene);
   await testWitchEncounter(scene);
   await testWestCrack(scene);
@@ -2513,7 +3502,14 @@ async function run() {
     'A failed save changed the collection or destroyed the pickup.');
   scene.collectibleManager.store = store;
   testCollection(scene, 'unicorn', 'accessory');
-  assert(new CollectionStore(storage).load().size === 6, 'Saved collection did not survive a new store instance.');
+  const flashlightPickup = scene.collectibleManager.pickups.getChildren()
+    .find((pickup) => pickup.getData('collectibleId') === 'flashlight');
+  scene.collectPickup(flashlightPickup);
+  const bootsPickup = scene.collectibleManager.pickups.getChildren()
+    .find((pickup) => pickup.getData('collectibleId') === 'lava-boots-1');
+  scene.collectWorldItem(scene.player.sprite, bootsPickup);
+  assert(scene.hud.toolCounters.get('lava-boots').textContent.includes('1 / 2')
+    && new CollectionStore(storage).load().size === 8, 'Tool pickup was not counted or saved.');
 
   let previousManager = scene.collectibleManager;
   scene.scene.restart();
@@ -2524,7 +3520,17 @@ async function run() {
   assertAccessoryCounters(scene);
   assert(scene.collectibleManager.getCollectedItems('unicorn').length === 3, 'Unicorns were not restored.');
   assert(scene.collectibleManager.getCollectedItems('accessory').length === 3, 'Accessories were not restored.');
-  assert(scene.collectibleManager.pickups.getChildren().length === 69, 'Saved pickups reappeared or new pickups are missing.');
+  assert(scene.collectibleManager.pickups.getChildren().length === 70
+    && scene.collectibleManager.collectedIds.has('flashlight') && scene.hud.toolProgress.textContent.includes('1 / 1')
+    && scene.collectibleManager.collectedIds.has('lava-boots-1')
+    && scene.hud.toolCounters.get('lava-boots').textContent.includes('1 / 2'),
+  'Tools or other pickups were not restored correctly after reload.');
+  scene.collectibleManager.collectedIds.delete('flashlight');
+  scene.collectibleManager.collectedIds.delete('lava-boots-1');
+  store.save(scene.collectibleManager.collectedIds, scene.collectibleManager.equipment);
+  scene.collectibleManager.createPickup(scene.collectibleManager.items.get('flashlight'));
+  scene.collectibleManager.createPickup(scene.collectibleManager.items.get('lava-boots-1'));
+  scene.updateCollectionProgress();
   assert(scene.sys.isActive(), 'A saved collection interrupted the adventure.');
   assert(scene.collectibleManager.getCollectedItems('unicorn').every((unicorn) => unicorn.color), 'Unicorn colors were not restored.');
   assert(scene.worldMap.getTileAt(64, 16).collides, 'Flora gate did not reset.');
@@ -2768,7 +3774,10 @@ async function run() {
   scene = await waitForWorld(game, previousManager);
   assert(scene.collectibleManager.getCollectedCount('unicorn') === 15
     && scene.collectibleManager.getCollectedCount('accessory') === 60
-    && scene.hud.progress.textContent.includes('15 / 15')
+    && Array.from(scene.hud.unicornCounters.values()).every((counter) => {
+      const [count, total] = counter.textContent.split(': ')[1].split(' / ');
+      return count === total;
+    })
     && Array.from(scene.hud.accessoryCounters.values()).every((counter) => counter.textContent.includes('15 / 15'))
     && !scene.ui.list.some((object) => object.text === 'Fortsæt eventyret'),
   'Reloading a full collection interrupted play or lost progress.');
@@ -2783,6 +3792,48 @@ async function run() {
   stable.followers.leader.sprite.setPosition(400, 105);
   stable.interact({ repeat: false });
   await new Promise((resolve) => setTimeout(resolve, 150));
+  scene.collectPickup(scene.collectibleManager.pickups.getChildren()
+    .find((pickup) => pickup.getData('collectibleId') === 'flashlight'));
+  for (const id of ['lava-boots-1', 'lava-boots-2']) {
+    scene.collectPickup(scene.collectibleManager.pickups.getChildren().find((pickup) => pickup.getData('collectibleId') === id));
+  }
+  assert(scene.hud.toolProgress.textContent.includes('1 / 1')
+    && scene.hud.toolCounters.get('lava-boots').textContent.includes('2 / 2'), 'Tools were not present before reset.');
+  scene.openGate('flora');
+  assert(scene.unlockSouthPass(), 'Could not save an unlocked southern gate.');
+  scene.collectibleManager.unlockReward('princess-bows');
+  scene.collectPickup(scene.collectibleManager.pickups.getChildren()
+    .find((pickup) => pickup.getData('collectibleId') === 'bow-and-arrow-1'));
+  const rescueState = store.loadState();
+  rescueState.unlockedGates.add('dragon');
+  store.save(rescueState.collectedIds, rescueState.equipment, rescueState.layoutSeed,
+    rescueState.unlockedGates, rescueState.unlockedRewards);
+  previousManager = scene.collectibleManager;
+  scene.scene.restart();
+  scene = await waitForWorld(game, previousManager);
+  assert(scene.southOpen && !scene.southWizard.visible && !scene.southMap.getTileAt(64, 0).collides
+    && store.loadState().unlockedGates.has('south') && store.loadState().equipment.size > 0
+    && scene.dragonRescued && store.loadState().unlockedGates.has('dragon')
+    && scene.dragonDen.texture.key === 'dragon-den-empty'
+    && scene.children.list.some((child) => child.texture?.key === 'prince')
+    && scene.npcManager.npcs.find((npc) => npc.id === 'old-queen').repeatDialogue.includes('hjemme igen')
+    && store.loadState().unlockedRewards.has('princess-bows')
+    && scene.hud.toolCounters.get('bow-and-arrow').textContent === 'Buer og pile: 1 / 2'
+    && scene.collectibleManager.pickups.getChildren().some((pickup) => pickup.getData('collectibleId') === 'bow-and-arrow-2')
+    && !scene.collectibleManager.pickups.getChildren().some((pickup) => pickup.getData('collectibleId') === 'bow-and-arrow-1'),
+  'Southern passage did not survive reloading with the collection.');
+  scene.interactWithDragonDen();
+  assert(scene.dialogueWindow.message.text.includes('prinsen er fri')
+    && scene.dialogueWindow.message.text.includes('prinsessen'), 'Reloaded empty den did not celebrate the ending.');
+  scene.dialogueWindow.close();
+  const rescuedQueen = scene.npcManager.npcs.find((npc) => npc.id === 'old-queen');
+  scene.npcManager.runInteraction(rescuedQueen);
+  assert(scene.dialogueWindow.message.text.includes('hjemme igen'), 'Reloaded queen did not celebrate the rescue.');
+  scene.dialogueWindow.close();
+  const rescuedPrincess = scene.npcManager.npcs.find((npc) => npc.id === 'warrior-princess');
+  scene.npcManager.runInteraction(rescuedPrincess);
+  assert(scene.dialogueWindow.message.text.includes('reddede prinsen'), 'Reloaded princess did not remember the rescue.');
+  scene.dialogueWindow.close();
   scene.openGate('flora');
   const resetButton = scene.hud.resetButton;
   const originalConfirm = window.confirm;
@@ -2790,8 +3841,9 @@ async function run() {
   try {
     window.confirm = () => { confirmations += 1; return false; };
     resetButton.click();
-    assert(confirmations === 1 && scene.collectibleManager.collectedIds.size === 75
+    assert(confirmations === 1 && scene.collectibleManager.collectedIds.size === 79
       && store.loadState().equipment.size > 0 && store.loadState().layoutSeed === firstSeed
+      && store.loadState().unlockedGates.has('south')
       && !scene.worldMap.getTileAt(64, 16).collides,
     'Canceling reset changed progress or the reset button did not respond.');
 
@@ -2800,8 +3852,9 @@ async function run() {
     resetButton.click();
     assert(confirmations === 2 && scene.dialogueWindow.isOpen
       && scene.dialogueWindow.message.text.includes('ikke nulstillet')
-      && scene.collectibleManager.collectedIds.size === 75
+      && scene.collectibleManager.collectedIds.size === 79
       && store.loadState().equipment.size > 0 && store.loadState().layoutSeed === firstSeed
+      && store.loadState().unlockedGates.has('south')
       && !scene.worldMap.getTileAt(64, 16).collides,
     'A failed reset did not preserve progress and report the error.');
     scene.dialogueWindow.close();
@@ -2814,9 +3867,18 @@ async function run() {
     assert(confirmations === 3 && store.loadState().collectedIds.size === 0
       && resetSeed !== firstSeed && resetLayout !== firstLayout
       && store.loadState().equipment.size === 0 && scene.collectibleManager.collectedIds.size === 0
-      && scene.collectibleManager.pickups.getChildren().length === 75
+      && store.loadState().unlockedGates.size === 0 && !scene.southOpen
+      && store.loadState().unlockedRewards.size === 0
+      && !scene.dragonRescued && scene.dragonDen.texture.key === 'dragon-den'
+      && !scene.children.list.some((child) => child.texture?.key === 'prince')
+      && scene.npcManager.npcs.find((npc) => npc.id === 'old-queen').interactions.length > 0
+      && scene.southWizard.visible && scene.southMap.getTileAt(64, 0).collides
+      && scene.collectibleManager.pickups.getChildren().length === 78
       && scene.worldMap.getTileAt(64, 16).collides
-      && scene.hud.progress.textContent.includes('0 / 15')
+      && Array.from(scene.hud.unicornCounters.values()).every((counter) => counter.textContent.includes(': 0 / '))
+      && scene.hud.toolProgress.textContent.includes('0 / 1')
+      && scene.hud.toolCounters.get('lava-boots').textContent.includes('0 / 2')
+      && scene.hud.toolCounters.get('bow-and-arrow').textContent === 'Buer og pile: 0 / 2'
       && Array.from(scene.hud.accessoryCounters.values()).every((counter) => counter.textContent.includes('0 / 15'))
       && document.querySelectorAll('.game-hud').length === 1,
     'Reset did not clear the saved collection and restart the world.');
@@ -2834,7 +3896,7 @@ async function run() {
       && scene.collectibleManager.equipment.size === 0
       && store.loadState().layoutSeed === resetSeed
       && JSON.stringify(scene.collectibleManager.getAllItems().map(({ id, x, y }) => [id, x, y])) === resetLayout
-      && scene.collectibleManager.pickups.getChildren().length === 75,
+      && scene.collectibleManager.pickups.getChildren().length === 78,
     'Reset progress did not remain empty after reloading the world.');
     await testAutomaticTurns(scene, store, failingStore);
     previousManager = scene.collectibleManager;

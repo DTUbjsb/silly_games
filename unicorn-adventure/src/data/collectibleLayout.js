@@ -29,7 +29,7 @@ export function arrangeCollectibles(items, seed) {
   }
   const regions = new Map();
   for (const item of arranged) {
-    if (isInForest(item)) {
+    if (item.type === 'tool' || isInForest(item)) {
       continue;
     }
     const region = item.y < 0 ? 'north' : item.x >= 4096 ? 'volcano' : item.x < 0 ? `west-${item.y < 52 * 32 ? 0 : 1}`

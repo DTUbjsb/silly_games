@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="110" viewBox="0 0 100 110">
+  <title>Den søde prins</title>
+  <path d="M30 38Q24 15 50 14Q76 15 70 38L68 62H32Z" fill="#865c3a"/>
+  <path d="M35 64H65L72 96H28Z" fill="#6593bb" stroke="#446888" stroke-width="3"/>
+  <path d="M35 65L50 77L65 65" fill="none" stroke="#eed58d" stroke-width="3"/>
+  <path d="M32 74L22 91M68 74L78 91" stroke="#6593bb" stroke-width="9" stroke-linecap="round"/>
+  <ellipse cx="50" cy="40" rx="20" ry="22" fill="#f2c7a6"/>
+  <path d="M30 36Q27 14 50 14Q73 14 70 36Q58 33 54 24Q45 33 30 36Z" fill="#865c3a"/>
+  <path d="M35 20L33 10L42 15L50 8L58 15L67 10L65 20Z" fill="#efcb6c" stroke="#ad8740" stroke-width="2"/>
+  <circle cx="42" cy="43" r="2" fill="#344454"/><circle cx="58" cy="43" r="2" fill="#344454"/>
+  <path d="M45 51Q50 56 55 51" fill="none" stroke="#a45f70" stroke-width="2"/>
+  <path d="M35 95H45V105H35ZM55 95H65V105H55Z" fill="#5a4b64"/>
+</svg>

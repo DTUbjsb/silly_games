@@ -1,10 +1,3 @@
-const CATEGORY_LABELS = {
-  Reading: 'Læsning',
-  Math: 'Matematik',
-  English: 'Engelsk',
-  Logic: 'Logik',
-};
-
 export class ChallengeScene extends Phaser.Scene {
   constructor() {
     super('ChallengeScene');
@@ -36,7 +29,7 @@ export class ChallengeScene extends Phaser.Scene {
       .setStrokeStyle(4, 0x9b83d5)
       .setScrollFactor(0)
       .setDepth(21);
-    this.add.text(400, 66, beginnerReading ? 'LÆS' : 'EN NY EVENTYRUDFORDRING', {
+    this.add.text(400, 66, beginnerReading ? 'HEJ' : 'EN NY EVENTYRUDFORDRING', {
       fontFamily: 'Trebuchet MS, sans-serif',
       fontSize: '16px',
       fontStyle: 'bold',
@@ -55,14 +48,6 @@ export class ChallengeScene extends Phaser.Scene {
       color: '#34526a',
       align: 'center',
       wordWrap: { width: 610 },
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(22);
-    this.add.text(400, 222, (
-      beginnerReading ? 'Læs · 1' : `${CATEGORY_LABELS[challenge.category]} · niveau ${challenge.difficulty}`
-    ), {
-      fontFamily: 'Trebuchet MS, sans-serif',
-      fontSize: '15px',
-      fontStyle: 'bold',
-      color: '#67539b',
     }).setOrigin(0.5).setScrollFactor(0).setDepth(22);
     this.add.text(400, 260, challenge.question, {
       fontFamily: 'Trebuchet MS, sans-serif',

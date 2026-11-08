@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="130" viewBox="0 0 100 130">
+  <title>En ond troldmand</title>
+  <path d="M22 120L30 71Q50 55 70 71L79 120Z" fill="#47335c" stroke="#241c35" stroke-width="4"/>
+  <path d="M28 103L12 118M72 103L88 118" stroke="#47335c" stroke-width="12" stroke-linecap="round"/>
+  <ellipse cx="50" cy="58" rx="22" ry="25" fill="#d9b7a3" stroke="#332638" stroke-width="3"/>
+  <path d="M32 63Q50 104 68 63Q61 76 50 76Q39 76 32 63Z" fill="#d7d2dc"/>
+  <path d="M35 55L44 58M56 58L65 55" stroke="#38273a" stroke-width="3"/>
+  <circle cx="40" cy="61" r="2" fill="#241c35"/><circle cx="60" cy="61" r="2" fill="#241c35"/>
+  <path d="M20 42L47 4L66 37L82 43Q50 53 20 42Z" fill="#3c2954" stroke="#241c35" stroke-width="4"/>
+  <path d="M42 25L47 20L52 26L48 31Z" fill="#f3ce72"/>
+  <path d="M82 119L92 62" stroke="#9d7450" stroke-width="4"/>
+  <circle cx="93" cy="59" r="6" fill="#f3a5dd"/>
+</svg>

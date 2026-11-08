@@ -1,0 +1,256 @@
+{
+  "challenges": [
+    {
+      "id": "english-extra-1-sun",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder “sun” på dansk?",
+      "options": [
+        "sol",
+        "måne",
+        "stjerne"
+      ],
+      "correctAnswer": "sol",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, sun betyder sol!",
+        "hint": "Det lyser på himlen om dagen."
+      }
+    },
+    {
+      "id": "english-extra-1-red",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder “red” på dansk?",
+      "options": [
+        "rød",
+        "grøn",
+        "blå"
+      ],
+      "correctAnswer": "rød",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, red betyder rød!",
+        "hint": "Det er farven på et rødt æble."
+      }
+    },
+    {
+      "id": "english-extra-1-tree",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder “tree” på dansk?",
+      "options": [
+        "træ",
+        "blomst",
+        "sten"
+      ],
+      "correctAnswer": "træ",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, tree betyder træ!",
+        "hint": "Det har stamme og grene."
+      }
+    },
+    {
+      "id": "english-extra-1-fish",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder “fish” på dansk?",
+      "options": [
+        "fisk",
+        "fugl",
+        "mus"
+      ],
+      "correctAnswer": "fisk",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, fish betyder fisk!",
+        "hint": "Det er et dyr, der svømmer."
+      }
+    },
+    {
+      "id": "english-extra-1-house",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder “house” på dansk?",
+      "options": [
+        "hus",
+        "bil",
+        "bog"
+      ],
+      "correctAnswer": "hus",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, house betyder hus!",
+        "hint": "Det er en bygning, man kan bo i."
+      }
+    },
+    {
+      "id": "english-extra-1-water",
+      "category": "English",
+      "difficulty": 1,
+      "question": "Hvad betyder “water” på dansk?",
+      "options": [
+        "vand",
+        "mælk",
+        "saft"
+      ],
+      "correctAnswer": "vand",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, water betyder vand!",
+        "hint": "Det kan man drikke fra en vandhane."
+      }
+    },
+    {
+      "id": "english-extra-2-bridge",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder “bridge” på dansk?",
+      "options": [
+        "bro",
+        "vej",
+        "hegn"
+      ],
+      "correctAnswer": "bro",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, bridge betyder bro!",
+        "hint": "Man kan krydse en flod på den."
+      }
+    },
+    {
+      "id": "english-extra-2-forest",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder “forest” på dansk?",
+      "options": [
+        "skov",
+        "strand",
+        "ørken"
+      ],
+      "correctAnswer": "skov",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, forest betyder skov!",
+        "hint": "Her vokser mange træer."
+      }
+    },
+    {
+      "id": "english-extra-2-mountain",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder “mountain” på dansk?",
+      "options": [
+        "bjerg",
+        "dal",
+        "sø"
+      ],
+      "correctAnswer": "bjerg",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, mountain betyder bjerg!",
+        "hint": "Det er højt og kan have sne på toppen."
+      }
+    },
+    {
+      "id": "english-extra-2-garden",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder “garden” på dansk?",
+      "options": [
+        "have",
+        "køkken",
+        "skole"
+      ],
+      "correctAnswer": "have",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, garden betyder have!",
+        "hint": "Her kan man dyrke blomster."
+      }
+    },
+    {
+      "id": "english-extra-2-rabbit",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder “rabbit” på dansk?",
+      "options": [
+        "kanin",
+        "ræv",
+        "fugl"
+      ],
+      "correctAnswer": "kanin",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, rabbit betyder kanin!",
+        "hint": "Dyret har lange ører og kan hoppe."
+      }
+    },
+    {
+      "id": "english-extra-2-apple",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder “apple” på dansk?",
+      "options": [
+        "æble",
+        "pære",
+        "gulerod"
+      ],
+      "correctAnswer": "æble",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, apple betyder æble!",
+        "hint": "Det er en rund frugt, som kan være rød."
+      }
+    },
+    {
+      "id": "english-extra-2-shoes",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder “shoes” på dansk?",
+      "options": [
+        "sko",
+        "handsker",
+        "huer"
+      ],
+      "correctAnswer": "sko",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, shoes betyder sko!",
+        "hint": "Man har dem på fødderne."
+      }
+    },
+    {
+      "id": "english-extra-2-rain",
+      "category": "English",
+      "difficulty": 2,
+      "question": "Hvad betyder “rain” på dansk?",
+      "options": [
+        "regn",
+        "sne",
+        "vind"
+      ],
+      "correctAnswer": "regn",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Feen vil lære et engelsk ord.",
+        "success": "Ja, rain betyder regn!",
+        "hint": "Det er vand, der falder fra skyerne."
+      }
+    }
+  ]
+}

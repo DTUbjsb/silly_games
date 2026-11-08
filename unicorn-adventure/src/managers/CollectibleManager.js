@@ -1,8 +1,10 @@
 import { CollectionStore } from './CollectionStore.js';
 import { arrangeCollectibles, newLayoutSeed } from '../data/collectibleLayout.js';
+import { TOOL_CATEGORIES } from '../data/toolCategories.js';
 
-const COLLECTIBLE_TYPES = new Set(['unicorn', 'accessory']);
+const COLLECTIBLE_TYPES = new Set(['unicorn', 'accessory', 'tool']);
 const ACCESSORY_SLOTS = new Set(['crown', 'saddle', 'sticker', 'wings']);
+const TOOL_KINDS = new Set(TOOL_CATEGORIES.map(({ kind }) => kind));
 
 export class CollectibleManager {
   constructor(scene) {
@@ -91,7 +93,7 @@ export class CollectibleManager {
     this.items = new Map(arrangeCollectibles(Array.from(loadedItems.values()), saved.layoutSeed)
       .map((item) => [item.id, item]));
     this.items.forEach((item) => {
-      if (!this.collectedIds.has(item.id)) {
+      if (!this.collectedIds.has(item.id) && (!item.unlockReward || saved.unlockedRewards.has(item.unlockReward))) {
         this.createPickup(item);
       }
     });
@@ -108,6 +110,8 @@ export class CollectibleManager {
       || !hasText(item.texture)
       || (item.type === 'unicorn' && !hasText(item.color))
       || (item.type === 'accessory' && !ACCESSORY_SLOTS.has(item.slot))
+      || (item.type === 'tool' && !TOOL_KINDS.has(item.kind))
+      || (item.unlockReward !== undefined && (item.type !== 'tool' || item.unlockReward !== 'princess-bows'))
       || (item.wornTexture !== undefined && !hasText(item.wornTexture))
       || !Number.isFinite(item.x)
       || !Number.isFinite(item.y)
@@ -128,6 +132,8 @@ export class CollectibleManager {
       texture: item.texture.trim(),
       ...(item.type === 'unicorn' ? { color: item.color.trim() } : {}),
       ...(item.type === 'accessory' ? { slot: item.slot } : {}),
+      ...(item.type === 'tool' ? { kind: item.kind } : {}),
+      ...(item.unlockReward ? { unlockReward: item.unlockReward } : {}),
       ...(item.wornTexture ? { wornTexture: item.wornTexture.trim() } : {}),
       x: item.x,
       y: item.y,
@@ -140,6 +146,18 @@ export class CollectibleManager {
       .setDepth(2);
     pickup.refreshBody();
     pickup.setData('collectibleId', item.id);
+  }
+
+  unlockReward(reward) {
+    const items = Array.from(this.items.values()).filter((item) => item.unlockReward === reward);
+    if (!items.length) throw new Error(`Ukendt belønning: "${reward}".`);
+    const state = this.store.loadState();
+    if (state.unlockedRewards.has(reward)) return;
+    state.unlockedRewards.add(reward);
+    this.store.save(state.collectedIds, state.equipment, state.layoutSeed, state.unlockedGates, state.unlockedRewards);
+    for (const item of items) {
+      if (!this.collectedIds.has(item.id)) this.createPickup(item);
+    }
   }
 
   getItemForPickup(pickup) {

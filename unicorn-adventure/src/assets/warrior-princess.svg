@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120">
+  <title>Krigerprinsessen</title>
+  <path d="M25 42Q22 12 50 12Q78 12 75 42L72 78H28Z" fill="#79502e" stroke="#573a29" stroke-width="2"/>
+  <path d="M34 67Q50 58 66 67L74 104H26Z" fill="#6c92aa" stroke="#38566d" stroke-width="3"/>
+  <path d="M33 78L23 95M67 78L77 95" stroke="#6c92aa" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="23" cy="96" r="4" fill="#f3c6a5"/><circle cx="77" cy="96" r="4" fill="#f3c6a5"/>
+  <path d="M35 102H46V115H34ZM54 102H65V115H54Z" fill="#795744"/>
+  <ellipse cx="50" cy="41" rx="20" ry="23" fill="#f3c6a5"/>
+  <path d="M29 38Q28 13 50 14Q72 13 71 38Q62 34 57 25Q48 35 29 38Z" fill="#79502e"/>
+  <path d="M35 20L33 9L42 14L50 6L58 14L67 9L65 20Z" fill="#efcb6c" stroke="#ad8740" stroke-width="2"/>
+  <circle cx="42" cy="43" r="2" fill="#344454"/><circle cx="58" cy="43" r="2" fill="#344454"/>
+  <path d="M45 52Q50 56 55 52" fill="none" stroke="#a45f70" stroke-width="2" stroke-linecap="round"/>
+  <path d="M34 69L50 80L66 69M50 80V100" fill="none" stroke="#dce8e7" stroke-width="3"/>
+</svg>

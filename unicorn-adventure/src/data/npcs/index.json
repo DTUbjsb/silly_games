@@ -1,5 +1,7 @@
 {
   "npcs": [
+    "old-queen.json",
+    "warrior-princess.json",
     "luna.json",
     "flora.json",
     "bridge-troll.json",

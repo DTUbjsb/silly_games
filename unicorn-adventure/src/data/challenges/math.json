@@ -186,7 +186,7 @@
       "story": {
         "character": "Egernet på stien",
         "introduction": "Egernet har otte nødder og vil give tre til sine venner. Hvor mange bliver der tilbage?",
-        "success": "Du har ret! Egernet deler sine nødder og viser jer den næste sti.",
+        "success": "Du har ret! Egernet har fem nødder tilbage.",
         "hint": "Start ved otte, og tæl tre nødder tilbage."
       }
     },
@@ -200,7 +200,7 @@
       "story": {
         "character": "Togføreren",
         "introduction": "Mit lille skovtog har fire vogne med fem passagerer i hver. Hvor mange rejser med?",
-        "success": "Tyve passagerer! Togføreren fløjter, og toget kører jer gennem skoven.",
+        "success": "Tyve passagerer! Det er fem i hver af de fire vogne.",
         "hint": "Læg fem sammen fire gange."
       }
     },
@@ -214,7 +214,7 @@
       "story": {
         "character": "Bageren",
         "introduction": "Jeg har 24 bær til seks venner. Hvor mange bær skal hver ven få, så det bliver lige?",
-        "success": "Lige mange til alle! Bageren giver jer en kurv til rejsen.",
+        "success": "Lige mange til alle! Hver ven får fire bær.",
         "hint": "Del 24 i seks lige store grupper."
       }
     },
@@ -228,7 +228,7 @@
       "story": {
         "character": "Købmanden på markedet",
         "introduction": "En eventyrbog koster 80 kr. I dag får du 25 % rabat. Hvad bliver prisen?",
-        "success": "Godt regnet! Købmanden sælger jer bogen til den rigtige pris.",
+        "success": "Godt regnet! Bogen koster 60 kr. efter rabatten.",
         "hint": "Find først 25 % af 80 kr., og træk det fra prisen."
       }
     }

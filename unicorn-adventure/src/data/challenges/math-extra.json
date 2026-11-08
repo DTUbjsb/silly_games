@@ -1,0 +1,508 @@
+{
+  "challenges": [
+    {
+      "id": "math-extra-1-add-1-2",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "1 + 2 = ?",
+      "options": [
+        "2",
+        "3",
+        "4"
+      ],
+      "correctAnswer": "3",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 3!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-1-add-2-2",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "2 + 2 = ?",
+      "options": [
+        "3",
+        "4",
+        "5"
+      ],
+      "correctAnswer": "4",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 4!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-1-add-1-5",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "1 + 5 = ?",
+      "options": [
+        "5",
+        "6",
+        "7"
+      ],
+      "correctAnswer": "6",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 6!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-1-add-2-5",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "2 + 5 = ?",
+      "options": [
+        "6",
+        "7",
+        "8"
+      ],
+      "correctAnswer": "7",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 7!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-1-add-4-4",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "4 + 4 = ?",
+      "options": [
+        "7",
+        "8",
+        "9"
+      ],
+      "correctAnswer": "8",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 8!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-1-add-5-4",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "5 + 4 = ?",
+      "options": [
+        "8",
+        "9",
+        "10"
+      ],
+      "correctAnswer": "9",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 9!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-1-sub-5-2",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "5 - 2 = ?",
+      "options": [
+        "2",
+        "3",
+        "4"
+      ],
+      "correctAnswer": "3",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 3!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-1-sub-7-2",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "7 - 2 = ?",
+      "options": [
+        "4",
+        "5",
+        "6"
+      ],
+      "correctAnswer": "5",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 5!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-1-sub-8-2",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "8 - 2 = ?",
+      "options": [
+        "5",
+        "6",
+        "7"
+      ],
+      "correctAnswer": "6",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 6!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-1-sub-9-2",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "9 - 2 = ?",
+      "options": [
+        "6",
+        "7",
+        "8"
+      ],
+      "correctAnswer": "7",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 7!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-1-sub-10-2",
+      "category": "Math",
+      "difficulty": 1,
+      "question": "10 - 2 = ?",
+      "options": [
+        "7",
+        "8",
+        "9"
+      ],
+      "correctAnswer": "8",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 8!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-add-12-7",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "12 + 7 = ?",
+      "options": [
+        "18",
+        "19",
+        "20"
+      ],
+      "correctAnswer": "19",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 19!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-2-add-16-5",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "16 + 5 = ?",
+      "options": [
+        "20",
+        "21",
+        "22"
+      ],
+      "correctAnswer": "21",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 21!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-2-add-18-6",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "18 + 6 = ?",
+      "options": [
+        "23",
+        "24",
+        "25"
+      ],
+      "correctAnswer": "24",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 24!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-2-add-27-5",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "27 + 5 = ?",
+      "options": [
+        "31",
+        "32",
+        "33"
+      ],
+      "correctAnswer": "32",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 32!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-2-add-35-8",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "35 + 8 = ?",
+      "options": [
+        "42",
+        "43",
+        "44"
+      ],
+      "correctAnswer": "43",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 43!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-2-add-42-9",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "42 + 9 = ?",
+      "options": [
+        "50",
+        "51",
+        "52"
+      ],
+      "correctAnswer": "51",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 51!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-2-add-14-14",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "14 + 14 = ?",
+      "options": [
+        "27",
+        "28",
+        "29"
+      ],
+      "correctAnswer": "28",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 28!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-2-add-23-16",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "23 + 16 = ?",
+      "options": [
+        "38",
+        "39",
+        "40"
+      ],
+      "correctAnswer": "39",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne lægge sammen.",
+        "success": "Ja, svaret er 39!",
+        "hint": "Brug tallene i regnestykket til at lægge sammen."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-15-6",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "15 - 6 = ?",
+      "options": [
+        "8",
+        "9",
+        "10"
+      ],
+      "correctAnswer": "9",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 9!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-20-8",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "20 - 8 = ?",
+      "options": [
+        "11",
+        "12",
+        "13"
+      ],
+      "correctAnswer": "12",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 12!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-26-9",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "26 - 9 = ?",
+      "options": [
+        "16",
+        "17",
+        "18"
+      ],
+      "correctAnswer": "17",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 17!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-40-7",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "40 - 7 = ?",
+      "options": [
+        "32",
+        "33",
+        "34"
+      ],
+      "correctAnswer": "33",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 33!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-53-5",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "53 - 5 = ?",
+      "options": [
+        "47",
+        "48",
+        "49"
+      ],
+      "correctAnswer": "48",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 48!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-62-8",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "62 - 8 = ?",
+      "options": [
+        "53",
+        "54",
+        "55"
+      ],
+      "correctAnswer": "54",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 54!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-35-12",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "35 - 12 = ?",
+      "options": [
+        "22",
+        "23",
+        "24"
+      ],
+      "correctAnswer": "23",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 23!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-48-16",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "48 - 16 = ?",
+      "options": [
+        "31",
+        "32",
+        "33"
+      ],
+      "correctAnswer": "32",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 32!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    },
+    {
+      "id": "math-extra-2-sub-70-20",
+      "category": "Math",
+      "difficulty": 2,
+      "question": "70 - 20 = ?",
+      "options": [
+        "49",
+        "50",
+        "51"
+      ],
+      "correctAnswer": "50",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen vil gerne trække fra.",
+        "success": "Ja, svaret er 50!",
+        "hint": "Brug tallene i regnestykket til at trække fra."
+      }
+    }
+  ]
+}

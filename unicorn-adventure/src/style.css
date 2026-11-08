@@ -50,15 +50,24 @@ h1 {
   width: min(100%, 800px);
   margin: 0 auto 10px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.3fr);
+  align-items: stretch;
   gap: 8px;
   color: #476579;
   font-size: 15px;
 }
 
+.hud-controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
 .hud-location,
 .hud-player,
+.hud-unicorns,
 .hud-collection {
   display: flex;
   flex-direction: column;
@@ -67,7 +76,12 @@ h1 {
 }
 
 .hud-player {
+  text-align: left;
+}
+
+.hud-unicorns {
   align-items: center;
+  text-align: center;
 }
 
 .hud-collection {
@@ -111,23 +125,16 @@ h1 {
 
 @media (max-width: 560px) {
   .game-hud {
-    grid-template-columns: 1fr 1fr;
-    font-size: 13px;
-  }
-
-  .hud-player {
-    align-items: flex-end;
+    gap: 4px;
+    font-size: 12px;
   }
 
   .hud-collection {
-    grid-column: 1 / -1;
-    align-items: flex-start;
-    text-align: left;
+    overflow-wrap: anywhere;
   }
 
   .hud-accessories {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

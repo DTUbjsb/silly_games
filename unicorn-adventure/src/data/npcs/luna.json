@@ -5,13 +5,13 @@
   "x": 2048,
   "y": 1680,
   "interactionRadius": 112,
-  "repeatDialogue": "Skoven er åben. Sadlen venter mellem træerne!",
+  "repeatDialogue": "Stien til regnbueskoven er åben. Tak for hjælpen!",
   "interactions": [
     {
       "type": "dialogue",
       "lines": [
         "Jeg hedder Luna og vogter indgangen til regnbueskoven.",
-        "Sadlen ligger derinde. Svar på et spørgsmål, og jag derefter myggene væk, så åbner jeg stien."
+        "Svar på et spørgsmål, og jag derefter myggene væk, så åbner jeg stien."
       ]
     },
     {

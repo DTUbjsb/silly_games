@@ -1,4 +1,5 @@
 import { MovementSystem } from '../systems/MovementSystem.js';
+import { minigameSpeed } from '../systems/MinigameDifficulty.js';
 
 const SETTINGS = {
   bridge: { title: 'BYG LAVABROEN', instruction: 'Saml 5 brosten, og gå til udgangen. Undgå gløderne.', goal: 5 },
@@ -18,6 +19,7 @@ export class VolcanoScene extends Phaser.Scene {
       throw new Error('Vulkanspillet mangler en spiller, spiltype eller afslutningsfunktion.');
     }
     this.mode = mode;
+    this.difficulty = minigameSpeed(player.age);
     this.onComplete = onComplete;
     this.finished = false;
     this.progress = 0;
@@ -118,7 +120,7 @@ export class VolcanoScene extends Phaser.Scene {
     if (this.finished) return;
     const hazard = this.hazards.create(Phaser.Math.Between(60, 740), 110, 'volcano-hazard');
     const direction = new Phaser.Math.Vector2(this.player.x - hazard.x, this.player.y - hazard.y).normalize();
-    hazard.body.setVelocity(direction.x * 125, Math.max(100, direction.y * 125));
+    hazard.body.setVelocity(direction.x * 125 * this.difficulty, Math.max(100, direction.y * 125) * this.difficulty);
     this.registry.get('soundEffects').play('flightBird');
   }
 
