@@ -1,0 +1,5 @@
+{
+  "id": "guide-lake", "name": "Sønissen", "avatar": "guide-gnome", "x": 3200, "y": 800,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om søen og mørket!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om søen og mørket!"] }]
+}

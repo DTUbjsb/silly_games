@@ -148,6 +148,67 @@ h1 {
   box-shadow: 0 20px 55px #405d771c, 0 4px 14px #405d7712;
 }
 
+.boost-bar {
+  position: absolute;
+  z-index: 1;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(390px, 85%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.boost-bar[hidden] {
+  display: none;
+}
+
+.boost-track {
+  position: relative;
+  flex: 1;
+  height: 25px;
+  overflow: hidden;
+  border: 2px solid #fff4d2;
+  border-radius: 14px;
+  background: #3b3655e8;
+}
+
+.boost-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #a45cd4, #ffbadd);
+}
+
+.boost-bar[data-phase="ready"] .boost-track {
+  box-shadow: 0 0 8px 3px #fff3a9, 0 0 18px 5px #ed91ed;
+}
+
+.boost-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: clamp(9px, 2.4vw, 13px);
+  font-weight: bold;
+  text-shadow: 0 1px 3px #30223d, 0 0 4px #30223d;
+  white-space: nowrap;
+}
+
+.boost-mounts {
+  display: flex;
+  align-items: center;
+}
+
+.boost-mounts img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px #30223d);
+}
+
 .turn-popup {
   position: absolute;
   top: 20%;

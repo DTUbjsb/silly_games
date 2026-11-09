@@ -1,0 +1,5 @@
+{
+  "id": "guide-dragon", "name": "Dragenissen", "avatar": "guide-gnome", "x": 1600, "y": 3456,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om prinsessen og dragen!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om prinsessen og dragen!"] }]
+}

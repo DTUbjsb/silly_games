@@ -20,6 +20,8 @@ export class DragonBattleScene extends Phaser.Scene {
     this.dragonLives = DRAGON_LIVES;
     this.princessLives = PRINCESS_LIVES;
     this.nextSwordHit = 0;
+    this.swordTarget = null;
+    this.swordSwingUntil = 0;
     this.nextArrow = 0;
     this.nextShooter = 0;
     this.aimTarget = { x: 400, y: 120 };
@@ -28,6 +30,7 @@ export class DragonBattleScene extends Phaser.Scene {
     this.add.rectangle(400, 510, 800, 180, 0x52493f);
     this.targets = this.physics.add.staticGroup();
     this.head = this.targets.create(400, 145, 'dragon-head').setDepth(2);
+    this.headMotionTime = 0;
     this.leftPaw = this.targets.create(48, 265, 'dragon-paw').setDepth(2);
     this.rightPaw = this.targets.create(752, 265, 'dragon-paw').setFlipX(true).setDepth(2);
     this.princess = this.physics.add.sprite(400, 390, 'warrior-princess').setScale(0.7).setDepth(4);
@@ -36,9 +39,17 @@ export class DragonBattleScene extends Phaser.Scene {
     this.bows = [];
     this.girls = players.slice(0, 2).map((child, index) => {
       const x = 300 + index * 200;
-      this.bows.push(this.add.image(x, 555, 'bow-and-arrow').setScale(0.65).setDepth(4));
+      this.bows.push(this.add.image(x, 555, 'bow-and-arrow').setScale(0.65).setDepth(5));
       return this.add.image(x, 562, child.avatar).setScale(0.58).setDepth(3);
     });
+    this.rockCover = this.add.graphics().setDepth(4);
+    for (const x of [300, 500]) {
+      this.rockCover.fillStyle(0x36343c).fillEllipse(x, 592, 125, 43);
+      this.rockCover.fillStyle(0x77717a).fillEllipse(x - 34, 581, 58, 38)
+        .fillEllipse(x + 25, 582, 67, 41);
+      this.rockCover.lineStyle(2, 0x4c4852).strokeEllipse(x - 34, 581, 58, 38)
+        .strokeEllipse(x + 25, 582, 67, 41);
+    }
     this.pointBow(this.aimTarget);
     this.makeTextures();
     this.arrows = this.physics.add.group({ allowGravity: false });
@@ -98,7 +109,7 @@ export class DragonBattleScene extends Phaser.Scene {
     const shooter = this.girls[this.nextShooter];
     this.nextShooter = 1 - this.nextShooter;
     const angle = Phaser.Math.Angle.Between(shooter.x, shooter.y, this.aimTarget.x, this.aimTarget.y);
-    const arrow = this.arrows.create(shooter.x, shooter.y, 'dragon-arrow').setRotation(angle);
+    const arrow = this.arrows.create(shooter.x, shooter.y, 'dragon-arrow').setRotation(angle).setDepth(5);
     arrow.body.setVelocity(Math.cos(angle) * ARROW_SPEED, Math.sin(angle) * ARROW_SPEED);
     this.registry.get('soundEffects').play('star');
   }
@@ -138,27 +149,38 @@ export class DragonBattleScene extends Phaser.Scene {
     this.score.setText(`Dragens liv: ${this.dragonLives} / ${DRAGON_LIVES}    Krigerprinsessens liv: ${this.princessLives} / ${PRINCESS_LIVES}`);
   }
 
-  update(time) {
+  update(time, delta = 0) {
     if (this.finished) return;
+    this.headMotionTime += delta;
+    this.head.x = 400 + 170 * Math.sin(this.headMotionTime * Math.PI * 2 / 3600);
+    this.head.refreshBody();
     const dx = Number(this.cursors.right.isDown) - Number(this.cursors.left.isDown);
     const dy = Number(this.cursors.down.isDown) - Number(this.cursors.up.isDown);
     const velocity = new Phaser.Math.Vector2(dx, dy).normalize().scale(220);
     this.princess.setVelocity(velocity.x, velocity.y);
     this.princess.x = Phaser.Math.Clamp(this.princess.x, 70, 730);
     this.princess.y = Phaser.Math.Clamp(this.princess.y, 135, 480);
-    this.sword.setPosition(this.princess.x + 25, this.princess.y - 20).setRotation(0.6);
     if (time >= this.nextSwordHit) {
       const body = this.princess.body;
-      const inReach = this.targets.getChildren().some((target) => {
+      const target = this.targets.getChildren().find((target) => {
         const closestX = Phaser.Math.Clamp(body.center.x, target.body.left, target.body.right);
         const closestY = Phaser.Math.Clamp(body.center.y, target.body.top, target.body.bottom);
         return Phaser.Math.Distance.Between(body.center.x, body.center.y, closestX, closestY) <= 55;
       });
-      if (inReach) {
+      if (target) {
         this.nextSwordHit = time + 700;
-        this.tweens.add({ targets: this.sword, angle: -55, duration: 120, yoyo: true });
+        this.swordTarget = target;
+        this.swordSwingUntil = time + 200;
         this.damageDragon();
       }
+    }
+    if (this.swordTarget && time < this.swordSwingUntil) {
+      const angle = Phaser.Math.Angle.Between(this.princess.x, this.princess.y, this.swordTarget.x, this.swordTarget.y);
+      this.sword.setPosition(this.princess.x + Math.cos(angle) * 32, this.princess.y + Math.sin(angle) * 32)
+        .setRotation(angle + Math.PI / 2);
+    } else {
+      this.swordTarget = null;
+      this.sword.setPosition(this.princess.x + 25, this.princess.y - 20).setRotation(0.6);
     }
     for (const projectile of [...this.arrows.getChildren(), ...this.fireballs.getChildren()]) {
       if (projectile.x < -40 || projectile.x > 840 || projectile.y < -40 || projectile.y > 640) projectile.destroy();

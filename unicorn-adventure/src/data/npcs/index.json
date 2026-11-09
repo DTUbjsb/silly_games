@@ -1,5 +1,15 @@
 {
   "npcs": [
+    "guide-speed.json",
+    "guide-west.json",
+    "guide-lake.json",
+    "guide-rainbow.json",
+    "guide-north.json",
+    "guide-east.json",
+    "guide-dark.json",
+    "guide-volcano.json",
+    "guide-wizard.json",
+    "guide-dragon.json",
     "old-queen.json",
     "warrior-princess.json",
     "luna.json",

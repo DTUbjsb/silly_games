@@ -11,10 +11,248 @@ import { CatMazeScene } from '../src/scenes/CatMazeScene.js';
 import { minigameSpeed } from '../src/systems/MinigameDifficulty.js';
 import { NorthFollowerNavigator } from '../src/systems/NorthFollowerNavigator.js';
 import { wizardTeam } from '../src/systems/WizardTeam.js';
+import { UnicornSpeedBoost } from '../src/systems/UnicornSpeedBoost.js';
+import { guideLines } from '../src/systems/GuideGnomes.js';
 
 function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
+  }
+}
+
+function testSpeedBoostRules() {
+  const white = { texture: 'unicorn-purple' };
+  const rainbow = { texture: 'unicorn-rainbow-rose' };
+  const dark = { texture: 'unicorn-dark-red' };
+  const volcano = { texture: 'unicorn-volcano-flame' };
+  const saddles = [{ slot: 'saddle' }, { slot: 'saddle' }];
+  const boost = new UnicornSpeedBoost();
+  assert(boost.getIndicator([white, rainbow], saddles.slice(0, 1)) === null, 'An unavailable boost showed an indicator.');
+  let indicator = boost.getIndicator([white, rainbow], saddles);
+  assert(indicator.phase === 'ready' && indicator.progress === 1 && indicator.durationSeconds === 2
+    && indicator.mounts[0] === white && indicator.mounts[1] === rainbow, 'Ready bar selected the wrong mounts.');
+  assert(!boost.activate([white, rainbow], saddles.slice(0, 1))
+    && !boost.activate([dark, volcano], saddles), 'Boost accepted missing saddles or an invalid mixed pair.');
+  assert(boost.activate([white, rainbow], saddles) && boost.multiplier === 1.5 && boost.remaining === 2000,
+    'White/rainbow boost has incorrect requirements or duration.');
+  assert(boost.mounts[0] === white && boost.mounts[1] === rainbow, 'Basic boost chose the wrong mounts.');
+  boost.update(1000);
+  indicator = boost.getIndicator([dark, dark], saddles);
+  assert(indicator.phase === 'active' && indicator.progress === 0.5 && indicator.durationSeconds === 2
+    && indicator.mounts[0] === white && indicator.mounts[1] === rainbow,
+  'Active bar or riding pair changed before the boost ended.');
+  boost.update(999);
+  assert(boost.multiplier === 1.5 && boost.remaining === 1 && !boost.activate([white, rainbow], saddles),
+    'Boost expired early or allowed activation during cooldown.');
+  boost.update(1);
+  assert(boost.multiplier === 1 && boost.cooldown === 8000, 'Basic boost did not end after exactly two seconds.');
+  indicator = boost.getIndicator([dark, dark], saddles);
+  assert(indicator.phase === 'recharging' && indicator.progress === 0 && indicator.durationSeconds === 4
+    && indicator.mounts[0] === dark,
+    'Basic bar did not empty or update the available pair after the boost.');
+  boost.update(4000);
+  assert(boost.getIndicator([dark, dark], saddles).progress === 0.5, 'Basic bar did not refill over eight seconds.');
+  boost.update(3999);
+  assert(!boost.activate([dark, dark], saddles), 'Boost cooldown ended early.');
+  boost.update(1);
+  assert(boost.activate([dark, dark], saddles) && boost.multiplier === 1.5 && boost.remaining === 4000,
+    'Dark boost has incorrect speed or duration.');
+  assert(boost.mounts.length === 2 && boost.mounts.every((item) => item === dark), 'Dark boost chose the wrong mounts.');
+  boost.update(2000);
+  assert(boost.getIndicator([dark, dark], saddles).progress === 0.5, 'Dark bar did not deplete over four seconds.');
+  boost.update(1999);
+  assert(boost.multiplier === 1.5, 'Dark boost ended early.');
+  boost.update(1);
+  assert(boost.multiplier === 1 && boost.cooldown === 6000, 'Dark boost or cooldown has incorrect timing.');
+  assert(boost.getIndicator([dark, dark], saddles).progress === 0, 'Dark bar was not empty after the boost.');
+  boost.update(3000);
+  assert(boost.getIndicator([dark, dark], saddles).progress === 0.5, 'Dark bar did not refill over six seconds.');
+  boost.update(3000);
+  assert(boost.activate([white, rainbow, dark, dark, volcano, volcano], saddles)
+    && boost.multiplier === 2 && boost.remaining === 4000, 'Volcano boost did not take priority.');
+  assert(boost.mounts.length === 2 && boost.mounts.every((item) => item === volcano), 'Volcano boost chose the wrong mounts.');
+  boost.update(2000);
+  assert(boost.getIndicator([volcano, volcano], saddles).progress === 0.5,
+    'Volcano bar did not deplete over four seconds.');
+  boost.update(2000);
+  assert(boost.multiplier === 1 && boost.cooldown === 6000, 'Volcano boost did not end after four seconds.');
+  boost.update(3000);
+  assert(boost.getIndicator([volcano, volcano], saddles).progress === 0.5, 'Volcano bar did not refill over six seconds.');
+  boost.update(3000);
+  assert(boost.getIndicator([volcano, volcano], saddles).phase === 'ready', 'Recharged bar did not return to ready.');
+}
+
+function testGuideGnomes(world) {
+  const gnomes = world.npcManager.npcs.filter((npc) => npc.avatar === 'guide-gnome');
+  assert(gnomes.length === 10 && world.textures.exists('guide-gnome'), 'Guide gnomes or artwork are missing.');
+  const state = { unicorns: [], accessories: [], tools: [], southOpen: false, dragonRescued: false, princess: false };
+  const speedLine = guideLines('guide-speed', state)[1];
+  assert(speedLine.includes('2 sekunder') && speedLine.match(/4 sekunder/g)?.length === 2,
+    'Speed guide did not explain both boost durations.');
+  assert(guideLines('guide-dark', { ...state, unicorns: [{ texture: 'unicorn-dark-red' }] })[0].includes('4 sekunder')
+    && guideLines('guide-volcano', { ...state, unicorns: [{ texture: 'unicorn-volcano-flame' }] })[0].includes('4 sekunder'),
+  'Regional guides did not explain the four-second boost.');
+  for (const npc of gnomes) {
+    const lines = guideLines(npc.id, state);
+    assert(lines.length >= 2 && /høhø/i.test(lines[lines.length - 1]), `${npc.id} is missing guidance or a joke.`);
+    if (npc.y < 0) assert(canReachNorth(reachableNorth(false), npc), `${npc.id} is unreachable in the north.`);
+  }
+  assert(guideLines('guide-lake', state)[0].includes('lommelygten')
+    && guideLines('guide-north', state)[0].includes('øen')
+    && guideLines('guide-rainbow', state)[0].includes('lavastøvler')
+    && guideLines('guide-east', state)[0].includes('lavastøvler')
+    && guideLines('guide-wizard', state)[0].includes('fire sadler')
+    && guideLines('guide-dragon', state)[0].includes('krigerprinsessen'), 'Early guidance is incomplete.');
+  const ready = { ...state, princess: true, southOpen: true,
+    tools: [{ kind: 'bow-and-arrow' }, { kind: 'bow-and-arrow' }] };
+  assert(guideLines('guide-dragon', ready)[0].includes('fire spørgsmål')
+    && guideLines('guide-wizard', ready)[0].includes('dragens hule'), 'Guidance did not advance to the dragon.');
+  for (const npc of gnomes.filter((item) => item.id !== 'guide-speed')) {
+    assert(guideLines(npc.id, { ...ready, dragonRescued: true })[0].includes('Prinsen er fri'),
+      `${npc.id} did not acknowledge the rescue.`);
+  }
+  const speedGuide = gnomes.find((npc) => npc.id === 'guide-speed');
+  world.npcManager.runInteraction(speedGuide);
+  assert(world.dialogueWindow.message.text.includes('fartboost'), 'Speed guide did not explain the boost.');
+  while (world.dialogueWindow.isOpen) world.dialogueWindow.advance();
+  world.npcManager.runInteraction(speedGuide);
+  assert(world.dialogueWindow.message.text.includes('fartboost'), 'Guide did not repeat the guidance.');
+  world.dialogueWindow.close();
+  const lakeGuide = gnomes.find((npc) => npc.id === 'guide-lake');
+  const savedIds = world.collectibleManager.collectedIds;
+  try {
+    world.npcManager.runInteraction(lakeGuide);
+    assert(world.dialogueWindow.message.text.includes('lommelygten'), 'Lake guide did not mention the flashlight.');
+    world.dialogueWindow.close();
+    world.collectibleManager.collectedIds = new Set([...savedIds, 'flashlight']);
+    world.npcManager.runInteraction(lakeGuide);
+    assert(world.dialogueWindow.message.text.includes('I har lommelygten'),
+      'Lake guide did not update after collecting the flashlight.');
+    world.dialogueWindow.close();
+  } finally {
+    world.collectibleManager.collectedIds = savedIds;
+    if (world.dialogueWindow.isOpen) world.dialogueWindow.close();
+  }
+}
+
+async function testWorldBoost(world) {
+  const collection = world.collectibleManager;
+  const savedIds = collection.collectedIds;
+  const positions = world.players.map((player) => ({ player, x: player.sprite.x, y: player.sprite.y }));
+  const pickupBodies = collection.pickups.getChildren().map((pickup) => ({ body: pickup.body, enabled: pickup.body.enable }));
+  const leaderId = world.player.id;
+  const gnome = world.npcManager.npcs.find((npc) => npc.id === 'guide-speed');
+  const items = collection.getAllItems();
+  const unicorns = items.filter((item) => item.type === 'unicorn' && !item.texture.startsWith('unicorn-rainbow-')
+    && !item.texture.startsWith('unicorn-dark-') && !item.texture.startsWith('unicorn-volcano-')).slice(0, 2);
+  const saddles = items.filter((item) => item.type === 'accessory' && item.slot === 'saddle').slice(0, 2);
+  try {
+    pickupBodies.forEach(({ body }) => { body.enable = false; });
+    collection.collectedIds = new Set([...unicorns, ...saddles].map((item) => item.id));
+    world.hud.setBoostStatus(world.speedBoost.getIndicator(unicorns, saddles));
+    assert(!world.hud.boostBar.hidden && world.hud.boostBar.dataset.phase === 'ready'
+      && world.hud.boostFill.style.width === '100%'
+      && world.hud.boostLabel.textContent.includes('2 sek.')
+      && world.hud.boostMounts.every((image, index) => image.dataset.texture === unicorns[index].texture
+        && image.alt === unicorns[index].name), 'Ready HUD did not show the selected unicorns and full bar.');
+    world.player.sprite.body.reset(gnome.x, gnome.y);
+    world.npcManager.update(world.player);
+    world.handleKeyboardInput({ code: 'Space', repeat: false });
+    assert(world.dialogueWindow.isOpen && world.speedBoost.cooldown === 0, 'SPACE boosted instead of interacting with a gnome.');
+    world.dialogueWindow.close();
+    world.player.sprite.body.reset(NORTH_HOLE.x, 58);
+    world.npcManager.update(world.player, true);
+    world.handleKeyboardInput({ code: 'Space', repeat: false });
+    assert(world.dialogueWindow.isOpen && world.dialogueWindow.message.text.includes('lommelygten')
+      && world.speedBoost.cooldown === 0, 'SPACE boosted instead of interacting with the northern entrance.');
+    world.dialogueWindow.close();
+    world.player.sprite.body.reset(800, 800);
+    world.npcManager.update(world.player);
+    world.handleKeyboardInput({ code: 'Space', repeat: true });
+    assert(world.speedBoost.cooldown === 0, 'A repeated key activated the boost.');
+    world.handleKeyboardInput({ code: 'Space', repeat: false });
+    assert(world.speedBoost.cooldown === 10000 && world.speedBoost.multiplier === 1.5,
+      'SPACE did not activate an eligible boost in the world.');
+    world.hud.setBoostStatus(world.speedBoost.getIndicator(unicorns, saddles));
+    assert(world.hud.boostBar.dataset.phase === 'active' && world.hud.boostLabel.textContent.includes('2 / 2 sek.')
+      && world.hud.boostTrack.getAttribute('aria-valuenow') === '100', 'Active HUD did not start full.');
+    const barTest = new UnicornSpeedBoost();
+    barTest.activate(unicorns, saddles);
+    barTest.update(2000);
+    world.hud.setBoostStatus(barTest.getIndicator(unicorns, saddles));
+    assert(world.hud.boostLabel.textContent === 'Lader op: 8 sek. · Boost: 2 sek.',
+      'Recharging HUD did not show the cooldown and next boost duration.');
+    world.updateMountedPlayers();
+    for (const [index, player] of world.players.entries()) {
+      const mount = world.mountedPlayers.get(player);
+      assert(!player.sprite.visible && mount.list[0].texture.key === unicorns[index].texture
+        && mount.list[2].texture.key === player.avatar && mount.x === player.sprite.x && mount.y === player.sprite.y,
+      'Mounted appearance did not preserve the player avatar, unicorn or position.');
+    }
+    world.dialogueWindow.showLines('Prøve', ['Vent']);
+    const remaining = world.speedBoost.remaining;
+    const cooldown = world.speedBoost.cooldown;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    assert(world.speedBoost.remaining === remaining && world.speedBoost.cooldown === cooldown,
+      'Boost or cooldown elapsed while dialogue was open.');
+    assert(world.hud.boostBar.hidden, 'Boost bar covered the dialogue window.');
+    world.dialogueWindow.close();
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    assert(world.speedBoost.remaining < remaining && world.speedBoost.cooldown < cooldown,
+      'Boost or cooldown did not resume after dialogue.');
+    const paused = new Promise((resolve) => world.events.once('pause', resolve));
+    world.scene.pause();
+    await paused;
+    assert(world.hud.boostBar.hidden, 'Boost bar remained visible in another scene.');
+    const pausedRemaining = world.speedBoost.remaining;
+    const pausedCooldown = world.speedBoost.cooldown;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    assert(world.speedBoost.remaining === pausedRemaining && world.speedBoost.cooldown === pausedCooldown,
+      'Boost or cooldown elapsed while the world was paused.');
+    const resumed = new Promise((resolve) => world.events.once('resume', resolve));
+    world.scene.resume();
+    await resumed;
+    world.movement.keys.D.isDown = true;
+    world.movement.update(world.speedBoost.multiplier);
+    assert(Math.abs(world.player.sprite.body.velocity.x - 363) < 0.01, 'Boost did not increase world movement by 50%.');
+    world.swapLeader();
+    world.movement.update(world.speedBoost.multiplier);
+    assert(Math.abs(world.player.sprite.body.velocity.x - 363) < 0.01, 'Boost was lost when changing leader.');
+    world.updateMountedPlayers();
+    assert(world.mountedPlayers.get(world.player).list[2].texture.key === world.player.avatar,
+      'Swapping leaders changed a rider’s hair or identity.');
+    world.swapLeader();
+    const volcanic = items.filter((item) => item.type === 'unicorn' && item.texture.startsWith('unicorn-volcano-')).slice(0, 2);
+    collection.collectedIds = new Set([...volcanic, ...saddles].map((item) => item.id));
+    world.speedBoost.update(10000);
+    world.updateMountedPlayers();
+    assert(world.mountedPlayers.size === 0 && world.players.every((player) => player.sprite.visible),
+      'Players did not return to their normal appearance after the boost.');
+    world.speedBoost = new UnicornSpeedBoost();
+    assert(world.speedBoost.activate(volcanic, saddles), 'Could not activate volcano boost.');
+    world.hud.setBoostStatus(world.speedBoost.getIndicator(volcanic, saddles));
+    assert(world.hud.boostLabel.textContent.includes('4 / 4 sek.'), 'Volcano HUD did not show the four-second duration.');
+    world.updateMountedPlayers();
+    assert(world.players.every((player, index) => world.mountedPlayers.get(player).list[0].texture.key === volcanic[index].texture),
+      'Volcano boost did not show the volcanic unicorns.');
+    world.movement.update(world.speedBoost.multiplier);
+    assert(Math.abs(world.player.sprite.body.velocity.x - 484) < 0.01, 'Volcano boost did not double world speed.');
+    world.movement.keys.D.isDown = false;
+    world.player.sprite.body.reset(160, 1600);
+    world.movement.keys.A.isDown = true;
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    assert(world.player.sprite.body.left >= -1 && world.player.sprite.x < 40,
+      'Boosted player could not reach or passed through the western wall.');
+  } finally {
+    world.movement.keys.D.isDown = false;
+    world.movement.keys.A.isDown = false;
+    world.speedBoost = new UnicornSpeedBoost();
+    world.updateMountedPlayers();
+    collection.collectedIds = savedIds;
+    pickupBodies.forEach(({ body, enabled }) => { body.enable = enabled; });
+    positions.forEach(({ player, x, y }) => player.sprite.body.reset(x, y));
+    world.setLeader(leaderId);
+    world.npcManager.update(world.player);
   }
 }
 
@@ -447,6 +685,20 @@ async function testVolcano(world) {
     assert(outcome === true, 'Crystal collection did not lead to victory.');
     await waitUntil(() => !scene.sys.isActive(), 'Crystal scene did not stop.');
     scene = await start('runes');
+    assert(scene.runeVolcano, 'Rune game did not create its volcano.');
+    await waitUntil(() => scene.hazards.getLength() > 0, 'Rune volcano did not launch sparks automatically.');
+    const spark = scene.hazards.getChildren()[0];
+    assert(spark.y <= 520 && spark.body.velocity.y < 0,
+      'Rune volcano did not launch a spark upwards.');
+    scene.hit(scene.player, spark);
+    assert(scene.hits === 1 && !spark.active, 'Rune spark did not damage the player.');
+    scene.invulnerableUntil = 0;
+    scene.hit(scene.player, scene.hazards.create(400, 520, 'volcano-hazard'));
+    scene.invulnerableUntil = 0;
+    scene.hit(scene.player, scene.hazards.create(400, 520, 'volcano-hazard'));
+    assert(outcome === false, 'Three rune sparks did not cause defeat.');
+    await waitUntil(() => !scene.sys.isActive(), 'Rune defeat did not stop the scene.');
+    scene = await start('runes');
     scene.collect(scene.player, scene.items.getChildren()[1]);
     assert(scene.progress === 0, 'Runes accepted the wrong order.');
     for (let i = 0; i < 4; i += 1) scene.collect(scene.player, scene.items.getChildren().find((item) => item.getData('index') === i));
@@ -693,7 +945,8 @@ function testMap(scene) {
   assert(!canReach(allOpen, items.flashlight)
     && canReach(closed, { x: LAKE.boatX, y: LAKE.shoreLandingY }), 'Island or shore boat is incorrectly accessible.');
   for (const npc of scene.npcManager.npcs.filter((npc) => npc.x >= 0 && npc.x < EAST_ORIGIN && npc.y >= 0 && npc.y < SOUTH_ORIGIN)) {
-    const access = ['luna', 'river-troll'].includes(npc.id) ? bridgeOpen : closed;
+    const access = npc.id === 'guide-wizard' ? bothBridgesOpen
+      : ['luna', 'river-troll'].includes(npc.id) ? bridgeOpen : closed;
     assert(canReach(access, npc), `${npc.id} is unreachable before its own gate opens.`);
   }
   const westClosed = reachableWest([]);
@@ -846,7 +1099,7 @@ async function testWestCrack(scene) {
       scene.movement.keys.A.isDown = false;
       scene.movement.update();
       assert(scene.player.sprite.body.left >= -1 && scene.player.sprite.x < 40,
-        `Player did not reach or crossed the west wall at y=${y}.`);
+        `Player did not reach or crossed the west wall at y=${y}: x=${scene.player.sprite.x}, left=${scene.player.sprite.body.left}, boost=${scene.speedBoost.multiplier}.`);
       assert(scene.leaderFollowerSystem.players.every((player) => player.sprite.body.left >= -1),
         `Follower crossed the west wall at y=${y}.`);
     }
@@ -1400,6 +1653,16 @@ async function testDragonBattle(world) {
     battle.time.removeAllEvents();
     assert(battle.dragonLives === 50 && battle.princessLives === 15 && battle.girls.length === 2
       && battle.difficulty === minigameSpeed(world.player.age), 'Dragon battle initialization failed.');
+    assert(battle.rockCover.depth > battle.girls[0].depth && battle.rockCover.depth < battle.bows[0].depth,
+      'The girls and their bows are not layered behind the rock cover.');
+    const oldHeadX = battle.head.x;
+    await waitUntil(() => Math.abs(battle.head.x - oldHeadX) > 40, 'Dragon head did not move sideways.');
+    assert(Math.abs(battle.head.body.center.x - battle.head.x) < 1, 'Moving head and hitbox are out of sync.');
+    battle.headMotionTime = 0;
+    battle.update(battle.time.now, 900);
+    const missedArrow = battle.arrows.create(400, battle.head.y, 'dragon-arrow');
+    assert(!battle.physics.overlap(missedArrow, battle.head), 'An arrow aimed at the old position still hit the moving head.');
+    missedArrow.destroy();
     const startX = battle.princess.x;
     battle.cursors.right.isDown = true;
     await waitUntil(() => battle.princess.x > startX + 10, 'Princess did not move with arrow keys.');
@@ -1426,13 +1689,16 @@ async function testDragonBattle(world) {
     world.dialogueWindow.close();
     ({ battle, selected } = await start());
     battle.time.removeAllEvents();
+    battle.headMotionTime = 0;
+    battle.update(battle.time.now, 0);
     for (const target of [battle.head, battle.leftPaw, battle.rightPaw]) {
       battle.princess.body.reset(target === battle.head ? 400 : target === battle.leftPaw ? 100 : 700,
         target === battle.head ? 235 : 270);
       battle.nextSwordHit = 0;
       const before = battle.dragonLives;
       battle.update(battle.time.now);
-      assert(battle.dragonLives === before - 1, 'Automatic sword did not hit a dragon body part.');
+      assert(battle.dragonLives === before - 1 && battle.swordTarget === target,
+        'Automatic sword did not hit or face the nearby dragon body part.');
     }
     battle.princess.body.reset(400, 390);
     for (let hit = 0; hit < 47; hit += 1) {
@@ -1810,6 +2076,9 @@ async function testSouthWizard(world) {
       battle.input.keyboard.emit('keydown', { key: String(index + 1), repeat: false });
     }
     assert(battle.beams.getLength() === 4, 'Keys 1–4 did not fire all four unicorns.');
+    assert(battle.beams.getChildren().every((beam) => beam.body.velocity.x === 430)
+      && battle.wizard.body.height + battle.beams.getChildren()[0].body.height >= 120,
+    'Wizard can hide between beams or the beams are not slower.');
     battle.handleShot({ key: '1', repeat: true });
     battle.handleShot({ key: '5', repeat: false });
     assert(battle.beams.getLength() === 4, 'Repeated or invalid key fired another beam.');
@@ -3424,6 +3693,9 @@ async function run() {
   const game = new Phaser.Game(createGameConfig());
   game.registry.set('collectionStore', store);
   let scene = await waitForWorld(game);
+  testSpeedBoostRules();
+  testGuideGnomes(scene);
+  await testWorldBoost(scene);
   const firstSeed = store.loadState().layoutSeed;
   const firstLayout = JSON.stringify(scene.collectibleManager.getAllItems().map(({ id, x, y }) => [id, x, y]));
   assert(Number.isInteger(firstSeed), 'A fresh game did not persist its layout seed.');

@@ -1,0 +1,5 @@
+{
+  "id": "guide-north", "name": "Lysnissen", "avatar": "guide-gnome", "x": 1056, "y": 240,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om hulen i nord!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om hulen i nord!"] }]
+}

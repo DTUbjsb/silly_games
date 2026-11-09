@@ -30,6 +30,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('witch', 'src/assets/witch.svg');
     this.load.image('wizard', 'src/assets/wizard.svg');
     this.load.image('old-queen', 'src/assets/old-queen.svg');
+    this.load.image('guide-gnome', 'src/assets/guide-gnome.svg');
     this.load.image('warrior-princess', 'src/assets/warrior-princess.svg');
     this.load.image('bow-and-arrow', 'src/assets/bow-and-arrow.svg');
     this.load.image('dragon-den', 'src/assets/dragon-den.svg');

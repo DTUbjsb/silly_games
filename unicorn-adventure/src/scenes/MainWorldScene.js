@@ -28,6 +28,8 @@ import { PlayerManager } from '../managers/PlayerManager.js';
 import { QuestManager } from '../managers/QuestManager.js';
 import { LeaderFollowerSystem } from '../systems/LeaderFollowerSystem.js';
 import { MovementSystem } from '../systems/MovementSystem.js';
+import { UnicornSpeedBoost } from '../systems/UnicornSpeedBoost.js';
+import { guideLines } from '../systems/GuideGnomes.js';
 import { NorthFollowerNavigator } from '../systems/NorthFollowerNavigator.js';
 import { NpcWander } from '../systems/NpcWander.js';
 import { VolcanoCatRoam } from '../systems/VolcanoCatRoam.js';
@@ -141,6 +143,9 @@ export class MainWorldScene extends Phaser.Scene {
     this.players = [];
     this.leaderFollowerSystem = null;
     this.movement = null;
+    this.speedBoost = new UnicornSpeedBoost();
+    this.mountedPlayers = new Map();
+    this.mountDirection = 1;
     this.cameras.main.setBounds(-westWidth, -northHeight, this.worldMap.widthInPixels + westWidth + EAST_REGION_WIDTH * 32,
       SOUTH_ORIGIN + (SOUTH_REGION_HEIGHT + 1) * TEST_WORLD_TILE_SIZE + northHeight);
     this.cameras.main.setZoom(0.65);
@@ -280,10 +285,15 @@ export class MainWorldScene extends Phaser.Scene {
     );
 
     if (!this.isAnswering && !this.dialogueWindow.isOpen) {
-      this.movement.update();
+      this.speedBoost.update(delta);
+      this.movement.update(this.speedBoost.multiplier);
     } else {
       this.leaderFollowerSystem.leader.sprite.setVelocity(0, 0);
     }
+    const boostIndicator = this.speedBoost.getIndicator(
+      this.collectibleManager.getCollectedItems('unicorn'), this.collectibleManager.getCollectedItems('accessory'),
+    );
+    this.hud.setBoostStatus(this.isAnswering || this.dialogueWindow.isOpen ? null : boostIndicator);
     this.updateFootsteps(time, leader);
     const followers = this.leaderFollowerSystem.followers.map((player, index) => ({
       sprite: player.sprite, x: player.sprite.x, y: player.sprite.y,
@@ -363,6 +373,39 @@ export class MainWorldScene extends Phaser.Scene {
       }
     }
     this.playerManager.update();
+    this.updateMountedPlayers();
+  }
+
+  updateMountedPlayers() {
+    if (this.speedBoost.remaining <= 0) {
+      for (const [player, mount] of this.mountedPlayers) {
+        mount.destroy();
+        player.sprite.setVisible(true);
+      }
+      this.mountedPlayers.clear();
+      return;
+    }
+    if (this.player.sprite.body.velocity.x !== 0) {
+      this.mountDirection = Math.sign(this.player.sprite.body.velocity.x);
+    }
+    const saddles = this.collectibleManager.getCollectedItems('accessory').filter((item) => item.slot === 'saddle');
+    this.players.forEach((player, index) => {
+      let mount = this.mountedPlayers.get(player);
+      if (!mount) {
+        const unicorn = this.speedBoost.mounts[index];
+        const saddle = saddles[index];
+        if (!unicorn || !saddle) throw new Error('Fartboostet mangler en enhjørning eller sadel.');
+        mount = this.add.container(0, 0, [
+          this.add.image(0, 0, unicorn.texture).setScale(0.67),
+          this.add.image(-4, -11, saddle.wornTexture ?? saddle.texture).setScale(0.52),
+          this.add.image(-5, -32, player.avatar).setScale(0.48),
+        ]).setDepth(2);
+        this.mountedPlayers.set(player, mount);
+        player.sprite.setVisible(false);
+      }
+      mount.setPosition(player.sprite.x, player.sprite.y).setScale(this.mountDirection, 1);
+      player.nameTag.setPosition(player.sprite.x, player.sprite.y - 72);
+    });
   }
 
   captureCat() {
@@ -551,7 +594,11 @@ export class MainWorldScene extends Phaser.Scene {
       } else if (this.isNearDragonDen()) {
         this.interactWithDragonDen();
       } else {
-        this.npcManager.interact();
+        if (!this.npcManager.interact()) {
+          this.speedBoost.activate(
+            this.collectibleManager.getCollectedItems('unicorn'), this.collectibleManager.getCollectedItems('accessory'),
+          );
+        }
       }
     }
   }
@@ -709,6 +756,18 @@ export class MainWorldScene extends Phaser.Scene {
   }
 
   updateStoryDialogue(npc) {
+    if (npc.avatar === 'guide-gnome') {
+      npc.interactions[0].lines = guideLines(npc.id, {
+        unicorns: this.collectibleManager.getCollectedItems('unicorn'),
+        accessories: this.collectibleManager.getCollectedItems('accessory'),
+        tools: this.collectibleManager.getCollectedItems('tool'),
+        southOpen: this.southOpen,
+        dragonRescued: this.dragonRescued,
+        princess: this.leaderFollowerSystem.companions.some((companion) => companion.id === 'warrior-princess'),
+      });
+      npc.interactionIndex = 0;
+      return;
+    }
     if (npc.id !== 'old-queen' || this.dragonRescued) return;
     const princess = this.leaderFollowerSystem?.companions.some((companion) => companion.id === 'warrior-princess');
     const bows = this.collectibleManager.getCollectedItems('tool').filter((item) => item.kind === 'bow-and-arrow').length;

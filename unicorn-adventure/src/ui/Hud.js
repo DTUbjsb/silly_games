@@ -68,9 +68,30 @@ export class Hud {
     this.turnPopup.hidden = true;
     game.append(this.turnPopup);
 
+    this.boostBar = makeElement('div', 'boost-bar', '');
+    this.boostBar.hidden = true;
+    const boostTrack = makeElement('div', 'boost-track', '');
+    boostTrack.setAttribute('role', 'progressbar');
+    boostTrack.setAttribute('aria-label', 'Fartboost');
+    boostTrack.setAttribute('aria-valuemin', '0');
+    boostTrack.setAttribute('aria-valuemax', '100');
+    this.boostTrack = boostTrack;
+    this.boostFill = makeElement('div', 'boost-fill', '');
+    this.boostLabel = makeElement('span', 'boost-label', '');
+    boostTrack.append(this.boostFill, this.boostLabel);
+    const boostMounts = makeElement('div', 'boost-mounts', '');
+    this.boostMounts = [0, 1].map(() => {
+      const image = document.createElement('img');
+      boostMounts.append(image);
+      return image;
+    });
+    this.boostBar.append(boostTrack, boostMounts);
+    game.append(this.boostBar);
+
     const pause = () => {
       this.resetButton.disabled = true;
       this.swapButton.disabled = true;
+      this.boostBar.hidden = true;
     };
     const resume = () => {
       this.resetButton.disabled = false;
@@ -84,6 +105,7 @@ export class Hud {
       scene.events.off('resume', resume);
       clearTimeout(this.turnPopupTimer);
       this.turnPopup.remove();
+      this.boostBar.remove();
       this.element.remove();
     });
   }
@@ -108,6 +130,28 @@ export class Hud {
 
   setTurn(playerName) {
     this.turn.textContent = `${playerName} har turen`;
+  }
+
+  setBoostStatus(indicator) {
+    this.boostBar.hidden = !indicator;
+    if (!indicator) return;
+    const { mounts, phase, progress, seconds, durationSeconds } = indicator;
+    const label = phase === 'ready' ? `Klar · ${durationSeconds} sek. · MELLEMRUM`
+      : phase === 'active' ? `Fartboost · ${seconds} / ${durationSeconds} sek.`
+        : `Lader op: ${seconds} sek. · Boost: ${durationSeconds} sek.`;
+    this.boostBar.dataset.phase = phase;
+    this.boostFill.style.width = `${progress * 100}%`;
+    this.boostLabel.textContent = label;
+    this.boostTrack.setAttribute('aria-valuenow', String(Math.round(progress * 100)));
+    this.boostTrack.setAttribute('aria-valuetext', label);
+    mounts.forEach((mount, index) => {
+      const image = this.boostMounts[index];
+      if (image.dataset.texture !== mount.texture) {
+        image.src = `src/assets/${mount.texture}.svg`;
+        image.dataset.texture = mount.texture;
+      }
+      image.alt = mount.name;
+    });
   }
 
   showTurnChange(playerName) {

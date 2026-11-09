@@ -1,0 +1,5 @@
+{
+  "id": "guide-west", "name": "Flyvenissen", "avatar": "guide-gnome", "x": 256, "y": 544,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om vejen mod vest!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om vejen mod vest!"] }]
+}

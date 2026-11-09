@@ -1,0 +1,5 @@
+{
+  "id": "guide-dark", "name": "Mørkenissen", "avatar": "guide-gnome", "x": 1056, "y": -240,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om mørke enhjørninger!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om mørke enhjørninger!"] }]
+}
