@@ -64,11 +64,10 @@ export class QuestManager {
       || !hasText(quest.title)
       || !hasText(quest.description)
       || !hasText(quest.reward)
-      || !hasText(quest.challengeId)
       || typeof quest.completed !== 'boolean'
     ) {
       throw new Error(
-        `Opgaven "${filename}" skal indeholde id, title, description, reward, challengeId og completed.`,
+        `Opgaven "${filename}" skal indeholde id, title, description, reward og completed.`,
       );
     }
 
@@ -77,7 +76,6 @@ export class QuestManager {
       title: quest.title.trim(),
       description: quest.description.trim(),
       reward: quest.reward.trim(),
-      challengeId: quest.challengeId.trim(),
       completed: quest.completed,
     };
   }

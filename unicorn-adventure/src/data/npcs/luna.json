@@ -21,6 +21,7 @@
     {
       "type": "challenge",
       "challengeId": "regnbue",
+      "questId": "rainbow-forest-rainbow",
       "randomForPlayer": true,
       "miniGame": "mosquito",
       "opensGate": "luna"

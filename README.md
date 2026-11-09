@@ -9,6 +9,8 @@ To run the game-rules regression checks, start the same server and open `tests/i
 
 ### Current gameplay
 
+#### World and progression
+
 - Explore the original 128 × 96 tile world and a new 32-tile-wide western region behind a solid wall. Forest walls and water are blocked.
 - Investigate the lava-filled ravine in the western wall with **MELLEMRUM**. Bring two rescued unicorns, two collected saddles, and two collected pairs of wings, then answer an age-appropriate question to open the flight. Press **MELLEMRUM** to begin and climb; survive for 20 seconds, avoiding lava and flying pterodactyls with the leading rider while the second rider follows safely. Five hits end the attempt, switch players, and leave the question unfinished. Winning takes both riders to the other side. The solid wall remains closed, so crossing back requires another question and flight.
 - A boat on the south shore of the starter-zone lake leads to an island. Answer a question and steer with **WASD** or the arrow keys, avoiding jumping fish and a lake monster for 18 seconds. Three hits end the attempt, switch players and leave the question unfinished. On success both players reach the island, where they can pick up a flashlight. Use the boat on the island to return to the shore.
@@ -24,16 +26,28 @@ To run the game-rules regression checks, start the same server and open `tests/i
 - A little red cat wanders the volcanic region. Talk to her and answer her question, then use **WASD** or the arrow keys to catch her in one of four rotating maze layouts before she reaches the exit. If she escapes, the other player takes a turn and she reappears far away in the volcanic region for another attempt. Once caught, she follows the players, including into the stable, and meows every 10–15 seconds. Her encounter and companionship reset with the other world interactions on reload.
 - West of the wall, discover three long-horned rainbow unicorns and twelve matching accessories. Iris guards a forest with one unicorn and four accessories, and a troll guards a river leading to another unicorn and four accessories; the rest are scattered around the region. Both guardians use the same question and minigame rules as the other fairies and trolls.
 - A troll guards each river crossing. Answer its question, then collect seven apples while dodging rocks to open the bridge. Move with the arrow keys or **WASD**; three rock hits end the attempt, switch players, and leave the question and bridge unfinished.
+- The fairies Flora and Luna each guard the only entrance to a forest containing an accessory. Answer a randomly selected question suited to the active player's age, then play the mosquito chase to open the entrance. Aim the wand with the mouse and press **MELLEMRUM** for one star at a time. Hit 10 mosquitoes to win; if more than 20 get through, the other player takes a turn and must answer another question. Luna's forest is across the troll's bridge.
+
+#### Controls and turns
+
 - Move the active child with the arrow keys or **WASD**. Press **T** to switch the leader; the other child follows. Walk up to an NPC and press **MELLEMRUM** to interact.
 - Turns switch automatically at four points: each correctly completed question counts as two points, and each collected accessory counts as one. Manual switches preserve each player's unfinished count; an automatic switch resets the outgoing player's count. A brief pop-up announces each change.
 - Above the game window, the reset and turn controls are on the left, the four unicorn-family counters are in the middle, and accessory and tool counters are on the right. The flashlight, pairs of lava boots, and bow-and-arrow sets have separate counters; accessories are counted separately as stickers, saddles, wings, and hats.
-- The fairies Flora and Luna each guard the only entrance to a forest containing an accessory. Answer a randomly selected question suited to the active player's age, then play the mosquito chase to open the entrance. Aim the wand with the mouse and press **MELLEMRUM** for one star at a time. Hit 10 mosquitoes to win; if more than 20 get through, the other player takes a turn and must answer another question. Luna's forest is across the troll's bridge.
+
+#### Sound and atmosphere
+
 - Correct answers, footsteps on the map, approaching NPCs, troll and fairy interactions, unicorn encounters, every accessory pickup, equipping accessories, and all minigames have sound effects. The lake crossing has its own music, paddling, fish splashes, monster and outcome sounds; mosquitoes buzz while present, and the troll and flight games also have music. Browser audio may require a click or keypress before it starts.
 - The starting area has cheerful background music, while the northern and volcanic regions have their own ominous themes. Music follows the active player and pauses when the world is paused for a question, minigame, or stable visit.
+
+#### Collections, stable, and saving
+
 - Find fifteen unicorns and 60 accessories around the map: fifteen hats, fifteen saddles, fifteen stickers, and fifteen pairs of wings. Each unicorn encounter starts a challenge; answer correctly to add it to the collection. Pick up accessories by walking over them. The HUD tracks both collections.
 - Visit the stable in the upper-left corner near the starting area by walking up to it and pressing **MELLEMRUM**. Walk up to a rescued unicorn and press **MELLEMRUM** to see its portrait. Choose a category to equip or remove collected stickers, saddles, wings, or hats and crowns. Equipped items are also visible on the unicorns in the stable. Each accessory can be worn by one unicorn at a time; choosing it on another unicorn moves it. Close the panel with **ESC** or the button. Return to the world through the stable exit.
 - Rescued unicorns, accessories, the flashlight, lava boots, and equipped assignments are saved in the browser's local storage across reloads and new playthroughs on the same browser and origin. They do not reappear as pickups; clearing browser site data removes the collection.
 - Use **Nulstil spil** in the upper-left corner of the world to start over. After confirmation, the saved collection and equipment are cleared and the world, gates, and quests reset. Outdoor unicorns and accessories are reshuffled within their existing progression regions; forest contents remain in place. The layout is saved across reloads. Existing collections without a saved layout retain their original positions until reset.
+
+#### Challenges and difficulty
+
 - Challenges are presented as story events and include age-scaled reading, math, English, and logic questions. Answer choices are rotated for each presentation, giving each position an equal chance of containing the correct answer.
 - Minigame opponents and moving hazards are 10% slower for the active player under seven, unchanged at seven, and 10% faster from age eight. Player controls and fixed-duration objectives are unchanged. In the rune puzzle, avoid sparks launched from the small volcano while collecting the runes in order; three hits lose the attempt.
 - Levels 1 and 2 each have 24 reading, 24 math, 24 logic, and 12 English questions. Some questions are reserved for specific guardians, so the mix in randomly selected encounters differs from these totals.
@@ -42,7 +56,7 @@ To run the game-rules regression checks, start the same server and open `tests/i
 ### What is not finished yet
 
 - This is a small prototype with a test map and sample characters, NPCs, quests, collectibles, and challenges.
-- Quest progress, gate access, and challenge progress are held in memory and reset when the page is reloaded.
+- Quest acceptance and completion, challenge history, and most world progress are held in memory and reset when the page is reloaded. The southern passage and dragon rescue are saved and restored; other unlocked gates and companion or encounter state reset.
 
 ### To-do:
 

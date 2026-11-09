@@ -46,6 +46,147 @@ const ACCESSORY_PICKUP_SOUNDS = {
   wings: 'wings',
 };
 
+const MINI_GAME_ROUTES = {
+  mosquito: {
+    scene: 'MosquitoScene',
+    kind: 'mosquito',
+    speaker: 'Myggejagten',
+    successMessage: () => 'Flot! Du ramte 10 myg, og stien til skoven er åben.',
+    failureMessage: () => 'For mange myg slap forbi. Prøv feens spørgsmål og myggejagten igen!',
+  },
+  troll: {
+    scene: 'TrollScene',
+    kind: 'troll',
+    speaker: 'Troldens æbler',
+    successMessage: (world, npcId) => npcId === 'north-troll'
+      ? 'Flot! Du samlede syv æbler, og stien til mørkeskoven er åben.'
+      : 'Flot! Du samlede syv æbler, og broen er åben.',
+    failureMessage: () => 'Du blev ramt af tre sten. Prøv troldens spørgsmål og æblejagten igen!',
+  },
+  flight: {
+    scene: 'FlightScene',
+    kind: 'flight',
+    speaker: 'Flyveturen',
+    successMessage: () => 'Flot! I fløj over revnen sammen.',
+    failureMessage: () => 'I mistede alle fem liv. Prøv spørgsmålet og flyveturen igen!',
+  },
+  cave: {
+    scene: 'CaveScene',
+    kind: 'cave',
+    speaker: 'Hulen',
+    successMessage: () => 'Flot! I krydsede hulen sammen.',
+    failureMessage: () => 'I mistede alle fem liv. Prøv spørgsmålet og hulen igen!',
+  },
+  boat: {
+    scene: 'LakeBoatScene',
+    kind: 'boat',
+    speaker: 'Bådturen',
+    successMessage: (world) => world.collectibleManager.collectedIds.has('flashlight')
+      ? 'Flot! I sejlede til øen.'
+      : 'Flot! I sejlede til øen. Find lommelygten!',
+    failureMessage: () => 'Båden blev ramt tre gange. Nu er det den anden spillers tur.',
+  },
+  wizard: {
+    scene: 'WizardBattleScene',
+    kind: 'wizard',
+    speaker: 'Troldmanden',
+    successMessage: () => 'Flot! Troldmanden er besejret, og vejen mod syd er åben.',
+    failureMessage: () => 'Pigerne mistede alle fem liv. Prøv spørgsmålet og kampen igen!',
+  },
+  witch: {
+    scene: 'WitchMazeScene',
+    kind: 'witch',
+    speaker: 'Heksens labyrint',
+    successMessage: () => 'Flot! Du fandt ud af heksens labyrint.',
+    failureMessage: () => 'Heksen fangede dig! Nu er det den anden spillers tur.',
+  },
+  catMaze: {
+    scene: 'CatMazeScene',
+    kind: 'cat',
+    speaker: 'Ildkatten',
+    successMessage: () => 'Flot! Du fangede ildkatten, før den slap væk.',
+    failureMessage: () => 'Katten slap væk og gemmer sig et andet sted i vulkanområdet. Nu er det den anden spillers tur.',
+  },
+  princessDuel: {
+    scene: 'PrincessDuelScene',
+    kind: 'princess',
+    speaker: 'Krigerprinsessen',
+    successMessage: (world) => {
+      if (world.dragonRescued) return 'Flot kæmpet! Jeg følger gerne med jer igen.';
+      const bows = world.collectibleManager.getCollectedItems('tool')
+        .filter((item) => item.kind === 'bow-and-arrow').length;
+      if (bows === 2) return 'Flot kæmpet! Jeg følger med jer, og I har allerede begge buer med pile.';
+      if (bows === 1) return 'Flot kæmpet! Jeg følger med jer. Find den sidste bue med pile i det sydlige område!';
+      return 'Flot kæmpet! Jeg følger med jer. Find de to buer med pile i det sydlige område!';
+    },
+    failureMessage: () => 'God træning! Prøv spørgsmålet og kampen igen. Nu er det den anden spillers tur.',
+  },
+  volcanoBridge: {
+    scene: 'VolcanoScene',
+    kind: 'volcano',
+    mode: 'bridge',
+    speaker: 'Vulkanen',
+    successMessage: () => 'Flot! I klarede vulkanens udfordring.',
+    failureMessage: () => 'Du blev ramt tre gange. Nu er det den anden spillers tur.',
+  },
+  volcanoCrystals: {
+    scene: 'VolcanoScene',
+    kind: 'volcano',
+    mode: 'crystals',
+    speaker: 'Vulkanen',
+    successMessage: () => 'Flot! I klarede vulkanens udfordring.',
+    failureMessage: () => 'Du blev ramt tre gange. Nu er det den anden spillers tur.',
+  },
+  volcanoRunes: {
+    scene: 'VolcanoScene',
+    kind: 'volcano',
+    mode: 'runes',
+    speaker: 'Vulkanen',
+    successMessage: () => 'Flot! I klarede vulkanens udfordring.',
+    failureMessage: () => 'Du blev ramt tre gange. Nu er det den anden spillers tur.',
+  },
+  volcanoEruption: {
+    scene: 'VolcanoScene',
+    kind: 'volcano',
+    mode: 'eruption',
+    speaker: 'Vulkanen',
+    successMessage: () => 'Flot! I klarede vulkanens udfordring.',
+    failureMessage: () => 'Du blev ramt tre gange. Nu er det den anden spillers tur.',
+  },
+};
+
+function createMiniGameArguments(world, route) {
+  const args = {
+    player: { name: world.player.name, avatar: world.player.avatar, age: world.player.age },
+  };
+  if (route.mode) args.mode = route.mode;
+
+  if (route.kind === 'wizard') {
+    const unicorns = world.collectibleManager.getCollectedItems('unicorn');
+    const accessories = world.collectibleManager.getCollectedItems('accessory');
+    Object.assign(args, {
+      players: world.leaderFollowerSystem.players.map((member) => ({ name: member.name, avatar: member.avatar })),
+      unicorns: wizardTeam(unicorns, accessories),
+      accessories,
+    });
+  } else if (route.kind === 'cave') {
+    Object.assign(args, {
+      players: world.leaderFollowerSystem.players.map((player) => ({ name: player.name, avatar: player.avatar })),
+    });
+  } else if (route.kind === 'flight') {
+    const unicorns = world.collectibleManager.getCollectedItems('unicorn');
+    const accessories = world.collectibleManager.getCollectedItems('accessory');
+    Object.assign(args, {
+      players: world.leaderFollowerSystem.players.map((player) => ({ name: player.name, avatar: player.avatar })),
+      unicorns: unicorns.slice(0, 2),
+      saddles: accessories.filter((item) => item.slot === 'saddle').slice(0, 2),
+      wings: accessories.filter((item) => item.slot === 'wings').slice(0, 2),
+      goingWest: world.player.sprite.x >= 0,
+    });
+  }
+  return args;
+}
+
 export class MainWorldScene extends Phaser.Scene {
   constructor() {
     super('MainWorldScene');
@@ -1347,91 +1488,27 @@ export class MainWorldScene extends Phaser.Scene {
       evaluateAnswer: (answer) => this.challengeManager.evaluateAnswer(challenge.id, answer),
       onComplete: (isCorrect) => {
         if (isCorrect) {
-          if (miniGame === 'mosquito' || miniGame === 'troll' || miniGame === 'flight' || miniGame === 'cave' || miniGame === 'boat' || miniGame === 'wizard'
-            || miniGame === 'witch' || miniGame === 'catMaze' || miniGame === 'princessDuel'
-            || ['volcanoBridge', 'volcanoCrystals', 'volcanoRunes', 'volcanoEruption'].includes(miniGame)) {
-            const trollGame = miniGame === 'troll';
-            const flightGame = miniGame === 'flight';
-            const caveGame = miniGame === 'cave';
-            const boatGame = miniGame === 'boat';
-            const wizardGame = miniGame === 'wizard';
-            const witchGame = miniGame === 'witch';
-            const catGame = miniGame === 'catMaze';
-            const princessGame = miniGame === 'princessDuel';
-            const volcanoMode = {
-              volcanoBridge: 'bridge', volcanoCrystals: 'crystals',
-              volcanoRunes: 'runes', volcanoEruption: 'eruption',
-            }[miniGame];
-            const unicorns = this.collectibleManager.getCollectedItems('unicorn');
-            const accessories = this.collectibleManager.getCollectedItems('accessory');
-            this.scene.launch(princessGame ? 'PrincessDuelScene' : wizardGame ? 'WizardBattleScene' : boatGame ? 'LakeBoatScene' : catGame ? 'CatMazeScene' : volcanoMode ? 'VolcanoScene' : witchGame ? 'WitchMazeScene' : caveGame ? 'CaveScene'
-              : flightGame ? 'FlightScene' : trollGame ? 'TrollScene' : 'MosquitoScene', {
-              player: { name: this.player.name, avatar: this.player.avatar, age: this.player.age },
-              ...(volcanoMode ? { mode: volcanoMode } : {}),
-              ...(wizardGame ? {
-                players: this.leaderFollowerSystem.players.map((member) => ({ name: member.name, avatar: member.avatar })),
-                unicorns: wizardTeam(unicorns, accessories),
-                accessories,
-              } : {}),
-              ...(caveGame ? {
-                players: this.leaderFollowerSystem.players.map((player) => ({ name: player.name, avatar: player.avatar })),
-              } : {}),
-              ...(flightGame ? {
-                players: this.leaderFollowerSystem.players.map((player) => ({ name: player.name, avatar: player.avatar })),
-                unicorns: unicorns.slice(0, 2),
-                saddles: accessories.filter((item) => item.slot === 'saddle').slice(0, 2),
-                wings: accessories.filter((item) => item.slot === 'wings').slice(0, 2),
-                goingWest: this.player.sprite.x >= 0,
-              } : {}),
+          const route = Object.hasOwn(MINI_GAME_ROUTES, miniGame) ? MINI_GAME_ROUTES[miniGame] : null;
+          if (route) {
+            this.scene.launch(route.scene, {
+              ...createMiniGameArguments(this, route),
               onComplete: (won) => {
                 if (won) {
-                  if (wizardGame && !this.unlockSouthPass()) return;
-                  if (princessGame && !this.recruitPrincess()) return;
+                  if (route.kind === 'wizard' && !this.unlockSouthPass()) return;
+                  if (route.kind === 'princess' && !this.recruitPrincess()) return;
                   complete();
-                  if (catGame) this.captureCat();
+                  if (route.kind === 'cat') this.captureCat();
                   if (!this.dialogueWindow.isOpen) {
-                    const bows = princessGame
-                      ? this.collectibleManager.getCollectedItems('tool').filter((item) => item.kind === 'bow-and-arrow').length : 0;
-                    this.dialogueWindow.showLines(princessGame ? 'Krigerprinsessen' : wizardGame ? 'Troldmanden' : boatGame ? 'Bådturen' : catGame ? 'Ildkatten' : volcanoMode ? 'Vulkanen' : witchGame ? 'Heksens labyrint' : caveGame ? 'Hulen' : flightGame ? 'Flyveturen' : trollGame ? 'Troldens æbler' : 'Myggejagten', [
-                      princessGame ? (this.dragonRescued
-                        ? 'Flot kæmpet! Jeg følger gerne med jer igen.'
-                        : bows === 2
-                          ? 'Flot kæmpet! Jeg følger med jer, og I har allerede begge buer med pile.'
-                         : bows === 1 ? 'Flot kæmpet! Jeg følger med jer. Find den sidste bue med pile i det sydlige område!'
-                           : 'Flot kæmpet! Jeg følger med jer. Find de to buer med pile i det sydlige område!')
-                        : wizardGame ? 'Flot! Troldmanden er besejret, og vejen mod syd er åben.'
-                        : boatGame ? (this.collectibleManager.collectedIds.has('flashlight')
-                          ? 'Flot! I sejlede til øen.' : 'Flot! I sejlede til øen. Find lommelygten!')
-                        : catGame ? 'Flot! Du fangede ildkatten, før den slap væk.'
-                        : volcanoMode ? 'Flot! I klarede vulkanens udfordring.'
-                        : witchGame ? 'Flot! Du fandt ud af heksens labyrint.'
-                        : caveGame ? 'Flot! I krydsede hulen sammen.'
-                        : flightGame ? 'Flot! I fløj over revnen sammen.'
-                        : trollGame ? (npcId === 'north-troll'
-                          ? 'Flot! Du samlede syv æbler, og stien til mørkeskoven er åben.'
-                          : 'Flot! Du samlede syv æbler, og broen er åben.')
-                        : 'Flot! Du ramte 10 myg, og stien til skoven er åben.',
-                    ]);
+                    this.dialogueWindow.showLines(route.speaker, [route.successMessage(this, npcId)]);
                   }
                 } else {
                   this.isAnswering = false;
-                  if (catGame) {
+                  if (route.kind === 'cat') {
                     if (!this.volcanoCatRoam) throw new Error('Ildkatten mangler i vulkanområdet.');
                     this.volcanoCatRoam.respawn();
                   }
                   this.swapLeader();
-                  this.dialogueWindow.showLines(princessGame ? 'Krigerprinsessen' : wizardGame ? 'Troldmanden' : boatGame ? 'Bådturen' : catGame ? 'Ildkatten' : volcanoMode ? 'Vulkanen' : witchGame ? 'Heksens labyrint' : caveGame ? 'Hulen' : flightGame ? 'Flyveturen' : trollGame ? 'Troldens æbler' : 'Myggejagten', [
-                    princessGame ? 'God træning! Prøv spørgsmålet og kampen igen. Nu er det den anden spillers tur.'
-                      : wizardGame ? 'Pigerne mistede alle fem liv. Prøv spørgsmålet og kampen igen!'
-                      : boatGame ? 'Båden blev ramt tre gange. Nu er det den anden spillers tur.'
-                      : catGame ? 'Katten slap væk og gemmer sig et andet sted i vulkanområdet. Nu er det den anden spillers tur.'
-                      : volcanoMode ? 'Du blev ramt tre gange. Nu er det den anden spillers tur.'
-                      : witchGame ? 'Heksen fangede dig! Nu er det den anden spillers tur.'
-                      : caveGame ? 'I mistede alle fem liv. Prøv spørgsmålet og hulen igen!'
-                      : flightGame ? 'I mistede alle fem liv. Prøv spørgsmålet og flyveturen igen!'
-                      : trollGame ? 'Du blev ramt af tre sten. Prøv troldens spørgsmål og æblejagten igen!'
-                      : 'For mange myg slap forbi. Prøv feens spørgsmål og myggejagten igen!',
-                  ]);
+                  this.dialogueWindow.showLines(route.speaker, [route.failureMessage(this, npcId)]);
                 }
               },
             });
