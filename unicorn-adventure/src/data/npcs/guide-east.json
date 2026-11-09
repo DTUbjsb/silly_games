@@ -1,0 +1,5 @@
+{
+  "id": "guide-east", "name": "Vulkanissen", "avatar": "guide-gnome", "x": 3808, "y": 448,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om lavakløften!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om lavakløften!"] }]
+}

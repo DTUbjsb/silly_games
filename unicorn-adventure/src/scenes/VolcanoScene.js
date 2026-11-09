@@ -4,7 +4,7 @@ import { minigameSpeed } from '../systems/MinigameDifficulty.js';
 const SETTINGS = {
   bridge: { title: 'BYG LAVABROEN', instruction: 'Saml 5 brosten, og gå til udgangen. Undgå gløderne.', goal: 5 },
   crystals: { title: 'KRYSTALJAGTEN', instruction: 'Saml 7 ildkrystaller, og undgå gløderne.', goal: 7 },
-  runes: { title: 'ILDENS RUNER', instruction: 'Træd på runerne i rækkefølgen 1, 2, 3, 4.', goal: 4 },
+  runes: { title: 'ILDENS RUNER', instruction: 'Træd på runerne i rækkefølgen 1, 2, 3, 4, og undgå gnisterne.', goal: 4 },
   eruption: { title: 'VULKANUDBRUD', instruction: 'Undgå gløderne i 15 sekunder!', goal: 15000 },
 };
 
@@ -65,6 +65,10 @@ export class VolcanoScene extends Phaser.Scene {
     }
     if (mode === 'bridge' || mode === 'crystals') this.spawnItem();
     if (mode === 'runes') {
+      this.runeVolcano = this.add.polygon(400, 565, [
+        -85, 35, -35, -35, 35, -35, 85, 35,
+      ], 0x493038).setStrokeStyle(3, 0x8c4d3a);
+      this.add.ellipse(400, 530, 70, 18, 0xf5782d).setStrokeStyle(3, 0xffc15c);
       [[165, 190], [600, 190], [600, 475], [165, 475]].forEach(([x, y], index) => {
         const rune = this.items.create(x, y, 'volcano-rune');
         rune.setData('index', index);
@@ -73,9 +77,7 @@ export class VolcanoScene extends Phaser.Scene {
         }).setOrigin(0.5).setDepth(2);
       });
     }
-    if (mode !== 'runes') {
-      this.time.addEvent({ delay: 1250, loop: true, callback: this.spawnHazard, callbackScope: this });
-    }
+    this.time.addEvent({ delay: 1250, loop: true, callback: this.spawnHazard, callbackScope: this });
     this.playMusic();
     this.time.addEvent({ delay: 500, loop: true, callback: this.playMusic, callbackScope: this });
     this.updateScore();
@@ -118,6 +120,13 @@ export class VolcanoScene extends Phaser.Scene {
 
   spawnHazard() {
     if (this.finished) return;
+    if (this.mode === 'runes') {
+      const hazard = this.hazards.create(400, 520, 'volcano-hazard');
+      const target = new Phaser.Math.Vector2(this.player.x - hazard.x, this.player.y - hazard.y).normalize();
+      hazard.body.setVelocity(target.x * 160 * this.difficulty, Math.min(-100, target.y * 160) * this.difficulty);
+      this.registry.get('soundEffects').play('trollThrow');
+      return;
+    }
     const hazard = this.hazards.create(Phaser.Math.Between(60, 740), 110, 'volcano-hazard');
     const direction = new Phaser.Math.Vector2(this.player.x - hazard.x, this.player.y - hazard.y).normalize();
     hazard.body.setVelocity(direction.x * 125 * this.difficulty, Math.max(100, direction.y * 125) * this.difficulty);
@@ -152,7 +161,7 @@ export class VolcanoScene extends Phaser.Scene {
     this.player.x = Phaser.Math.Clamp(this.player.x, 40, 760);
     this.player.y = Phaser.Math.Clamp(this.player.y, 135, 555);
     for (const hazard of this.hazards.getChildren()) {
-      if (hazard.x < -50 || hazard.x > 850 || hazard.y > 650) hazard.destroy();
+      if (hazard.x < -50 || hazard.x > 850 || hazard.y < -50 || hazard.y > 650) hazard.destroy();
     }
     if (this.mode === 'eruption') {
       this.progress += delta;

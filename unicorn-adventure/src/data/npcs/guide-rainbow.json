@@ -1,0 +1,5 @@
+{
+  "id": "guide-rainbow", "name": "Støvlenissen", "avatar": "guide-gnome", "x": -480, "y": 496,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om lavastøvler!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om lavastøvler!"] }]
+}

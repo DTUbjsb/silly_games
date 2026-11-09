@@ -60,7 +60,7 @@ export class WizardBattleScene extends Phaser.Scene {
       return sprite;
     });
     this.wizard = this.physics.add.sprite(690, 300, 'wizard').setScale(0.68).setDepth(2);
-    this.wizard.body.setSize(75, 110);
+    this.wizard.body.setSize(90, 180);
     this.wizard.body.setVelocityY(105 * this.difficulty);
     this.beams = this.physics.add.group({ allowGravity: false });
     this.stars = this.physics.add.group({ allowGravity: false });
@@ -100,7 +100,7 @@ export class WizardBattleScene extends Phaser.Scene {
     if (this.time.now - this.lastShots[index] < 350) return;
     this.lastShots[index] = this.time.now;
     const source = this.unicorns[index];
-    this.beams.create(source.x, source.y, 'wizard-beam').body.setVelocityX(540);
+    this.beams.create(source.x, source.y, 'wizard-beam').body.setVelocityX(430);
     this.registry.get('soundEffects').play('star');
   }
 

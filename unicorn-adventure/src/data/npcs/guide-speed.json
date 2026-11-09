@@ -1,0 +1,5 @@
+{
+  "id": "guide-speed", "name": "Fartnissen", "avatar": "guide-gnome", "x": 480, "y": 240,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om fartboost!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om fartboost!"] }]
+}

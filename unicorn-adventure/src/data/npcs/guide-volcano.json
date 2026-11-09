@@ -1,0 +1,5 @@
+{
+  "id": "guide-volcano", "name": "Lavagnisten", "avatar": "guide-gnome", "x": 4416, "y": 736,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om vulkanenhjørninger!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om vulkanenhjørninger!"] }]
+}

@@ -107,6 +107,18 @@ export class NPCManager {
       throw new Error(`Personens avatar "${npc.avatar}" er ikke indlæst.`);
     }
 
+    const interactions = npc.interactions.map((interaction, index) => (
+      this.validateInteraction(interaction, filename, index)
+    ));
+    interactions.forEach((interaction, index) => {
+      if (interaction.type === 'quest') {
+        const nextInteraction = interactions[index + 1];
+        if (nextInteraction?.type !== 'challenge' || nextInteraction.questId !== interaction.questId) {
+          throw new Error(`Opgaven "${interaction.questId}" i "${filename}" skal følges af dens udfordring.`);
+        }
+      }
+    });
+
     return {
       id: npc.id.trim(),
       name: npc.name.trim(),
@@ -117,9 +129,7 @@ export class NPCManager {
         ? Math.max(1, npc.interactionRadius)
         : 112,
       repeatDialogue: npc.repeatDialogue.trim(),
-      interactions: npc.interactions.map((interaction, index) => (
-        this.validateInteraction(interaction, filename, index)
-      )),
+      interactions,
     };
   }
 
@@ -141,9 +151,6 @@ export class NPCManager {
       if (!quest) {
         throw new Error(`Personen "${filename}" henviser til en ukendt opgave.`);
       }
-      if (!this.challengeManager.getChallenge(quest.challengeId)) {
-        throw new Error(`Opgaven "${quest.id}" henviser til en ukendt læringsudfordring.`);
-      }
       return { type: 'quest', questId: interaction.questId.trim() };
     }
 
@@ -161,9 +168,15 @@ export class NPCManager {
       if (interaction.randomForPlayer !== undefined && typeof interaction.randomForPlayer !== 'boolean') {
         throw new Error(`Personen "${filename}" har en ugyldig indstilling for tilfældige spørgsmål.`);
       }
+      if (interaction.questId !== undefined) {
+        if (!hasText(interaction.questId) || !this.questManager.getQuest(interaction.questId.trim())) {
+          throw new Error(`Personen "${filename}" henviser til en ukendt opgave.`);
+        }
+      }
       return {
         type: 'challenge',
         challengeId,
+        ...(interaction.questId === undefined ? {} : { questId: interaction.questId.trim() }),
         opensGate: interaction.opensGate,
         miniGame: interaction.miniGame,
         randomForPlayer: interaction.randomForPlayer ?? false,
@@ -270,9 +283,11 @@ export class NPCManager {
     const interaction = npc.interactions[npc.interactionIndex];
     const miniGame = interaction?.type === 'challenge' && interaction.challengeId === challengeId
       ? interaction.miniGame : undefined;
+    const questId = interaction?.type === 'challenge' ? interaction.questId : undefined;
     this.onChallenge(challengeId, () => {
-      const activeQuest = this.questManager.getActiveQuests()
-        .find((quest) => quest.challengeId === challengeId);
+      const activeQuest = questId
+        ? this.questManager.getActiveQuests().find((quest) => quest.id === questId)
+        : undefined;
       if (activeQuest) {
         this.questManager.completeQuest(activeQuest.id);
       }
@@ -307,7 +322,7 @@ export class NPCManager {
 
     if (this.questManager.getActiveQuests().some((activeQuest) => activeQuest.id === questId)) {
       this.advanceInteraction(npc);
-      this.startChallenge(npc, quest.challengeId);
+      this.runInteraction(npc);
       return;
     }
 
@@ -319,15 +334,7 @@ export class NPCManager {
 
       this.questManager.acceptQuest(questId);
       this.advanceInteraction(npc);
-      const nextInteraction = npc.interactions[npc.interactionIndex];
-      if (
-        nextInteraction?.type === 'challenge'
-        && nextInteraction.challengeId === quest.challengeId
-      ) {
-        this.runInteraction(npc);
-      } else {
-        this.startChallenge(npc, quest.challengeId);
-      }
+      this.runInteraction(npc);
     });
   }
 

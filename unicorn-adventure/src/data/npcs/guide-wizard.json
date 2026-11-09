@@ -1,0 +1,5 @@
+{
+  "id": "guide-wizard", "name": "Troldenissen", "avatar": "guide-gnome", "x": 1824, "y": 2832,
+  "interactionRadius": 90, "repeatDialogue": "Spørg mig om troldmanden!",
+  "interactions": [{ "type": "dialogue", "lines": ["Spørg mig om troldmanden!"] }]
+}
