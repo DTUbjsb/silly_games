@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <title>Dreng med lilla hår</title>
+  <path d="M38 77h24l4 14H52l-2-8-2 8H34z" fill="#526a8f"/>
+  <path d="M39 54h22l8 24-7 3H38l-7-3z" fill="#63b8d5"/>
+  <path d="M39 54l11 9 11-9" fill="#b9e8ef"/>
+  <path d="M38 80h8v11h-8zM55 80h8v11h-8z" fill="#f3bd9e"/>
+  <path d="M35 88h13q2 0 2 3v3H34v-3q0-3 1-3M53 88h13q1 0 1 3v3H52v-3q0-3 1-3" fill="#6b6f9e"/>
+  <path d="M34 59Q25 66 27 76M66 59Q75 66 73 76" fill="none" stroke="#f3bd9e" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="50" cy="36" rx="20" ry="22" fill="#f7c9a8"/>
+  <path d="M29 36Q27 11 50 12Q74 12 71 38L66 32Q61 34 56 24Q49 32 34 32Z" fill="#9b71cd"/>
+  <path d="M32 30Q40 34 47 27Q54 33 67 29L68 38Q60 34 53 34Q45 38 35 35Z" fill="#9b71cd"/>
+  <circle cx="43" cy="39" r="2" fill="#35445a"/>
+  <circle cx="58" cy="39" r="2" fill="#35445a"/>
+  <path d="M45 47q5 5 10 0" fill="none" stroke="#b75e75" stroke-width="2" stroke-linecap="round"/>
+</svg>

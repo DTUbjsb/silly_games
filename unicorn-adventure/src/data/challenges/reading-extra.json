@@ -557,6 +557,60 @@
         "success": "Ja, de går ind!",
         "hint": "Læs sætningen igen og se efter svaret."
       }
+    },
+    {
+      "id": "reading-three-feather",
+      "category": "Reading",
+      "difficulty": 3,
+      "question": "“Ella fandt en fjer på stien. Hun lagde den i lommen, så den ikke blæste væk.” Hvad gjorde Ella for at passe på fjeren?",
+      "options": [
+        "Hun lagde den i lommen",
+        "Hun lagde den tilbage på stien",
+        "Hun gav den til en fugl"
+      ],
+      "correctAnswer": "Hun lagde den i lommen",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs begge sætninger, og find ud af, hvad Ella gjorde.",
+        "success": "Ja, hun lagde fjeren i lommen, så den ikke blæste væk!",
+        "hint": "Se efter handlingen, der skulle forhindre fjeren i at blæse væk."
+      }
+    },
+    {
+      "id": "reading-four-rainclouds",
+      "category": "Reading",
+      "difficulty": 4,
+      "question": "“På vej hjem fra skole så Malik mørke skyer. Han skyndte sig ind, og få minutter senere begyndte det at regne.” Hvad kan man forstå om vejret, da Malik kom hjem?",
+      "options": [
+        "Regnen var tæt på at begynde",
+        "Solen var lige stået op",
+        "Det havde sneet hele dagen"
+      ],
+      "correctAnswer": "Regnen var tæt på at begynde",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Teksten fortæller både, hvad Malik så, og hvad der skete bagefter.",
+        "success": "Rigtigt! De mørke skyer varslede regnen.",
+        "hint": "Tænk over, hvad de mørke skyer og regnen få minutter senere fortæller."
+      }
+    },
+    {
+      "id": "reading-five-bookmark",
+      "category": "Reading",
+      "difficulty": 5,
+      "question": "“Mila glædede sig til at læse videre i sin bog. Hun satte et bogmærke dér, hvor hun stoppede, men lod bogen blive i klasselokalet. Næste morgen tog hun bogen frem, før læreren bad klassen læse.” Hvorfor satte Mila et bogmærke i bogen?",
+      "options": [
+        "Så hun kunne finde stedet igen",
+        "Så læreren kunne låne bogen",
+        "Så hun kunne huske at tage bogen med hjem"
+      ],
+      "correctAnswer": "Så hun kunne finde stedet igen",
+      "story": {
+        "character": "Læsevennen",
+        "introduction": "Læs, hvad Mila gør, og tænk over, hvorfor et bogmærke er nyttigt.",
+        "success": "Ja, bogmærket viser, hvor Mila skal læse videre!",
+        "hint": "Et bogmærke hjælper læseren med at huske, hvor læsningen stoppede."
+      }
     }
   ]
 }

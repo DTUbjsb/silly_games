@@ -11,6 +11,17 @@ const GIRL_AVATARS_BY_HAIR_COLOR = new Map([
   ['dark brown', 'girl-brown'],
   ['purple', 'girl-purple'],
 ]);
+const BOY_AVATARS_BY_HAIR_COLOR = new Map([
+  ['yellow', 'boy-yellow'],
+  ['blonde', 'boy-yellow'],
+  ['blond', 'boy-yellow'],
+  ['golden', 'boy-yellow'],
+  ['brown', 'boy-brown'],
+  ['brunette', 'boy-brown'],
+  ['light brown', 'boy-brown'],
+  ['dark brown', 'boy-brown'],
+  ['purple', 'boy-purple'],
+]);
 
 export class PlayerManager {
   constructor(scene) {
@@ -69,6 +80,20 @@ export class PlayerManager {
       loadedProfiles.set(profile.id, profile);
     }
 
+    const savedPlayers = this.scene.collectibleManager.store.loadState().players;
+    if (savedPlayers) {
+      savedPlayers.forEach((savedPlayer, index) => {
+        const profile = loadedProfiles.get(savedPlayer.id);
+        loadedProfiles.set(savedPlayer.id, {
+          ...profile,
+          name: savedPlayer.name,
+          age: savedPlayer.age,
+          gender: savedPlayer.gender,
+          hairColor: savedPlayer.hairColor,
+        });
+      });
+    }
+
     this.profiles = loadedProfiles;
     return this.getAllPlayers();
   }
@@ -93,6 +118,7 @@ export class PlayerManager {
       age: profile.age,
       avatar: profile.avatar.trim(),
       hairColor: profile.hairColor.trim(),
+      gender: profile.gender ?? 'girl',
     };
   }
 
@@ -125,15 +151,16 @@ export class PlayerManager {
   }
 
   resolveAvatar(profile) {
+    const avatars = profile.gender === 'boy' ? BOY_AVATARS_BY_HAIR_COLOR : GIRL_AVATARS_BY_HAIR_COLOR;
     if (profile.avatar !== 'girl') {
       return profile.avatar;
     }
 
     const hairColor = profile.hairColor.trim().toLowerCase();
-    const avatar = GIRL_AVATARS_BY_HAIR_COLOR.get(hairColor);
+    const avatar = avatars.get(hairColor);
     if (!avatar) {
       throw new Error(
-        `Hårfarven "${profile.hairColor}" understøttes ikke. Vælg yellow, blonde, brown, brunette eller purple.`,
+        `Hårfarven "${profile.hairColor}" understøttes ikke.`,
       );
     }
 

@@ -9,12 +9,80 @@
   </head>
   <body>
     <main class="game-shell">
-      <header class="page-heading">
-        <p class="eyebrow">En lille verden af udfordringer</p>
-        <h1>Enhjørningeeventyr</h1>
-      </header>
-      <div id="game" aria-label="Læringsspillet Enhjørningeeventyr"></div>
-      <p class="page-hint">Gå med piletasterne eller WASD. Find enhjørninger og tilbehør, og besøg stalden ved startområdet.</p>
+      <section id="landing-page" class="landing-page" aria-labelledby="page-title">
+        <header class="page-heading">
+          <p class="eyebrow">En lille verden af udfordringer</p>
+          <h1 id="page-title">Enhjørningeeventyr</h1>
+          <p>Vælg jeres figurer, før eventyret begynder.</p>
+        </header>
+        <form id="player-setup" class="player-setup">
+          <div class="player-choices">
+            <fieldset class="player-card">
+              <legend>Spiller 1</legend>
+              <label>
+                Navn
+                <input name="player-1-name" type="text" maxlength="24" autocomplete="given-name" required>
+              </label>
+              <label>
+                Alder
+                <select name="player-1-age" required></select>
+              </label>
+              <label>
+                Køn
+                <select name="player-1-gender" required>
+                  <option value="girl">Pige</option>
+                  <option value="boy">Dreng</option>
+                </select>
+              </label>
+              <label>
+                Hårfarve
+                <select name="player-1-hair" required>
+                  <option value="yellow">Gul</option>
+                  <option value="brown">Brun</option>
+                  <option value="purple">Lilla</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset class="player-card">
+              <legend>Spiller 2</legend>
+              <label>
+                Navn
+                <input name="player-2-name" type="text" maxlength="24" autocomplete="off" required>
+              </label>
+              <label>
+                Alder
+                <select name="player-2-age" required></select>
+              </label>
+              <label>
+                Køn
+                <select name="player-2-gender" required>
+                  <option value="girl">Pige</option>
+                  <option value="boy">Dreng</option>
+                </select>
+              </label>
+              <label>
+                Hårfarve
+                <select name="player-2-hair" required>
+                  <option value="yellow">Gul</option>
+                  <option value="brown">Brun</option>
+                  <option value="purple">Lilla</option>
+                </select>
+              </label>
+            </fieldset>
+          </div>
+          <p class="profile-note">Spørgsmålene tilpasses hver spillers alder. Køn og hårfarve ændrer figurens udseende i spillet.</p>
+          <p id="setup-message" class="setup-message" role="status" aria-live="polite"></p>
+          <button class="start-button" type="submit">Start eventyret</button>
+        </form>
+      </section>
+      <section id="game-shell" class="game-shell" aria-label="Spillet" hidden>
+        <header class="page-heading">
+          <p class="eyebrow">En lille verden af udfordringer</p>
+          <h1>Enhjørningeeventyr</h1>
+        </header>
+        <div id="game" aria-label="Læringsspillet Enhjørningeeventyr"></div>
+        <p class="page-hint">Gå med piletasterne eller WASD. Find enhjørninger og tilbehør, og besøg stalden ved startområdet.</p>
+      </section>
     </main>
 
     <!-- Phaser is the only runtime dependency; the game itself stays split into native ES modules. -->

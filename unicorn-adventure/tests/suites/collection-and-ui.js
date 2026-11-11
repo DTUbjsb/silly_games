@@ -96,9 +96,21 @@ export function testChallenges(scene) {
       `${challenge.id} must have three distinct options and exactly one correct answer.`);
     }
   }
+  const categories = ['Math', 'English', 'Logic', 'Reading'];
+  for (let age = 4; age <= 18; age += 1) {
+    const difficulty = manager.getDifficultyForAge(age);
+    for (const category of categories) {
+      const challenge = manager.getChallengeForCategory(age, category);
+      assert(challenge.difficulty === difficulty,
+        `${category} question did not match age ${age}'s difficulty ${difficulty}.`);
+    }
+  }
   const reserved = scene.npcManager.getGateChallengeIds();
   const originalRandom = Math.random;
   const originalStart = scene.startChallenge;
+  const originalLeader = scene.leaderFollowerSystem.leader;
+  const originalLeaderAge = originalLeader.age;
+  const fixedMathChallenge = challenges.find((challenge) => challenge.category === 'Math');
   const pickup = scene.collectibleManager.pickups.getChildren()
     .find((item) => scene.collectibleManager.getItemForPickup(item).type === 'unicorn');
   try {
@@ -133,12 +145,20 @@ export function testChallenges(scene) {
     try {
       manager.getChallengeForAge(6, [], allSuitable);
     } catch (error) {
-      noSuitable = error.message.includes('passende niveau');
+      noSuitable = error.message.includes('alderssvarende niveau');
     }
     assert(noSuitable, 'Missing suitable challenges did not report an error.');
 
     let selected;
     scene.startChallenge = (challenge) => { selected = challenge; };
+    for (let age = 4; age <= 18; age += 1) {
+      originalLeader.age = age;
+      selected = null;
+      scene.startNPCChallenge(fixedMathChallenge.id, () => {}, undefined, { npcId: `age-test-${age}` });
+      assert(selected?.category === 'Math' && selected.difficulty === manager.getDifficultyForAge(age),
+        `Fixed-category NPC question did not match age ${age}.`);
+    }
+    originalLeader.age = originalLeaderAge;
     for (const age of [8, 6]) {
       while (scene.leaderFollowerSystem.leader.age !== age) {
         scene.swapLeader();
@@ -151,6 +171,7 @@ export function testChallenges(scene) {
   } finally {
     Math.random = originalRandom;
     scene.startChallenge = originalStart;
+    originalLeader.age = originalLeaderAge;
     while (scene.leaderFollowerSystem.leader.age !== 8) {
       scene.swapLeader();
     }
@@ -342,11 +363,12 @@ export async function testAutomaticTurns(scene, store, failingStore) {
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
     assert(challengeScene.sys.isActive(), 'Turn test challenge did not open.');
+    const selectedChallenge = trollGame ? challengeScene.challenge : challenge;
     const correct = challengeScene.challenge.options.findIndex((option) => (
-      scene.challengeManager.answersMatch(option, challenge.correctAnswer)
+      scene.challengeManager.answersMatch(option, selectedChallenge.correctAnswer)
     ));
     const wrong = challengeScene.challenge.options.findIndex((option) => (
-      !scene.challengeManager.answersMatch(option, challenge.correctAnswer)
+      !scene.challengeManager.answersMatch(option, selectedChallenge.correctAnswer)
     ));
     const before = leader();
     challengeScene.answerButtons[wrong].emit('pointerdown');

@@ -281,7 +281,10 @@ export async function testVolcanoCat(world) {
     world.handleSpace();
     const question = world.game.scene.getScene('ChallengeScene');
     await waitUntil(() => question.sys.isActive(), 'Cat question did not start.');
-    assert(question.challenge.id === 'volcano-cat-reading', 'The cat asked the wrong question.');
+    assert(question.challenge.category === 'Reading'
+      && question.challenge.difficulty === world.challengeManager.getDifficultyForAge(world.player.age),
+    'The cat question did not match the active player’s age and reading category.');
+    const questionId = question.challenge.id;
     const wrong = question.challenge.options.findIndex((option) => !world.challengeManager.answersMatch(option, question.challenge.correctAnswer));
     question.answerButtons[wrong].emit('pointerdown');
     assert(!question.isResolved && !world.game.scene.isActive('CatMazeScene'), 'A wrong answer started the cat maze.');
@@ -291,8 +294,8 @@ export async function testVolcanoCat(world) {
     const maze = world.game.scene.getScene('CatMazeScene');
     await waitUntil(() => maze.sys.isActive(), 'Cat maze did not start after the correct answer.');
     assert(maze.difficulty === minigameSpeed(world.player.age), 'Cat maze used the wrong player age.');
-    assert(!world.stateManager.learnedChallengeIds.has('volcano-cat-reading'), 'Cat question was credited before capture.');
-    return maze;
+    assert(!world.stateManager.learnedChallengeIds.has(questionId), 'Cat question was credited before capture.');
+    return { maze, questionId };
   };
   try {
     assert(cat && cat.sprite.texture.key === 'red-cat' && world.volcanoCatRoam, 'The red cat is missing.');
@@ -301,7 +304,7 @@ export async function testVolcanoCat(world) {
     assert(Phaser.Math.Distance.Between(beforeWalk.x, beforeWalk.y, cat.x, cat.y) > 1
       && cat.sprite.x === cat.x && cat.sprite.y === cat.y, 'Cat did not roam or its interaction position was stale.');
     const beforeEscape = { x: cat.x, y: cat.y };
-    let maze = await begin();
+    let { maze, questionId } = await begin();
     const playerBeforeFailure = world.player.id;
     for (let i = 0; i < 1000 && !maze.finished; i += 1) maze.update(0, 50);
     assert(maze.finished && maze.escaped, 'Cat did not follow the maze to its exit.');
@@ -309,7 +312,7 @@ export async function testVolcanoCat(world) {
     assert(Phaser.Math.Distance.Between(beforeEscape.x, beforeEscape.y, cat.x, cat.y) >= 900
       && world.player.id !== playerBeforeFailure && cat.interactionIndex === 0
       && !cat.following && world.leaderFollowerSystem.companions.length === 0
-      && !world.stateManager.learnedChallengeIds.has('volcano-cat-reading'),
+      && !world.stateManager.learnedChallengeIds.has(questionId),
     'Escaping cat did not relocate far away, switch players, and leave the question unfinished.');
     world.dialogueWindow.close();
     const accessible = reachableVolcano([]);
@@ -323,7 +326,7 @@ export async function testVolcanoCat(world) {
         assert(canReachVolcano(accessible, cat), 'Cat wandered into a blocked or inaccessible volcanic area.');
       }
     }
-    maze = await begin();
+    ({ maze, questionId } = await begin());
     for (let i = 0; i < 500 && !maze.finished; i += 1) {
       if (!maze.runner.next) {
         const path = mazePath([maze.runner.x, maze.runner.y], [13, 1], maze.mazeRows);
@@ -337,7 +340,7 @@ export async function testVolcanoCat(world) {
     }
     await waitUntil(() => !maze.sys.isActive() && world.sys.isActive(), 'World did not resume after catching the cat.');
     assert(maze.finished && !maze.escaped && cat.interactionIndex === 1
-      && world.stateManager.learnedChallengeIds.has('volcano-cat-reading')
+      && world.stateManager.learnedChallengeIds.has(questionId)
       && cat.following && world.leaderFollowerSystem.companions[0] === cat && !cat.nameTag.visible,
     'Following a valid maze route did not capture the cat and credit the question.');
     world.dialogueWindow.close();

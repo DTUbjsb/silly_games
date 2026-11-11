@@ -251,6 +251,24 @@
         "success": "Ja, rain betyder regn!",
         "hint": "Det er vand, der falder fra skyerne."
       }
+    },
+    {
+      "id": "english-three-hiding-dog",
+      "category": "English",
+      "difficulty": 3,
+      "question": "Hvad betyder “The little dog is hiding behind the chair” på dansk?",
+      "options": [
+        "Den lille hund gemmer sig bag stolen",
+        "Den lille hund løber foran stolen",
+        "Den store hund gemmer sig under bordet"
+      ],
+      "correctAnswer": "Den lille hund gemmer sig bag stolen",
+      "story": {
+        "character": "Sprogfeen",
+        "introduction": "Sætningens ord fortæller både, hvad hunden gør, og hvor den er.",
+        "success": "Ja, den lille hund gemmer sig bag stolen!",
+        "hint": "Hiding betyder gemmer sig, og behind betyder bag."
+      }
     }
   ]
 }

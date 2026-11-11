@@ -5,6 +5,10 @@ Small silly js/html games for kids. Mainly in Danish or teaching Danish->English
 
 `unicorn-adventure/` is an unfinished browser-based educational RPG built with Phaser 3. Run it from a local HTTP server (rather than opening the HTML file directly), because the game loads ES modules and JSON data.
 
+Before playing, both players enter their names and choose their ages, genders and hair colors on the landing page. Gender and hair color select the matching player sprite throughout the world and mini-games. These choices and game progress are stored in the browser in save-file version 2; resetting progress returns to the landing page with the player choices retained.
+
+Question difficulty follows the active player's age: ages 4–6 use level 1, 7–8 level 2, 9–10 level 3, 11–12 level 4, and 13–18 level 5.
+
 To run the game-rules regression checks, start the same server and open `tests/index.html` beneath the game URL. The tests use the same Phaser CDN as the game.
 
 ### Current gameplay

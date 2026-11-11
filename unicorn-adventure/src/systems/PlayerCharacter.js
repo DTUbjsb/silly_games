@@ -1,10 +1,11 @@
 export class PlayerCharacter {
-  constructor(scene, { id, name, age, avatar, hairColor, x, y }) {
+  constructor(scene, { id, name, age, avatar, hairColor, gender, x, y }) {
     this.id = id;
     this.name = name;
     this.age = age;
     this.avatar = avatar;
     this.hairColor = hairColor;
+    this.gender = gender;
     this.sprite = scene.physics.add.sprite(x, y, avatar);
     this.sprite.setScale(0.82);
     this.sprite.setCollideWorldBounds(true);

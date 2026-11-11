@@ -503,6 +503,24 @@
         "success": "Ja, svaret er 50!",
         "hint": "Brug tallene i regnestykket til at trække fra."
       }
+    },
+    {
+      "id": "math-three-groups",
+      "category": "Math",
+      "difficulty": 3,
+      "question": "6 poser har 4 kugler hver. Der ligger også 3 løse kugler. Hvor mange kugler er der i alt?",
+      "options": [
+        "24",
+        "27",
+        "30"
+      ],
+      "correctAnswer": "27",
+      "story": {
+        "character": "Talvennen",
+        "introduction": "Talvennen skal tælle kuglerne i poserne og dem, der ligger løst.",
+        "success": "Ja, der er 27 kugler i alt!",
+        "hint": "Gang først seks poser med fire kugler, og læg derefter de tre løse til."
+      }
     }
   ]
 }

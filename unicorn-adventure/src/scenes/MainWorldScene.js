@@ -232,6 +232,7 @@ export class MainWorldScene extends Phaser.Scene {
     const southTileset = this.southMap.addTilesetImage('world-tiles', 'world-tiles', TEST_WORLD_TILE_SIZE, TEST_WORLD_TILE_SIZE, 0, 0);
     this.southLayer = this.southMap.createLayer(0, southTileset, 0, SOUTH_ORIGIN).setDepth(-1);
     this.southMap.setCollision([WORLD_TILE.WEST_WALL, WORLD_TILE.SOUTH_GATE]);
+    this.createSouthGroundDetails();
     this.southWalls = [
       this.add.rectangle(-westWidth / 2, SOUTH_ORIGIN + 16, westWidth, 32, 0x596378),
       this.add.rectangle(EAST_ORIGIN + EAST_REGION_WIDTH * 16, SOUTH_ORIGIN + 16, EAST_REGION_WIDTH * 32, 32, 0x596378),
@@ -1157,13 +1158,20 @@ export class MainWorldScene extends Phaser.Scene {
       return;
     }
     if (!window.confirm(
-      'Vil du nulstille spillet? Alle indsamlede enhjørninger, redskaber og alt tilbehør slettes, og eventyret starter forfra.',
+      'Vil du nulstille spillet? Alle indsamlede enhjørninger, redskaber og alt tilbehør slettes. I kommer tilbage til startsiden.',
     )) {
       return;
     }
     try {
-      const previousSeed = this.collectibleManager.store.loadState().layoutSeed;
-      this.collectibleManager.store.save(new Set(), new Map(), newLayoutSeed(previousSeed), new Set(), new Set());
+      const { layoutSeed, players } = this.collectibleManager.store.loadState();
+      this.collectibleManager.store.save(
+        new Set(),
+        new Map(),
+        newLayoutSeed(layoutSeed),
+        new Set(),
+        new Set(),
+        players,
+      );
     } catch (error) {
       console.error('Kunne ikke nulstille spillet.', error);
       this.dialogueWindow.showLines('Nulstil spil', [
@@ -1171,7 +1179,11 @@ export class MainWorldScene extends Phaser.Scene {
       ]);
       return;
     }
-    this.scene.restart();
+    const resetEvent = new Event('unicorn-adventure-reset', { cancelable: true });
+    window.dispatchEvent(resetEvent);
+    if (!resetEvent.defaultPrevented) {
+      this.scene.restart();
+    }
   }
 
   loadPlayers() {
@@ -1349,6 +1361,49 @@ export class MainWorldScene extends Phaser.Scene {
     graphics.destroy();
   }
 
+  createSouthGroundDetails() {
+    const graphics = this.add.graphics().setDepth(-0.8).setName('south-ground-details');
+    const scorchedPatches = [
+      { x: -250, y: -70, width: 110, height: 54 },
+      { x: 210, y: -145, width: 136, height: 62 },
+      { x: -180, y: -285, width: 94, height: 46 },
+      { x: 185, y: -485, width: 122, height: 58 },
+      { x: -230, y: -615, width: 146, height: 70 },
+      { x: 220, y: -790, width: 112, height: 54 },
+      { x: -95, y: 145, width: 130, height: 60 },
+    ];
+
+    for (const patch of scorchedPatches) {
+      const x = DRAGON_DEN.x + patch.x;
+      const y = DRAGON_DEN.y + patch.y;
+      graphics.fillStyle(0x6b513c, 0.16).fillEllipse(x, y, patch.width, patch.height);
+      graphics.fillStyle(0x51453a, 0.1)
+        .fillEllipse(x - patch.width * 0.18, y + 2, patch.width * 0.44, patch.height * 0.62)
+        .fillEllipse(x + patch.width * 0.2, y - 3, patch.width * 0.38, patch.height * 0.54);
+      graphics.lineStyle(2, 0x544936, 0.16)
+        .lineBetween(x - 12, y - 4, x - 5, y + 3)
+        .lineBetween(x + 7, y - 8, x + 12, y - 1);
+    }
+
+    for (let step = 0; step < 8; step += 1) {
+      const side = step % 2 === 0 ? -1 : 1;
+      const x = DRAGON_DEN.x + Math.sin(step * 0.8) * 58 + side * 13;
+      const y = DRAGON_DEN.y - 108 - step * 88;
+      graphics.fillStyle(0x514139, 0.12).fillEllipse(x, y - 3, 38, 34);
+      graphics.fillStyle(0x514139, 0.28)
+        .fillEllipse(x, y + 2, 17, 14)
+        .fillEllipse(x - 10, y - 10, 7, 10)
+        .fillEllipse(x, y - 15, 7, 11)
+        .fillEllipse(x + 10, y - 10, 7, 10);
+      graphics.lineStyle(2, 0x443832, 0.24)
+        .lineBetween(x - 12, y - 13, x - 14, y - 17)
+        .lineBetween(x, y - 18, x, y - 22)
+        .lineBetween(x + 12, y - 13, x + 14, y - 17);
+    }
+
+    this.southGroundDetails = graphics;
+  }
+
   collectWorldItem(playerSprite, pickup) {
     if (
       this.isAnswering
@@ -1432,21 +1487,28 @@ export class MainWorldScene extends Phaser.Scene {
 
   startNPCChallenge(challengeId, onCorrect, miniGame, options = {}) {
     let challenge;
-    if (options.randomForPlayer) {
-      try {
-        const previous = this.lastNPCChallenges.get(options.npcId);
+    const historyKey = options.npcId ?? challengeId;
+    try {
+      const previous = this.lastNPCChallenges.get(historyKey);
+      if (options.randomForPlayer) {
         challenge = this.getPlayerChallenge(previous ? [previous] : []);
-      } catch (error) {
-        console.error('Kunne ikke finde et spørgsmål til udfordringen.', error);
-        this.dialogueWindow.showLines('Udfordringen', [`${error.message} Prøv igen senere.`]);
-        return;
+      } else {
+        const fixedChallenge = this.challengeManager.getChallenge(challengeId);
+        if (!fixedChallenge) {
+          throw new Error(`Læringsudfordringen "${challengeId}" findes ikke.`);
+        }
+        challenge = this.challengeManager.getChallengeForCategory(
+          this.leaderFollowerSystem.leader.age,
+          fixedChallenge.category,
+          [...this.stateManager.getLearnedChallengeIds(), ...(previous ? [previous] : [])],
+          this.npcManager.getGateChallengeIds(),
+        );
       }
-      this.lastNPCChallenges.set(options.npcId, challenge.id);
-    } else {
-      challenge = this.challengeManager.getChallenge(challengeId);
-    }
-    if (!challenge) {
-      throw new Error(`Læringsudfordringen "${challengeId}" findes ikke.`);
+      this.lastNPCChallenges.set(historyKey, challenge.id);
+    } catch (error) {
+      console.error('Kunne ikke finde et spørgsmål til udfordringen.', error);
+      this.dialogueWindow.showLines('Udfordringen', [`${error.message} Prøv igen senere.`]);
+      return;
     }
 
     this.startChallenge(challenge, onCorrect, miniGame, options.npcId);

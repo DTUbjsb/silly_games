@@ -130,8 +130,16 @@ export function testMap(scene) {
   assert(items['accessory-wave'].slot === 'sticker'
     && items['accessory-alvina-hat'].slot === 'crown'
     && items['accessory-ellie-hat'].slot === 'crown', 'New accessories use incorrect slots.');
+  assert(scene.southGroundDetails?.name === 'south-ground-details'
+    && scene.southGroundDetails.depth > scene.southLayer.depth
+    && scene.southGroundDetails.depth < 0,
+  'Southern ground details are missing or cover the player sprites.');
   assert(scene.playerManager.resolveAvatar({ avatar: 'girl', hairColor: 'purple' }) === 'girl-purple',
     'Purple-haired girl uses the wrong texture name.');
+  assert(['yellow', 'brown', 'purple'].every((hairColor) => (
+    scene.playerManager.resolveAvatar({ avatar: 'girl', gender: 'boy', hairColor }) === `boy-${hairColor}`
+      && scene.textures.exists(`boy-${hairColor}`)
+  )), 'Boy avatars are missing or do not use their selected hair colors.');
 }
 
 export async function testWestCrack(scene) {

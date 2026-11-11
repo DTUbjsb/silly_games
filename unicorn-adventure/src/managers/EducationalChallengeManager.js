@@ -140,18 +140,16 @@ export class EducationalChallengeManager {
     const targetDifficulty = this.getDifficultyForAge(age);
     const reserved = new Set(reservedIds);
     const suitable = Array.from(this.challenges.values())
-      .filter((challenge) => challenge.difficulty <= targetDifficulty && !reserved.has(challenge.id)
+      .filter((challenge) => challenge.difficulty === targetDifficulty && !reserved.has(challenge.id)
         && (category === null || challenge.category === category));
     if (suitable.length === 0) {
-      throw new Error(`Der findes ingen udfordringer på et passende niveau${category ? ` i kategorien ${category}` : ''}.`);
+      throw new Error(`Der findes ingen udfordringer på det alderssvarende niveau${category ? ` i kategorien ${category}` : ''}.`);
     }
 
     const excluded = new Set(excludedIds);
     const unseen = suitable.filter((challenge) => !excluded.has(challenge.id));
     const pool = unseen.length > 0 ? unseen : suitable;
-    const difficulty = Math.max(...pool.map((challenge) => challenge.difficulty));
-    const candidates = pool.filter((challenge) => challenge.difficulty === difficulty);
-    const challenge = candidates[Math.floor(Math.random() * candidates.length)];
+    const challenge = pool[Math.floor(Math.random() * pool.length)];
     return { ...challenge, options: [...challenge.options] };
   }
 

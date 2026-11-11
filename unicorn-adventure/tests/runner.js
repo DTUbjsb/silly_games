@@ -59,6 +59,44 @@ export async function run() {
     && writableLegacyStore.loadState().collectedIds.has('accessory-heart')
     && writableLegacyStore.loadState().equipment.get('accessory-crown') === 'unicorn-solstraale',
   'Saving a legacy collection changed its layout or lost progress.');
+  assert(JSON.parse(legacyRaw).version === 2, 'Saving a legacy collection did not upgrade it to version 2.');
+  let profileRaw = null;
+  const profileStore = new CollectionStore({
+    getItem: () => profileRaw,
+    setItem: (key, value) => { profileRaw = value; },
+  });
+  const players = [
+    { id: 'player-001', name: 'Sofie', age: 8, gender: 'girl', hairColor: 'brown' },
+    { id: 'player-002', name: 'Emil', age: 6, gender: 'boy', hairColor: 'purple' },
+  ];
+  profileStore.save(new Set(), new Map(), 123, new Set(), new Set(), players);
+  assert(JSON.parse(profileRaw).version === 2
+    && profileStore.loadState().players[1].name === 'Emil'
+    && profileStore.loadState().players[1].gender === 'boy',
+  'Player choices were not saved in version 2.');
+  const legacyGenderStore = new CollectionStore({
+    getItem: () => JSON.stringify({
+      version: 2,
+      collectedIds: [],
+      players: [{ ...players[0], gender: 'other' }, players[1]],
+    }),
+  });
+  assert(legacyGenderStore.loadState().players[0].gender === 'girl',
+    'A removed saved gender option was not migrated to a supported choice.');
+  const invalidProfilesStore = new CollectionStore({
+    getItem: () => JSON.stringify({
+      version: 2,
+      collectedIds: [],
+      players: [{ ...players[0], gender: 'unknown' }, players[1]],
+    }),
+  });
+  let invalidProfilesRejected = false;
+  try {
+    invalidProfilesStore.loadState();
+  } catch (error) {
+    invalidProfilesRejected = error.message.includes('ugyldigt format');
+  }
+  assert(invalidProfilesRejected, 'Invalid saved player choices were accepted.');
   const invalidSeedStore = new CollectionStore({
     getItem: () => '{"version":1,"collectedIds":[],"layoutSeed":-1}',
   });

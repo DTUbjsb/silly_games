@@ -9,6 +9,9 @@ export class BootScene extends Phaser.Scene {
     this.load.image('girl-purple', 'src/assets/girl-purple.svg');
     this.load.image('girl-yellow', 'src/assets/girl-yellow.svg');
     this.load.image('girl-brown', 'src/assets/girl-brown.svg');
+    this.load.image('boy-yellow', 'src/assets/boy-yellow.svg');
+    this.load.image('boy-brown', 'src/assets/boy-brown.svg');
+    this.load.image('boy-purple', 'src/assets/boy-purple.svg');
     this.load.image('unicorn-purple', 'src/assets/unicorn-purple.svg');
     this.load.image('unicorn-blue', 'src/assets/unicorn-blue.svg');
     this.load.image('unicorn-pink', 'src/assets/unicorn-pink.svg');

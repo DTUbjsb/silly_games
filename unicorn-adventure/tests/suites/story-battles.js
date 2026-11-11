@@ -811,21 +811,26 @@ export async function testTrollGame(world) {
   };
   const start = async (npcId, challengeId, gateX, gateY) => {
     const player = world.player;
-    const challenge = world.challengeManager.getChallenge(challengeId);
+    const category = world.challengeManager.getChallenge(challengeId).category;
     world.npcManager.runInteraction(world.npcManager.npcs.find((npc) => npc.id === npcId));
     const question = game.scene.getScene('ChallengeScene');
     await waitUntil(() => question.sys.isActive(), `${npcId} question did not start.`);
+    assert(question.challenge.category === category
+      && question.challenge.difficulty === world.challengeManager.getDifficultyForAge(player.age),
+    `${npcId} question did not match the active player's category and age.`);
     const correct = question.challenge.options.findIndex((option) => (
-      world.challengeManager.answersMatch(option, challenge.correctAnswer)
+      world.challengeManager.answersMatch(option, question.challenge.correctAnswer)
     ));
+    const questionId = question.challenge.id;
     question.answerButtons[correct].emit('pointerdown');
     question.continueButton.emit('pointerdown');
     const troll = game.scene.getScene('TrollScene');
     await waitUntil(() => troll.sys.isActive(), `${npcId} game did not start.`);
+    troll.questionId = questionId;
     assert(troll.difficulty === minigameSpeed(player.age), 'Troll game used the wrong player age.');
     const map = npcId === 'north-troll' ? world.northMap : npcId === 'west-troll' ? world.westMap : world.worldMap;
     assert(world.sys.isPaused() && world.isAnswering && map.getTileAt(gateX, gateY).collides
-      && !world.stateManager.getLearnedChallengeIds().includes(challengeId)
+      && !world.stateManager.getLearnedChallengeIds().includes(questionId)
       && troll.player.texture.key === player.avatar && troll.player.x < 400
       && troll.children.list.some((object) => object.text === player.name),
     'Troll game did not preserve the active player or keep the bridge and question unfinished.');
@@ -872,7 +877,7 @@ export async function testTrollGame(world) {
     }
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after troll loss.');
     assert(world.player.id !== first && world.worldMap.getTileAt(31, 32).collides
-      && !world.stateManager.getLearnedChallengeIds().includes('math-addition')
+      && !world.stateManager.getLearnedChallengeIds().includes(troll.questionId)
       && world.stateManager.turnPoints.get(first) === 1 && heard.includes('trollLose'),
     'Losing did not switch players or left incorrect bridge, question, points, or sound state.');
     world.dialogueWindow.close();
@@ -889,7 +894,7 @@ export async function testTrollGame(world) {
     }
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after troll win.');
     assert(!world.worldMap.getTileAt(31, 32).collides && world.worldMap.getTileAt(93, 64).collides
-      && world.stateManager.getLearnedChallengeIds().includes('math-addition')
+      && world.stateManager.getLearnedChallengeIds().includes(troll.questionId)
       && world.stateManager.turnPoints.get(winner) === 2
       && heard.filter((name) => name === 'trollApple').length === 7 && heard.includes('trollWin'),
     'Winning did not open only the bridge, credit the question and play sounds.');
@@ -909,7 +914,7 @@ export async function testTrollGame(world) {
     }
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after second troll loss.');
     assert(world.worldMap.getTileAt(93, 64).collides && world.player.id !== secondPlayer
-      && !world.stateManager.getLearnedChallengeIds().includes('river-troll-berries')
+      && !world.stateManager.getLearnedChallengeIds().includes(troll.questionId)
       && world.stateManager.turnPoints.get(secondPlayer) === 2,
     'Second troll loss changed the bridge, question, or unfinished points.');
     world.dialogueWindow.close();
@@ -921,7 +926,7 @@ export async function testTrollGame(world) {
     }
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after second troll.');
     assert(!world.worldMap.getTileAt(93, 64).collides
-      && world.stateManager.getLearnedChallengeIds().includes('river-troll-berries')
+      && world.stateManager.getLearnedChallengeIds().includes(troll.questionId)
       && world.player.id === first,
     'Second troll win did not open the bridge or apply the question turn count.');
     world.dialogueWindow.close();
@@ -935,7 +940,7 @@ export async function testTrollGame(world) {
     }
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after western troll loss.');
     assert(world.player.id !== westPlayer && world.westMap.getTileAt(23, 52).collides
-      && !world.stateManager.getLearnedChallengeIds().includes('west-troll-apples'),
+      && !world.stateManager.getLearnedChallengeIds().includes(troll.questionId),
     'Losing the western troll game changed the bridge or question.');
     world.dialogueWindow.close();
     troll = await start('west-troll', 'west-troll-apples', 23, 52);
@@ -945,7 +950,7 @@ export async function testTrollGame(world) {
     }
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after western troll win.');
     assert(!world.westMap.getTileAt(23, 52).collides && world.westMap.getTileAt(16, 27).collides
-      && world.stateManager.getLearnedChallengeIds().includes('west-troll-apples'),
+      && world.stateManager.getLearnedChallengeIds().includes(troll.questionId),
     'Winning the western troll game did not open only its bridge and credit the question.');
     world.dialogueWindow.close();
     troll = await start('north-troll', 'north-troll-stones', 91, 20);
@@ -957,7 +962,7 @@ export async function testTrollGame(world) {
     }
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after northern troll loss.');
     assert(world.northMap.getTileAt(91, 20).collides
-      && !world.stateManager.getLearnedChallengeIds().includes('north-troll-stones'),
+      && !world.stateManager.getLearnedChallengeIds().includes(troll.questionId),
     'Losing the northern troll game opened the forest or credited the question.');
     world.dialogueWindow.close();
     troll = await start('north-troll', 'north-troll-stones', 91, 20);
@@ -965,7 +970,7 @@ export async function testTrollGame(world) {
     while (troll.applesCollected < 7) overlap(troll, troll.apples, troll.collectApple);
     await waitUntil(() => world.sys.isActive() && !troll.sys.isActive(), 'World did not resume after northern troll win.');
     assert(!world.northMap.getTileAt(91, 20).collides
-      && world.stateManager.getLearnedChallengeIds().includes('north-troll-stones')
+      && world.stateManager.getLearnedChallengeIds().includes(troll.questionId)
       && world.dialogueWindow.message.text.includes('mørkeskoven')
       && !world.dialogueWindow.message.text.includes('broen'),
     'Winning the northern troll game did not open the forest.');
