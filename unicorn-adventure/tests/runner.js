@@ -6,6 +6,7 @@ import { CollectionStore } from '../src/managers/CollectionStore.js';
 import { GameStateManager } from '../src/managers/GameStateManager.js';
 import { SoundEffects } from '../src/audio/SoundEffects.js';
 import { arrangeCollectibles } from '../src/data/collectibleLayout.js';
+import { createWorldLayout } from '../src/data/worldLayout.js';
 import { mazePath, MAZE_LAYOUTS } from '../src/scenes/WitchMazeScene.js';
 import { CatMazeScene } from '../src/scenes/CatMazeScene.js';
 import { minigameSpeed } from '../src/systems/MinigameDifficulty.js';
@@ -152,6 +153,34 @@ export async function run() {
   await testWorldBoost(scene);
   const firstSeed = store.loadState().layoutSeed;
   const firstLayout = JSON.stringify(scene.collectibleManager.getAllItems().map(({ id, x, y }) => [id, x, y]));
+  const firstTerrain = JSON.stringify(createWorldLayout(firstSeed));
+  const generated = createWorldLayout(firstSeed);
+  for (const [map, data] of [[scene.worldMap, generated.world], [scene.westMap, generated.west],
+    [scene.northMap, generated.north], [scene.southMap, generated.south]]) {
+    data.forEach((row, y) => row.forEach((tile, x) => {
+      assert(map.getTileAt(x, y).index === tile, `Generated terrain was not applied at ${x},${y}.`);
+    }));
+  }
+  assert(firstTerrain === JSON.stringify(createWorldLayout(firstSeed))
+    && firstTerrain !== JSON.stringify(createWorldLayout((firstSeed + 1) >>> 0)),
+  'Terrain was not reproducible or did not vary with the seed.');
+  for (const seed of [0, 1, 123, 0xffffffff]) {
+    const layout = createWorldLayout(seed);
+    for (const [original, generated] of [[TEST_WORLD_DATA, layout.world], [WEST_REGION_DATA, layout.west],
+      [NORTH_REGION_DATA, layout.north], [SOUTH_REGION_DATA, layout.south]]) {
+      original.forEach((row, y) => row.forEach((tile, x) => {
+        const changed = generated[y][x];
+        assert(tile === changed
+          || ([WORLD_TILE.GRASS, WORLD_TILE.FLOWERS].includes(tile)
+            && [WORLD_TILE.GRASS, WORLD_TILE.FLOWERS, WORLD_TILE.PATH].includes(changed))
+          || (tile === WORLD_TILE.DARK_TREE && changed === WORLD_TILE.DARK_GROUND),
+        `Seed ${seed} changed a protected tile at ${x},${y}.`);
+        if (original === NORTH_REGION_DATA && x >= 90 && x <= 110 && y >= 10 && y <= 30) {
+          assert(tile === changed, 'The northern forest boundary changed.');
+        }
+      }));
+    }
+  }
   assert(Number.isInteger(firstSeed), 'A fresh game did not persist its layout seed.');
   assertAccessoryCounters(scene);
   assertUnicornCounters(scene);
@@ -214,8 +243,15 @@ export async function run() {
   await testWestCrack(scene);
   await testFlight(scene);
   await testWestPhysicalCollision(scene);
-  testGateInteractions(scene);
+  testGateInteractions(scene, failingWriteStore);
   await testOpenWestGates(scene);
+  scene.collectibleManager.store = failingWriteStore;
+  assert(!scene.unlockGate('northForest') && scene.northMap.getTileAt(91, 20).collides
+    && scene.dialogueWindow.message.text.includes('ikke åbnet'),
+  'A failed gate save did not keep the gate closed and report the error.');
+  scene.dialogueWindow.close();
+  scene.collectibleManager.store = store;
+  assert(scene.unlockGate('northForest'), 'Could not save the northern gate.');
   const firstPickup = scene.collectibleManager.pickups.getChildren()[0];
   scene.collectibleManager.store = failingWriteStore;
   let writeFailed = false;
@@ -259,12 +295,12 @@ export async function run() {
   scene.updateCollectionProgress();
   assert(scene.sys.isActive(), 'A saved collection interrupted the adventure.');
   assert(scene.collectibleManager.getCollectedItems('unicorn').every((unicorn) => unicorn.color), 'Unicorn colors were not restored.');
-  assert(scene.worldMap.getTileAt(64, 16).collides, 'Flora gate did not reset.');
-  assert(scene.worldMap.getTileAt(68, 52).collides, 'Luna gate did not reset.');
-  assert(scene.worldMap.getTileAt(31, 32).collides, 'Bridge did not reset.');
-  assert(scene.worldMap.getTileAt(93, 64).collides, 'Second bridge did not reset.');
-  assert(scene.westMap.getTileAt(23, 52).collides && scene.westMap.getTileAt(16, 27).collides,
-    'Western gates did not reset.');
+  assert(!scene.worldMap.getTileAt(64, 16).collides, 'Flora gate did not persist.');
+  assert(!scene.worldMap.getTileAt(68, 52).collides, 'Luna gate did not persist.');
+  assert(!scene.worldMap.getTileAt(31, 32).collides, 'Bridge did not persist.');
+  assert(!scene.worldMap.getTileAt(93, 64).collides, 'Second bridge did not persist.');
+  assert(!scene.westMap.getTileAt(23, 52).collides && !scene.westMap.getTileAt(16, 27).collides,
+    'Western gates did not persist.');
 
   scene.enterStable();
   let stable = await waitForStable(game, 3);
@@ -525,7 +561,9 @@ export async function run() {
   }
   assert(scene.hud.toolProgress.textContent.includes('1 / 1')
     && scene.hud.toolCounters.get('lava-boots').textContent.includes('2 / 2'), 'Tools were not present before reset.');
-  scene.openGate('flora');
+  assert(store.loadState().unlockedGates.has('flora')
+    && !scene.worldMap.getTileAt(64, 16).collides,
+  'The previously won fairy gate was not restored.');
   assert(scene.unlockSouthPass(), 'Could not save an unlocked southern gate.');
   scene.collectibleManager.unlockReward('princess-bows');
   scene.collectPickup(scene.collectibleManager.pickups.getChildren()
@@ -548,6 +586,45 @@ export async function run() {
     && scene.collectibleManager.pickups.getChildren().some((pickup) => pickup.getData('collectibleId') === 'bow-and-arrow-2')
     && !scene.collectibleManager.pickups.getChildren().some((pickup) => pickup.getData('collectibleId') === 'bow-and-arrow-1'),
   'Southern passage did not survive reloading with the collection.');
+  for (const [id, map, x, y] of [
+    ['flora', scene.worldMap, 64, 16], ['bridge', scene.worldMap, 31, 32],
+    ['secondBridge', scene.worldMap, 93, 64], ['luna', scene.worldMap, 68, 52],
+    ['westForest', scene.westMap, 16, 27], ['westBridge', scene.westMap, 23, 52],
+    ['northForest', scene.northMap, 91, 20],
+    ['volcanoA', scene.eastMap, 12, 16], ['volcanoB', scene.eastMap, 35, 53],
+  ]) {
+    assert(store.loadState().unlockedGates.has(id) && !map.getTileAt(x, y).collides,
+      `${id} was not restored after restarting the world.`);
+  }
+  assert(scene.npcManager.npcs.find((npc) => npc.id === 'flora').interactionIndex
+    === scene.npcManager.npcs.find((npc) => npc.id === 'flora').interactions.length,
+  'A completed guardian encounter was not restored.');
+  assert(scene.questManager.getQuest('rainbow-forest-rainbow').completed, 'The completed gate quest was not restored.');
+  for (const [npcId, sceneName] of [['guide-wizard', 'WizardBattleScene'], ['guide-dragon', 'DragonBattleScene']]) {
+    const before = JSON.stringify([...store.loadState().unlockedGates].sort());
+    const guide = scene.npcManager.npcs.find((npc) => npc.id === npcId);
+    scene.npcManager.runInteraction(guide);
+    while (scene.dialogueWindow.mode === 'dialogue') scene.dialogueWindow.advance();
+    assert(scene.dialogueWindow.mode === 'quest' && scene.dialogueWindow.acceptButton.text === 'Spil igen',
+      `${npcId} did not offer a replay.`);
+    scene.dialogueWindow.chooseQuest(false);
+    assert(!game.scene.isActive(sceneName), 'Declining a replay started a battle.');
+    for (const won of [false, true]) {
+      scene.npcManager.runInteraction(guide);
+      while (scene.dialogueWindow.mode === 'dialogue') scene.dialogueWindow.advance();
+      scene.dialogueWindow.chooseQuest(true);
+      const battle = game.scene.getScene(sceneName);
+      const deadline = Date.now() + 5000;
+      while (!battle.sys.isActive() && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 25));
+      assert(battle.sys.isActive() && scene.sys.isPaused(), `${sceneName} replay did not launch.`);
+      battle.finish(won);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      assert(scene.sys.isActive() && !scene.isAnswering && scene.southOpen && scene.dragonRescued
+        && JSON.stringify([...store.loadState().unlockedGates].sort()) === before,
+      `${sceneName} replay changed story progress.`);
+      scene.dialogueWindow.close();
+    }
+  }
   scene.interactWithDragonDen();
   assert(scene.dialogueWindow.message.text.includes('prinsen er fri')
     && scene.dialogueWindow.message.text.includes('prinsessen'), 'Reloaded empty den did not celebrate the ending.');
@@ -592,6 +669,7 @@ export async function run() {
     const resetLayout = JSON.stringify(scene.collectibleManager.getAllItems().map(({ id, x, y }) => [id, x, y]));
     assert(confirmations === 3 && store.loadState().collectedIds.size === 0
       && resetSeed !== firstSeed && resetLayout !== firstLayout
+      && JSON.stringify(createWorldLayout(resetSeed)) !== firstTerrain
       && store.loadState().equipment.size === 0 && scene.collectibleManager.collectedIds.size === 0
       && store.loadState().unlockedGates.size === 0 && !scene.southOpen
       && store.loadState().unlockedRewards.size === 0
@@ -625,10 +703,18 @@ export async function run() {
       && scene.collectibleManager.pickups.getChildren().length === 78,
     'Reset progress did not remain empty after reloading the world.');
     await testAutomaticTurns(scene, store, failingStore);
+    const afterTurns = store.loadState();
+    afterTurns.unlockedGates.delete('bridge');
+    store.save(afterTurns.collectedIds, afterTurns.equipment, afterTurns.layoutSeed,
+      afterTurns.unlockedGates, afterTurns.unlockedRewards, afterTurns.players);
     previousManager = scene.collectibleManager;
     scene.scene.restart();
     scene = await waitForWorld(game, previousManager);
     await testFairyShooter(scene);
+    const afterFairies = store.loadState();
+    afterFairies.unlockedGates.clear();
+    store.save(afterFairies.collectedIds, afterFairies.equipment, afterFairies.layoutSeed,
+      afterFairies.unlockedGates, afterFairies.unlockedRewards, afterFairies.players);
     previousManager = scene.collectibleManager;
     scene.scene.restart();
     scene = await waitForWorld(game, previousManager);

@@ -1,3 +1,5 @@
+import { WORLD_GATES } from '../data/testWorld.js';
+
 const STORAGE_KEY = 'unicorn-adventure-collection-v1';
 const PLAYER_GENDERS = new Set(['girl', 'boy']);
 const PLAYER_HAIR_COLORS = new Set(['yellow', 'brown', 'purple']);
@@ -54,7 +56,7 @@ export class CollectionStore {
         && (!Number.isInteger(saved.layoutSeed) || saved.layoutSeed < 0 || saved.layoutSeed > 0xffffffff))
       || (saved.unlockedGates !== undefined && (
         !Array.isArray(saved.unlockedGates)
-        || !saved.unlockedGates.every((gate) => ['south', 'dragon'].includes(gate))
+        || !saved.unlockedGates.every((gate) => gate === 'dragon' || Object.hasOwn(WORLD_GATES, gate))
         || new Set(saved.unlockedGates).size !== saved.unlockedGates.length
       ))
       || (saved.unlockedRewards !== undefined && (

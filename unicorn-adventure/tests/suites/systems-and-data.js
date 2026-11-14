@@ -108,6 +108,11 @@ export function testGuideGnomes(world) {
       `${npc.id} did not acknowledge the rescue.`);
   }
   const speedGuide = gnomes.find((npc) => npc.id === 'guide-speed');
+  for (const id of ['guide-wizard', 'guide-dragon']) {
+    world.npcManager.runInteraction(gnomes.find((npc) => npc.id === id));
+    while (world.dialogueWindow.mode === 'dialogue') world.dialogueWindow.advance();
+    assert(!world.dialogueWindow.isOpen, `${id} offered a replay before victory.`);
+  }
   world.npcManager.runInteraction(speedGuide);
   assert(world.dialogueWindow.message.text.includes('fartboost'), 'Speed guide did not explain the boost.');
   while (world.dialogueWindow.isOpen) world.dialogueWindow.advance();

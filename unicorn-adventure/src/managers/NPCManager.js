@@ -254,7 +254,7 @@ export class NPCManager {
   }
 
   runInteraction(npc) {
-    this.beforeInteraction?.(npc);
+    if (this.beforeInteraction?.(npc)) return;
     const interaction = npc.interactions[npc.interactionIndex];
     if (!interaction) {
       this.dialogueWindow.showLines(npc.name, [npc.repeatDialogue]);
@@ -285,6 +285,13 @@ export class NPCManager {
       ? interaction.miniGame : undefined;
     const questId = interaction?.type === 'challenge' ? interaction.questId : undefined;
     this.onChallenge(challengeId, () => {
+      const interaction = npc.interactions[npc.interactionIndex];
+      if (interaction?.type === 'challenge' && interaction.challengeId === challengeId && interaction.opensGate) {
+        if (typeof this.onGateOpen !== 'function') {
+          throw new Error('Der mangler en handling til at åbne adgangen.');
+        }
+        if (this.onGateOpen(interaction.opensGate) === false) return false;
+      }
       const activeQuest = questId
         ? this.questManager.getActiveQuests().find((quest) => quest.id === questId)
         : undefined;
@@ -292,14 +299,7 @@ export class NPCManager {
         this.questManager.completeQuest(activeQuest.id);
       }
 
-      const interaction = npc.interactions[npc.interactionIndex];
       if (interaction?.type === 'challenge' && interaction.challengeId === challengeId) {
-        if (interaction.opensGate) {
-          if (typeof this.onGateOpen !== 'function') {
-            throw new Error('Der mangler en handling til at åbne adgangen.');
-          }
-          this.onGateOpen(interaction.opensGate);
-        }
         this.advanceInteraction(npc);
       }
 

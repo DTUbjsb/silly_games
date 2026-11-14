@@ -385,7 +385,7 @@ export async function testWorldMusicPause(scene) {
   }
 }
 
-export function testGateInteractions(scene) {
+export function testGateInteractions(scene, failingStore) {
   const manager = scene.npcManager;
   let success;
   let currentChallenge;
@@ -412,6 +412,13 @@ export function testGateInteractions(scene) {
   manager.runInteraction(byId('volcano-keeper'));
   assert(challengeOptions.miniGame === 'volcanoCrystals' && gateClosed(WORLD_TILE.VOLCANIC_GATE_A),
     'Crystal guardian did not guard its gate.');
+  const originalStore = scene.collectibleManager.store;
+  scene.collectibleManager.store = failingStore;
+  assert(success() === false && byId('volcano-keeper').interactionIndex === 0
+    && gateClosed(WORLD_TILE.VOLCANIC_GATE_A) && scene.dialogueWindow.message.text.includes('ikke åbnet'),
+  'A failed guardian save advanced the encounter or opened its gate.');
+  scene.dialogueWindow.close();
+  scene.collectibleManager.store = originalStore;
   success();
   assert(!gateClosed(WORLD_TILE.VOLCANIC_GATE_A) && gateClosed(WORLD_TILE.VOLCANIC_GATE_B),
     'Crystal guardian opened the wrong gate.');

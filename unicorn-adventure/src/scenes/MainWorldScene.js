@@ -37,6 +37,7 @@ import { wizardTeam } from '../systems/WizardTeam.js';
 import { DialogueWindow } from '../ui/DialogueWindow.js';
 import { Hud } from '../ui/Hud.js';
 import { newLayoutSeed } from '../data/collectibleLayout.js';
+import { createWorldLayout } from '../data/worldLayout.js';
 
 const STABLE_ENTRANCE = { x: 160, y: 160 };
 const ACCESSORY_PICKUP_SOUNDS = {
@@ -300,7 +301,7 @@ export class MainWorldScene extends Phaser.Scene {
       dialogueWindow: this.dialogueWindow,
       onChallenge: (challengeId, onCorrect, miniGame, options) => this.startNPCChallenge(challengeId, onCorrect, miniGame, options),
       gateIds: Object.keys(WORLD_GATES),
-      onGateOpen: (gateId) => this.openGate(gateId),
+      onGateOpen: (gateId) => this.unlockGate(gateId),
       beforeInteraction: (npc) => this.updateStoryDialogue(npc),
     });
     this.playerStatus = this.add.text(400, 300, 'Indlæser spilverdenen...', {
@@ -899,7 +900,7 @@ export class MainWorldScene extends Phaser.Scene {
 
   updateStoryDialogue(npc) {
     if (npc.avatar === 'guide-gnome') {
-      npc.interactions[0].lines = guideLines(npc.id, {
+      const lines = guideLines(npc.id, {
         unicorns: this.collectibleManager.getCollectedItems('unicorn'),
         accessories: this.collectibleManager.getCollectedItems('accessory'),
         tools: this.collectibleManager.getCollectedItems('tool'),
@@ -907,6 +908,17 @@ export class MainWorldScene extends Phaser.Scene {
         dragonRescued: this.dragonRescued,
         princess: this.leaderFollowerSystem.companions.some((companion) => companion.id === 'warrior-princess'),
       });
+      const replay = npc.id === 'guide-wizard' && this.southOpen ? 'wizard'
+        : npc.id === 'guide-dragon' && this.dragonRescued ? 'dragon' : null;
+      if (replay) {
+        this.dialogueWindow.showLines(npc.name, lines, () => {
+          const name = replay === 'wizard' ? 'troldmandskampen' : 'dragekampen';
+          this.dialogueWindow.showChoice(npc.name, `Vil I prøve ${name} igen?`, 'Vælg en mulighed:',
+            (accepted) => { if (accepted) this.replayBattle(replay); }, 'Spil igen', 'Ikke nu');
+        });
+        return true;
+      }
+      npc.interactions[0].lines = lines;
       npc.interactionIndex = 0;
       return;
     }
@@ -927,6 +939,31 @@ export class MainWorldScene extends Phaser.Scene {
       help,
     ];
     npc.repeatDialogue = `${direction} ${help}`;
+  }
+
+  replayBattle(kind) {
+    const route = MINI_GAME_ROUTES.wizard;
+    if (kind === 'wizard' && !wizardTeam(
+      this.collectibleManager.getCollectedItems('unicorn'),
+      this.collectibleManager.getCollectedItems('accessory'),
+    )) {
+      this.dialogueWindow.showLines('Troldenissen', ['I skal bruge det samme hold og tilbehør som sidst for at spille igen.']);
+      return;
+    }
+    const args = kind === 'wizard' ? createMiniGameArguments(this, route) : {
+      player: { age: this.player.age },
+      players: this.leaderFollowerSystem.players.map((member) => ({ avatar: member.avatar, name: member.name })),
+    };
+    this.isAnswering = true;
+    this.scene.launch(kind === 'wizard' ? route.scene : 'DragonBattleScene', {
+      ...args,
+      onComplete: (won) => {
+        this.isAnswering = false;
+        this.dialogueWindow.showLines(kind === 'wizard' ? 'Troldenissen' : 'Dragenissen',
+          [won ? 'Flot kæmpet! I vandt igen.' : 'Godt kæmpet! I kan prøve igen, når I har lyst.']);
+      },
+    });
+    this.scene.pause();
   }
 
   interactWithSouthPass() {
@@ -1200,7 +1237,28 @@ export class MainWorldScene extends Phaser.Scene {
         }
 
         this.stateManager = new GameStateManager();
-        const unlockedGates = this.collectibleManager.store.loadState().unlockedGates;
+        const { unlockedGates, layoutSeed } = this.collectibleManager.store.loadState();
+        const layout = createWorldLayout(layoutSeed);
+        for (const [map, data] of [[this.worldMap, layout.world], [this.westMap, layout.west],
+          [this.northMap, layout.north], [this.southMap, layout.south]]) {
+          data.forEach((row, y) => row.forEach((tile, x) => {
+            if (map.getTileAt(x, y).index !== tile) map.putTileAt(tile, x, y);
+          }));
+        }
+        for (const gate of unlockedGates) {
+          if (gate !== 'south' && gate !== 'dragon') this.openGate(gate);
+        }
+        for (const npc of this.npcManager.npcs) {
+          const index = npc.interactions.findIndex((interaction) => unlockedGates.has(interaction.opensGate));
+          if (index !== -1) {
+            npc.interactionIndex = index + 1;
+            const questId = npc.interactions[index].questId;
+            if (questId && !this.questManager.getQuest(questId).completed) {
+              this.questManager.acceptQuest(questId);
+              this.questManager.completeQuest(questId);
+            }
+          }
+        }
         if (unlockedGates.has('south')) this.openSouthPass();
         if (unlockedGates.has('dragon')) this.rescuePrince();
         this.updateCollectionProgress();
@@ -1534,13 +1592,28 @@ export class MainWorldScene extends Phaser.Scene {
     }
   }
 
+  unlockGate(gateId) {
+    try {
+      const state = this.collectibleManager.store.loadState();
+      state.unlockedGates.add(gateId);
+      this.collectibleManager.store.save(state.collectedIds, state.equipment, state.layoutSeed,
+        state.unlockedGates, state.unlockedRewards, state.players);
+    } catch (error) {
+      console.error('Kunne ikke gemme den åbne adgang.', error);
+      this.dialogueWindow.showLines('Adgangen', [`${error.message} Adgangen blev ikke åbnet. Prøv igen.`]);
+      return false;
+    }
+    this.openGate(gateId);
+    return true;
+  }
+
   startChallenge(challenge, onCorrect = null, miniGame = undefined, npcId = undefined) {
     this.isAnswering = true;
     const playerId = this.leaderFollowerSystem.leader.id;
     const complete = () => {
       this.isAnswering = false;
+      if (onCorrect?.() === false) return false;
       this.stateManager.learn(challenge.id);
-      onCorrect?.();
       if (this.stateManager.recordQuestion(playerId)) {
         this.swapLeader();
       }
@@ -1558,7 +1631,7 @@ export class MainWorldScene extends Phaser.Scene {
                 if (won) {
                   if (route.kind === 'wizard' && !this.unlockSouthPass()) return;
                   if (route.kind === 'princess' && !this.recruitPrincess()) return;
-                  complete();
+                  if (complete() === false) return;
                   if (route.kind === 'cat') this.captureCat();
                   if (!this.dialogueWindow.isOpen) {
                     this.dialogueWindow.showLines(route.speaker, [route.successMessage(this, npcId)]);
