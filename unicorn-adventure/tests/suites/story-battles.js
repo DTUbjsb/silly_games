@@ -107,6 +107,8 @@ export async function testDragonBattle(world) {
       && battle.difficulty === minigameSpeed(world.player.age), 'Dragon battle initialization failed.');
     assert(battle.rockCover.depth > battle.girls[0].depth && battle.rockCover.depth < battle.bows[0].depth,
       'The girls and their bows are not layered behind the rock cover.');
+    assert(battle.girls[0].x === 135 && battle.girls[1].x === 665,
+      'The archers are not in opposite corners.');
     const oldHeadX = battle.head.x;
     await waitUntil(() => Math.abs(battle.head.x - oldHeadX) > 40, 'Dragon head did not move sideways.');
     assert(Math.abs(battle.head.body.center.x - battle.head.x) < 1, 'Moving head and hitbox are out of sync.');
@@ -119,13 +121,43 @@ export async function testDragonBattle(world) {
     battle.cursors.right.isDown = true;
     await waitUntil(() => battle.princess.x > startX + 10, 'Princess did not move with arrow keys.');
     battle.cursors.right.isDown = false;
-    battle.pointBow({ x: battle.head.x, y: battle.head.y });
+    battle.pointBow({ x: 400, y: 120 });
     battle.fireArrow({ repeat: false });
-    assert(battle.arrows.getLength() === 1 && battle.arrows.getChildren()[0].body.velocity.y < 0,
-      'Bow did not fire an aimed arrow.');
     battle.fireArrow({ repeat: true });
     assert(battle.arrows.getLength() === 1, 'Repeating space fired extra arrows.');
-    await waitUntil(() => battle.dragonLives === 49, 'A fired arrow did not reach the dragon.');
+    battle.nextArrow = 0;
+    battle.fireArrow({ repeat: false });
+    const [leftArrow, rightArrow] = battle.arrows.getChildren();
+    assert(leftArrow.x === battle.girls[0].x && rightArrow.x === battle.girls[1].x
+      && Math.abs(leftArrow.body.velocity.x) < 0.001 && leftArrow.body.velocity.y < 0
+      && Math.abs(leftArrow.body.velocity.x - rightArrow.body.velocity.x) < 0.001
+      && Math.abs(leftArrow.body.velocity.y - rightArrow.body.velocity.y) < 0.001
+      && battle.bows[0].rotation === battle.bows[1].rotation,
+    'Center aim did not produce parallel arrows from alternating archers.');
+    battle.headMotionTime = 0;
+    battle.update(battle.time.now, 0);
+    for (const arrow of [leftArrow, rightArrow]) {
+      arrow.body.reset(arrow.x, battle.leftPaw.y);
+      assert(!battle.targets.getChildren().some((target) => battle.physics.overlap(arrow, target)),
+        'A centered, stationary aim automatically hit the dragon.');
+    }
+    battle.arrows.clear(true, true);
+    battle.pointBow({ x: 400 + battle.leftPaw.x - battle.girls[0].x, y: battle.leftPaw.y });
+    battle.nextShooter = 0;
+    battle.nextArrow = 0;
+    battle.fireArrow({ repeat: false });
+    const aimedArrow = battle.arrows.getChildren()[0];
+    assert(aimedArrow.body.velocity.x < 0 && aimedArrow.body.velocity.y < 0,
+      'Bow did not fire in the chosen direction.');
+    battle.nextArrow = 0;
+    battle.fireArrow({ repeat: false });
+    const parallelArrow = battle.arrows.getChildren()[1];
+    assert(Math.abs(aimedArrow.body.velocity.x - parallelArrow.body.velocity.x) < 0.001
+      && Math.abs(aimedArrow.body.velocity.y - parallelArrow.body.velocity.y) < 0.001
+      && battle.bows[0].rotation === battle.bows[1].rotation,
+    'Arrows and bows did not remain parallel when aiming diagonally.');
+    parallelArrow.destroy();
+    await waitUntil(() => battle.dragonLives === 49, 'A properly aimed arrow did not reach the dragon.');
     battle.shootFireball();
     assert(battle.fireballs.getLength() === 1 && battle.fireballs.getChildren()[0].body.velocity.length() > 0,
       'Dragon did not fire a moving fireball.');
@@ -527,13 +559,23 @@ export async function testSouthWizard(world) {
     for (let index = 0; index < 4; index += 1) {
       battle.input.keyboard.emit('keydown', { key: String(index + 1), repeat: false });
     }
-    assert(battle.beams.getLength() === 4, 'Keys 1–4 did not fire all four unicorns.');
+    assert(battle.beams.countActive(true) === 2 && battle.lastShots[2] === -Infinity && battle.lastShots[3] === -Infinity,
+      'Spamming unicorn keys exceeded the shared two-beam limit or consumed a rejected shot cooldown.');
     assert(battle.beams.getChildren().every((beam) => beam.body.velocity.x === 430)
       && battle.wizard.body.height + battle.beams.getChildren()[0].body.height >= 120,
     'Wizard can hide between beams or the beams are not slower.');
     battle.handleShot({ key: '1', repeat: true });
     battle.handleShot({ key: '5', repeat: false });
-    assert(battle.beams.getLength() === 4, 'Repeated or invalid key fired another beam.');
+    assert(battle.beams.countActive(true) === 2, 'Repeated or invalid key fired another beam.');
+    battle.beams.getChildren()[0].destroy();
+    battle.handleShot({ key: '3', repeat: false });
+    assert(battle.beams.countActive(true) === 2 && battle.beams.getChildren().some((beam) => beam.y === battle.unicorns[2].y),
+      'Destroying a beam did not allow another unicorn to fire.');
+    battle.beams.getChildren()[0].x = 851;
+    battle.update();
+    battle.handleShot({ key: '4', repeat: false });
+    assert(battle.beams.countActive(true) === 2 && battle.beams.getChildren().some((beam) => beam.y === battle.unicorns[3].y),
+      'An off-screen beam did not free a shot for the fourth unicorn.');
     battle.beams.clear(true, true);
     const dodgeBeam = battle.beams.create(battle.wizard.x - 100, battle.wizard.y - 20, 'wizard-beam');
     battle.update();

@@ -4,6 +4,7 @@ import { renderUnicornAccessories } from '../ui/UnicornAccessories.js';
 
 const WIZARD_LIVES = 7;
 const GIRL_LIVES = 5;
+const MAX_BEAMS = 2;
 
 export class WizardBattleScene extends Phaser.Scene {
   constructor() {
@@ -33,6 +34,9 @@ export class WizardBattleScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.add.text(400, 52, '1–4: Skyd med enhjørningerne · Piletaster / WASD: Flyt pigerne', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '15px', color: '#ffffff',
+    }).setOrigin(0.5);
+    this.add.text(400, 104, `Højst ${MAX_BEAMS} skud i luften ad gangen`, {
+      fontFamily: 'Trebuchet MS, sans-serif', fontSize: '14px', color: '#fff1c8',
     }).setOrigin(0.5);
     this.score = this.add.text(400, 80, '', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '17px', fontStyle: 'bold', color: '#ffffff',
@@ -97,7 +101,7 @@ export class WizardBattleScene extends Phaser.Scene {
   handleShot(event) {
     if (this.finished || event.repeat || !/^[1-4]$/.test(event.key)) return;
     const index = Number(event.key) - 1;
-    if (this.time.now - this.lastShots[index] < 350) return;
+    if (this.time.now - this.lastShots[index] < 350 || this.beams.countActive(true) >= MAX_BEAMS) return;
     this.lastShots[index] = this.time.now;
     const source = this.unicorns[index];
     this.beams.create(source.x, source.y, 'wizard-beam').body.setVelocityX(430);

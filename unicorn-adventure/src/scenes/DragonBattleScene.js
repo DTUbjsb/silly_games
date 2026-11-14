@@ -3,6 +3,9 @@ import { minigameSpeed } from '../systems/MinigameDifficulty.js';
 const DRAGON_LIVES = 50;
 const PRINCESS_LIVES = 15;
 const ARROW_SPEED = 600;
+const ARCHER_Y = 562;
+const AIM_ORIGIN = { x: 400, y: ARCHER_Y };
+const ARCHER_X = [135, 665];
 
 export class DragonBattleScene extends Phaser.Scene {
   constructor() {
@@ -38,12 +41,12 @@ export class DragonBattleScene extends Phaser.Scene {
     this.sword = this.add.rectangle(0, 0, 12, 72, 0xd8e6e9).setStrokeStyle(3, 0x6a7987).setDepth(5);
     this.bows = [];
     this.girls = players.slice(0, 2).map((child, index) => {
-      const x = 300 + index * 200;
+      const x = ARCHER_X[index];
       this.bows.push(this.add.image(x, 555, 'bow-and-arrow').setScale(0.65).setDepth(5));
-      return this.add.image(x, 562, child.avatar).setScale(0.58).setDepth(3);
+      return this.add.image(x, ARCHER_Y, child.avatar).setScale(0.58).setDepth(3);
     });
     this.rockCover = this.add.graphics().setDepth(4);
-    for (const x of [300, 500]) {
+    for (const x of ARCHER_X) {
       this.rockCover.fillStyle(0x36343c).fillEllipse(x, 592, 125, 43);
       this.rockCover.fillStyle(0x77717a).fillEllipse(x - 34, 581, 58, 38)
         .fillEllipse(x + 25, 582, 67, 41);
@@ -71,7 +74,7 @@ export class DragonBattleScene extends Phaser.Scene {
     this.score = this.add.text(400, 40, '', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '15px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5).setDepth(9);
-    this.add.text(400, 584, 'Mus + MELLEMRUM: skyd · Piletaster: flyt krigerprinsessen', {
+    this.add.text(400, 584, 'Mus: sigt fra midten · MELLEMRUM: skyd · Piletaster: flyt prinsessen', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '14px', color: '#ffffff',
       backgroundColor: '#191824dd', padding: { x: 6, y: 3 },
     }).setOrigin(0.5).setDepth(9);
@@ -97,10 +100,8 @@ export class DragonBattleScene extends Phaser.Scene {
 
   pointBow(pointer) {
     this.aimTarget = { x: pointer.x, y: pointer.y };
-    this.bows.forEach((bow, index) => {
-      const girl = this.girls[index];
-      bow.setRotation(Phaser.Math.Angle.Between(girl.x, girl.y, pointer.x, pointer.y) + Math.PI / 4);
-    });
+    const angle = Phaser.Math.Angle.Between(AIM_ORIGIN.x, AIM_ORIGIN.y, pointer.x, pointer.y);
+    this.bows.forEach((bow) => bow.setRotation(angle + Math.PI / 4));
   }
 
   fireArrow(event) {
@@ -108,7 +109,7 @@ export class DragonBattleScene extends Phaser.Scene {
     this.nextArrow = this.time.now + 180;
     const shooter = this.girls[this.nextShooter];
     this.nextShooter = 1 - this.nextShooter;
-    const angle = Phaser.Math.Angle.Between(shooter.x, shooter.y, this.aimTarget.x, this.aimTarget.y);
+    const angle = Phaser.Math.Angle.Between(AIM_ORIGIN.x, AIM_ORIGIN.y, this.aimTarget.x, this.aimTarget.y);
     const arrow = this.arrows.create(shooter.x, shooter.y, 'dragon-arrow').setRotation(angle).setDepth(5);
     arrow.body.setVelocity(Math.cos(angle) * ARROW_SPEED, Math.sin(angle) * ARROW_SPEED);
     this.registry.get('soundEffects').play('star');

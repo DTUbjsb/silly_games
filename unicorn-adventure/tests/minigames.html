@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <base href="../">
+    <title>Prøv minispillene</title>
+    <link rel="stylesheet" href="tests/minigames.css">
+  </head>
+  <body>
+    <main>
+      <h1>Prøv minispillene</h1>
+      <p>Vælg et spil og en alder. Testen ændrer ikke dit gemte eventyr.</p>
+      <form id="controls">
+        <label>Minispil
+          <select id="minigame">
+            <option value="wizard">Kampen mod troldmanden</option>
+            <option value="dragon">Dragekampen</option>
+            <option value="mosquito">Myggejagten</option>
+            <option value="troll">Troldens æbler</option>
+            <option value="flight-west">Flyv over revnen mod vest</option>
+            <option value="flight-east">Flyv over revnen mod øst</option>
+            <option value="cave">Hulen</option>
+            <option value="witch">Heksens labyrint</option>
+            <option value="cat">Fang ildkatten</option>
+            <option value="boat">Bådturen</option>
+            <option value="bridge">Byg lavabroen</option>
+            <option value="crystals">Krystaljagten</option>
+            <option value="runes">Ildens runer</option>
+            <option value="eruption">Vulkanudbrud</option>
+            <option value="princess">Kamp mod krigerprinsessen</option>
+          </select>
+        </label>
+        <label>Alder
+          <input id="age" type="number" min="4" max="18" value="8" required>
+        </label>
+        <button id="start" type="submit" disabled>Start spil</button>
+        <button id="stop" type="button" disabled>Afslut spil</button>
+      </form>
+      <p id="status" role="status" aria-live="polite">Indlæser minispil...</p>
+      <div id="game" aria-label="Minispil"></div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"
+      onerror="document.querySelector('#status').textContent = 'Spilmotoren kunne ikke indlæses. Kontrollér internetforbindelsen og genindlæs siden.'"></script>
+    <script type="module" src="tests/minigames.js"></script>
+  </body>
+</html>
