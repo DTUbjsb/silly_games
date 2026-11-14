@@ -4,8 +4,8 @@ const DRAGON_LIVES = 50;
 const PRINCESS_LIVES = 15;
 const ARROW_SPEED = 600;
 const ARCHER_Y = 562;
-const AIM_ORIGIN = { x: 400, y: ARCHER_Y };
-const ARCHER_X = [135, 665];
+const ARCHER_X = [85, 165];
+const AIM_ORIGIN = { x: (ARCHER_X[0] + ARCHER_X[1]) / 2, y: ARCHER_Y };
 
 export class DragonBattleScene extends Phaser.Scene {
   constructor() {
@@ -38,7 +38,15 @@ export class DragonBattleScene extends Phaser.Scene {
     this.rightPaw = this.targets.create(752, 265, 'dragon-paw').setFlipX(true).setDepth(2);
     this.princess = this.physics.add.sprite(400, 390, 'warrior-princess').setScale(0.7).setDepth(4);
     this.princess.body.setSize(55, 85).setOffset(22, 35);
-    this.sword = this.add.rectangle(0, 0, 12, 72, 0xd8e6e9).setStrokeStyle(3, 0x6a7987).setDepth(5);
+    this.sword = this.add.graphics().setDepth(5);
+    this.sword.fillStyle(0xd8e6e9).lineStyle(2, 0x6a7987)
+      .fillPoints([{ x: 0, y: -36 }, { x: 7, y: -24 }, { x: 7, y: 15 },
+        { x: -7, y: 15 }, { x: -7, y: -24 }], true)
+      .strokePoints([{ x: 0, y: -36 }, { x: 7, y: -24 }, { x: 7, y: 15 },
+        { x: -7, y: 15 }, { x: -7, y: -24 }], true);
+    this.sword.lineStyle(2, 0xffffff).lineBetween(0, -27, 0, 12);
+    this.sword.fillStyle(0x87572f).fillRect(-3, 18, 6, 15);
+    this.sword.fillStyle(0xe3b85e).fillRoundedRect(-13, 14, 26, 6, 2).fillCircle(0, 34, 4);
     this.bows = [];
     this.girls = players.slice(0, 2).map((child, index) => {
       const x = ARCHER_X[index];
@@ -57,7 +65,7 @@ export class DragonBattleScene extends Phaser.Scene {
     this.makeTextures();
     this.arrows = this.physics.add.group({ allowGravity: false });
     this.fireballs = this.physics.add.group({ allowGravity: false });
-    this.physics.add.overlap(this.arrows, this.targets, this.hitDragon, undefined, this);
+    this.physics.add.overlap(this.head, this.arrows, (head, arrow) => this.hitDragon(arrow));
     this.physics.add.overlap(this.princess, this.fireballs, this.hitPrincess, undefined, this);
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.on('pointermove', this.pointBow, this);
@@ -74,7 +82,7 @@ export class DragonBattleScene extends Phaser.Scene {
     this.score = this.add.text(400, 40, '', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '15px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5).setDepth(9);
-    this.add.text(400, 584, 'Mus: sigt fra midten · MELLEMRUM: skyd · Piletaster: flyt prinsessen', {
+    this.add.text(400, 584, 'Mus + MELLEMRUM: skyd hovedet · Piletaster: sværd mod hoved og poter', {
       fontFamily: 'Trebuchet MS, sans-serif', fontSize: '14px', color: '#ffffff',
       backgroundColor: '#191824dd', padding: { x: 6, y: 3 },
     }).setOrigin(0.5).setDepth(9);

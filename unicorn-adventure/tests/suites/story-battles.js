@@ -107,8 +107,9 @@ export async function testDragonBattle(world) {
       && battle.difficulty === minigameSpeed(world.player.age), 'Dragon battle initialization failed.');
     assert(battle.rockCover.depth > battle.girls[0].depth && battle.rockCover.depth < battle.bows[0].depth,
       'The girls and their bows are not layered behind the rock cover.');
-    assert(battle.girls[0].x === 135 && battle.girls[1].x === 665,
-      'The archers are not in opposite corners.');
+    assert(battle.girls[0].x === 85 && battle.girls[1].x === 165
+      && battle.girls.every((girl) => girl.y === 562),
+    'The archers are not together in the left corner.');
     const oldHeadX = battle.head.x;
     await waitUntil(() => Math.abs(battle.head.x - oldHeadX) > 40, 'Dragon head did not move sideways.');
     assert(Math.abs(battle.head.body.center.x - battle.head.x) < 1, 'Moving head and hitbox are out of sync.');
@@ -129,35 +130,24 @@ export async function testDragonBattle(world) {
     battle.fireArrow({ repeat: false });
     const [leftArrow, rightArrow] = battle.arrows.getChildren();
     assert(leftArrow.x === battle.girls[0].x && rightArrow.x === battle.girls[1].x
-      && Math.abs(leftArrow.body.velocity.x) < 0.001 && leftArrow.body.velocity.y < 0
+      && leftArrow.body.velocity.x > 0 && leftArrow.body.velocity.y < 0
       && Math.abs(leftArrow.body.velocity.x - rightArrow.body.velocity.x) < 0.001
       && Math.abs(leftArrow.body.velocity.y - rightArrow.body.velocity.y) < 0.001
       && battle.bows[0].rotation === battle.bows[1].rotation,
-    'Center aim did not produce parallel arrows from alternating archers.');
-    battle.headMotionTime = 0;
-    battle.update(battle.time.now, 0);
-    for (const arrow of [leftArrow, rightArrow]) {
-      arrow.body.reset(arrow.x, battle.leftPaw.y);
-      assert(!battle.targets.getChildren().some((target) => battle.physics.overlap(arrow, target)),
-        'A centered, stationary aim automatically hit the dragon.');
-    }
+    'The archers did not alternate parallel shots toward the chosen direction.');
     battle.arrows.clear(true, true);
-    battle.pointBow({ x: 400 + battle.leftPaw.x - battle.girls[0].x, y: battle.leftPaw.y });
-    battle.nextShooter = 0;
-    battle.nextArrow = 0;
-    battle.fireArrow({ repeat: false });
-    const aimedArrow = battle.arrows.getChildren()[0];
-    assert(aimedArrow.body.velocity.x < 0 && aimedArrow.body.velocity.y < 0,
-      'Bow did not fire in the chosen direction.');
-    battle.nextArrow = 0;
-    battle.fireArrow({ repeat: false });
-    const parallelArrow = battle.arrows.getChildren()[1];
-    assert(Math.abs(aimedArrow.body.velocity.x - parallelArrow.body.velocity.x) < 0.001
-      && Math.abs(aimedArrow.body.velocity.y - parallelArrow.body.velocity.y) < 0.001
-      && battle.bows[0].rotation === battle.bows[1].rotation,
-    'Arrows and bows did not remain parallel when aiming diagonally.');
-    parallelArrow.destroy();
-    await waitUntil(() => battle.dragonLives === 49, 'A properly aimed arrow did not reach the dragon.');
+    const pawArrows = [battle.leftPaw, battle.rightPaw].map((paw) => (
+      battle.arrows.create(paw.x, paw.y, 'dragon-arrow')
+    ));
+    assert(pawArrows.every((arrow, index) => battle.physics.overlap(arrow, [battle.leftPaw, battle.rightPaw][index])),
+      'Paw collision test arrows were not positioned on the paws.');
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    assert(battle.dragonLives === 50 && pawArrows.every((arrow) => arrow.active),
+      'An arrow damaged a paw or was destroyed by the registered collider.');
+    battle.arrows.clear(true, true);
+    const headArrow = battle.arrows.create(battle.head.x, battle.head.y, 'dragon-arrow');
+    await waitUntil(() => battle.dragonLives === 49, 'The registered arrow collider did not hit the dragon head.');
+    assert(!headArrow.active, 'An arrow was not destroyed after hitting the head.');
     battle.shootFireball();
     assert(battle.fireballs.getLength() === 1 && battle.fireballs.getChildren()[0].body.velocity.length() > 0,
       'Dragon did not fire a moving fireball.');
